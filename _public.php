@@ -657,9 +657,9 @@ class zcfsTemplate
 
 	public static function FeedsEntriesCount($a)
 	{
-		$none = 'no entries';
-		$one = 'one entry';
-		$more = '%d entries';
+		$none = __('no entries');
+		$one = __('one entry');
+		$more = __('%d entries');
 
 		if (isset($a['none'])) {
 			$none = addslashes($a['none']);
@@ -732,4 +732,16 @@ class zcfsTemplate
 				return '&&';
 		}
 	}
+}
+
+$core->addBehavior('publicBreadcrumb',array('extZcfeeds','publicBreadcrumb'));
+
+class extZcfeeds
+{
+    public static function publicBreadcrumb($context,$separator)
+    {
+        if ($context == 'zoneclearFeedsPage') {
+            return __('List of feeds');
+        }
+    }
 }

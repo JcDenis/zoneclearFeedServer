@@ -24,12 +24,12 @@ $this->registerModule(
 	/* Author */
 	"Jean-Christian Denis, BG, Pierre Van Glabeke",
 	/* Version */
-	'2015.04.25',
+	'2015.07.19',
 	/* Properies */
 	array(
 		'permissions' => 'admin',
 		'type' => 'plugin',
-		'dc_min' => '2.7',
+		'dc_min' => '2.8',
 		'support' => 'http://forum.dotclear.org/viewtopic.php?pid=331158',
 		'details' => 'http://plugins.dotaddict.org/dc2/details/zoneclearFeedServer'
 	)

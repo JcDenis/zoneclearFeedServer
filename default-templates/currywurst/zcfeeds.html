@@ -36,9 +36,6 @@
 <tpl:Block name="body-tag"><body class="dc-zcfeeds"></tpl:Block>
 
 <tpl:Block name="main-content">
-
-<div id="main" role="main">
-
   <tpl:zcFeeds sortby="name" order="asc">
   <tpl:zcFeedsHeader>
   <div id="content-info">
@@ -47,7 +44,7 @@
   </div>
   </tpl:zcFeedsHeader>
   
-    <div id="p{{tpl:zcFeedID}}" class="post {{tpl:zcFeedIfOdd}} {{tpl:zcFeedIfFirst}}" lang="{{tpl:zcFeedLang}}" xml:lang="{{tpl:zcFeedLang}}">
+    <div id="p{{tpl:zcFeedID}}" class="post {{tpl:zcFeedIfOdd}} {{tpl:zcFeedIfFirst}}" lang="{{tpl:zcFeedLang}}" role="article">
     
     <h2 class="post-title">{{tpl:zcFeedName encode_html="1"}}</h2>
     

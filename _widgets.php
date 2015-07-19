@@ -79,12 +79,7 @@ class zoneclearFeedServerWidget
 			10,
 			'text'
 		);
-		$w->zcfssource->setting(
-			'pagelink',
-			__('Add link to feeds page'),
-			1,
-			'check'
-		);
+		$w->zcfssource->setting('pagelink',__('Link to the list of sources:'),__('All sources'));
 		$w->zcfssource->setting(
 			'homeonly',
 			__('Display on:'),
@@ -96,17 +91,8 @@ class zoneclearFeedServerWidget
 				__('Except on home page') => 2
 			)
 		);
-		$w->zcfssource->setting(
-			'content_only',
-			__('Content only'),
-			0,
-			'check'
-		);
-		$w->zcfssource->setting(
-			'class',
-			__('CSS class:'),
-			''
-		);
+		$w->zcfssource->setting('content_only',__('Content only'),0,'check');
+		$w->zcfssource->setting('class',__('CSS class:'),'');
 		$w->zcfssource->setting('offline',__('Offline'),0,'check');
 	}
 
@@ -228,13 +214,14 @@ class zoneclearFeedServerWidget
 			$i++;
 		}
 
-		if ($w->pagelink) {
-			$res .= '<li><a href="'.$core->blog->url.$core->url->getBase('zoneclearFeedsPage').'">'.__('All sources').'</a></li>';
-		}
-
 		$res =
 		($w->title ? $w->renderTitle(html::escapeHTML($w->title)) : '').
     '<ul>'.$res.'</ul>';
+
+		if ($w->pagelink) {
+			$res .= '<p><strong><a href="'.$core->blog->url.$core->url->getBase('zoneclearFeedsPage').'">'.
+      html::escapeHTML($w->pagelink).'</a></strong></p>';
+		}
 
 		return $w->renderDiv($w->content_only,'zoneclear-sources '.$w->class,'',$res);
 	}

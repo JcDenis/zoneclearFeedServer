@@ -3,6 +3,13 @@ zoneclearFeedServer xxxx.xx.xx
  * Added plugin muppet support (request Mathieu M.)
  * Added log for errors
 
+zoneclearFeedServer 2015.07.19 - Pierre Van Glabeke
+ * modif lien vers tous les flux
+ * héritage thème mustek
+ * ajout breadcrumb
+ * localisation
+ * dc2.8 requis
+
 zoneclearFeedServer 2015.04.25 - Pierre Van Glabeke
  * modif nom dans liste des plugins
  * modif html5 pour validation

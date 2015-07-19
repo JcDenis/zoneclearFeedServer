@@ -1,25 +1,28 @@
-<!DOCTYPE html>
-<html lang="{{tpl:BlogLanguage}}">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="ROBOTS" content="{{tpl:BlogMetaRobots}}" />
+{{tpl:extends parent="__layout.html"}}
 
-  <title>{{tpl:lang List of feeds}} - {{tpl:BlogName encode_html="1"}}</title>
-  <meta name="description" lang="{{tpl:BlogLanguage}}" content="{{tpl:BlogDescription cut_string="180" encode_html="1"}}" />
-  <meta name="copyright" content="{{tpl:BlogCopyrightNotice encode_html="1"}}" />
-  <meta name="author" content="{{tpl:BlogEditor encode_html="1"}}" />
-  <meta name="date" content="{{tpl:BlogUpdateDate iso8601="1"}}" />
+<tpl:Block name="head-title">
+	<title>{{tpl:lang List of feeds}} - {{tpl:BlogName encode_html="1"}}</title>
+</tpl:Block>
 
-  <meta property="dc.title" lang="{{tpl:BlogLanguage}}" content="{{tpl:lang List of feeds}} - {{tpl:BlogName encode_html="1"}}" />
-  <meta property="dc.description" lang="{{tpl:BlogLanguage}}" content="{{tpl:BlogDescription encode_html="1"}}" />
-  <meta property="dc.language" content="{{tpl:BlogLanguage}}" />
-  <meta property="dc.publisher" content="{{tpl:BlogEditor encode_html="1"}}" />
-  <meta property="dc.rights" content="{{tpl:BlogCopyrightNotice encode_html="1"}}" />
-  <meta property="dc.date" content="{{tpl:BlogUpdateDate iso8601="1"}}" />
-  <meta property="dc.type" content="text" />
-  <meta property="dc.format" content="text/html" />
+<tpl:Block name="meta-robots">
+	<meta name="ROBOTS" content="{{tpl:BlogMetaRobots}}" />
+</tpl:Block>
 
-  <link rel="contents" href="{{tpl:BlogArchiveURL}}" title="{{tpl:lang Archives}}" />
+<tpl:Block name="meta-entry">
+	<meta name="description" lang="{{tpl:BlogLanguage}}" content="{{tpl:BlogDescription encode_html="1" cut_string="180"}}" />
+	<meta name="author" content="{{tpl:BlogEditor encode_html="1"}}" />
+	<meta name="date" content="{{tpl:BlogUpdateDate iso8601="1"}}" />
+</tpl:Block>
+
+<tpl:Block name="dc-entry">
+	<meta property="dc.title" lang="{{tpl:BlogLanguage}}" content="{{tpl:lang List of feeds}} - {{tpl:BlogName encode_html="1"}}" />
+	<meta property="dc.description" lang="{{tpl:BlogLanguage}}" content="{{tpl:BlogDescription remove_html="1"}}" />
+	<meta property="dc.language" content="{{tpl:BlogLanguage}}" />
+	<meta property="dc.date" content="{{tpl:BlogUpdateDate iso8601="1"}}" />
+</tpl:Block>
+
+<tpl:Block name="head-linkrel">
+	<link rel="contents" href="{{tpl:BlogArchiveURL}}" title="{{tpl:lang Archives}}" />
 
   <tpl:Categories>
   <link rel="section" href="{{tpl:CategoryURL}}" title="{{tpl:CategoryTitle encode_html="1"}}" />
@@ -28,20 +31,11 @@
   <link rel="alternate" type="application/atom+xml" title="Atom 1.0" href="{{tpl:BlogFeedURL type="atom"}}" />
   <link rel="EditURI" type="application/rsd+xml" title="RSD" href="{{tpl:BlogRSDURL}}" />
   <link rel="meta" type="application/xbel+xml" title="Blogroll" href="{{tpl:BlogrollXbelLink}}" />
+</tpl:Block>
 
-  {{tpl:include src="_head.html"}}
-</head>
+<tpl:Block name="body-tag"><body class="dc-zcfeeds"></tpl:Block>
 
-<body class="dc-zcfeeds">
-<div id="page">
-
-{{tpl:include src="_top.html"}}
-
-<div id="wrapper">
-
-<div id="main" role="main">
-  <div id="content">
-
+<tpl:Block name="main-content">
   <tpl:zcFeeds sortby="name" order="asc">
   <tpl:zcFeedsHeader>
   <div id="content-info">
@@ -49,7 +43,8 @@
     <p>{{tpl:zcFeedsCount}} - {{tpl:zcFeedsEntriesCount}}</p>
   </div>
   </tpl:zcFeedsHeader>
-    <div id="p{{tpl:zcFeedID}}" class="post {{tpl:zcFeedIfOdd}} {{tpl:zcFeedIfFirst}}" lang="{{tpl:zcFeedLang}}" xml:lang="{{tpl:zcFeedLang}}">
+  
+    <div id="p{{tpl:zcFeedID}}" class="post {{tpl:zcFeedIfOdd}} {{tpl:zcFeedIfFirst}}" lang="{{tpl:zcFeedLang}}" role="article">
 
     <h2 class="post-title">{{tpl:zcFeedName encode_html="1"}}</h2>
 
@@ -66,22 +61,4 @@
 
     </div>
   </tpl:zcFeeds>
-  </div>
-</div> <!-- End #main -->
-
-<div id="sidebar" role="complementary">
-  <div id="blognav">
-    {{tpl:Widgets type="nav"}}
-  </div> <!-- End #blognav -->
-
-  <div id="blogextra">
-    {{tpl:Widgets type="extra"}}
-  </div> <!-- End #blogextra -->
-</div>
-
-</div> <!-- End #wrapper -->
-
-{{tpl:include src="_footer.html"}}
-</div> <!-- End #page -->
-</body>
-</html>
+</tpl:Block>
