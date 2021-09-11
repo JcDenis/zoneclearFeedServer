@@ -1,0 +1,12 @@
+<modules xmlns:da="http://dotaddict.org/da/">
+<module id="zoneclearFeedServer">
+<name>zoneclearFeedServer</name>
+<version>2015.07.19</version>
+<author>Jean-Christian Denis, BG, Pierre Van Glabeke</author>
+<desc>Mix your blog with a feeds planet</desc>
+<file>https://github.com/JcDenis/zoneclearFeedServer/releases/download/v2015.07.19/plugin-zoneclearFeedServer.zip</file>
+<da:dcmin>2.19</da:dcmin>
+<da:details>https://plugins.dotaddict.org/dc2/details/pacKman</da:details>
+<da:support>https://github.com/JcDenis/zoneclearFeedServer</da:support>
+</module>
+</modules>
