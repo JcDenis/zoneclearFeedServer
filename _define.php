@@ -1,36 +1,31 @@
 <?php
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of zoneclearFeedServer, a plugin for Dotclear 2.
-# 
-# Copyright (c) 2009-2015 Jean-Christian Denis and contributors
-# 
-# Licensed under the GPL version 2.0 license.
-# A copy of this license is available in LICENSE file or at
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief zoneclearFeedServer, a plugin for Dotclear 2
+ * 
+ * @package Dotclear
+ * @subpackage Plugin
+ * 
+ * @author Jean-Christian Denis, BG, Pierre Van Glabeke
+ * 
+ * @copyright Jean-Christian Denis
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 if (!defined('DC_RC_PATH')) {
-
-	return null;
+    return null;
 }
 
 $this->registerModule(
-	/* Name */
-	"zoneclearFeedServer",
-	/* Description*/
-	"Mix your blog with a feeds planet",
-	/* Author */
-	"Jean-Christian Denis, BG, Pierre Van Glabeke",
-	/* Version */
-	'2015.07.19',
-	/* Properies */
-	array(
-		'permissions' => 'admin',
-		'type' => 'plugin',
-		'dc_min' => '2.8',
-		'support' => 'http://forum.dotclear.org/viewtopic.php?pid=331158',
-		'details' => 'http://plugins.dotaddict.org/dc2/details/zoneclearFeedServer'
-	)
+    'zoneclearFeedServer',
+    'Mix your blog with a feeds planet',
+    'Jean-Christian Denis, BG, Pierre Van Glabeke',
+    '2015.07.19',
+    [
+        'requires' => [['core', '2.19']],
+        'permissions'   => 'admin',
+        'type'          => 'plugin',
+        'support'       => 'https://github.com/JcDenis/zoneclearFeedServer',
+        'details'       => 'https://plugins.dotaddict.org/dc2/details/pacKman',
+        'repository' => 'https://raw.githubusercontent.com/JcDenis/zoneclearFeedServer/master/dcstore.xml'
+    ]
 );

@@ -1,25 +1,25 @@
 <?php
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of zoneclearFeedServer, a plugin for Dotclear 2.
-# 
-# Copyright (c) 2009-2015 Jean-Christian Denis and contributors
-# 
-# Licensed under the GPL version 2.0 license.
-# A copy of this license is available in LICENSE file or at
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief zoneclearFeedServer, a plugin for Dotclear 2
+ * 
+ * @package Dotclear
+ * @subpackage Plugin
+ * 
+ * @author Jean-Christian Denis, BG, Pierre Van Glabeke
+ * 
+ * @copyright Jean-Christian Denis
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 if (!defined('DC_RC_PATH')) {
 
-	return null;
+    return null;
 }
 
 if ($core->getVersion('zoneclearFeedServer') != 
     $core->plugins->moduleInfo('zoneclearFeedServer', 'version')) {
 
-	return null;
+    return null;
 }
 
 $d = dirname(__FILE__).'/inc/';
@@ -32,24 +32,24 @@ $__autoload['zcfsDefaultFeedsActions'] = $d.'class.zcfs.feedsactions.php';
 
 # public url for page of description of the flux
 $core->url->register(
-	'zoneclearFeedsPage',
-	'zcfeeds',
-	'^zcfeeds(.*?)$',
-	array('zcfsUrlHandler', 'zcFeedsPage')
+    'zoneclearFeedsPage',
+    'zcfeeds',
+    '^zcfeeds(.*?)$',
+    array('zcfsUrlHandler', 'zcFeedsPage')
 );
-
+/*
 # Add to plugn soCialMe (writer part)
 $__autoload['zcfsSoCialMeWriter'] = $d.'lib.zcfs.socialmewriter.php';
 $core->addBehavior(
-	'soCialMeWriterMarker',
-	array('zcfsSoCialMeWriter', 'soCialMeWriterMarker')
+    'soCialMeWriterMarker',
+    array('zcfsSoCialMeWriter', 'soCialMeWriterMarker')
 );
 $core->addBehavior(
-	'zoneclearFeedServerAfterFeedUpdate',
-	array('zcfsSoCialMeWriter', 'zoneclearFeedServerAfterFeedUpdate')
+    'zoneclearFeedServerAfterFeedUpdate',
+    array('zcfsSoCialMeWriter', 'zoneclearFeedServerAfterFeedUpdate')
 );
-
+//*/
 # Add to report on plugin activityReport
 if (defined('ACTIVITY_REPORT')) {
-	require_once $d.'lib.zcfs.activityreport.php';
+    require_once $d.'lib.zcfs.activityreport.php';
 }

@@ -13,5 +13,5 @@
 
 if (!isset($__resources['help']['zoneclearFeedServer']))
 {
-	$__resources['help']['zoneclearFeedServer'] = dirname(__FILE__).'/help/zoneclearFeedServer.html';
+    $__resources['help']['zoneclearFeedServer'] = dirname(__FILE__).'/help/zoneclearFeedServer.html';
 }
