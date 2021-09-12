@@ -15,14 +15,14 @@ class zcfsFeedsActionsPage extends dcActionsPage
 {
     public $zcfs;
 
-    public function __construct(dcCore $core, $uri, $redirect_args=array())
+    public function __construct(dcCore $core, $uri, $redirect_args = [])
     {
         $this->zcfs = new zoneclearFeedServer($core);
 
         parent::__construct($core, $uri, $redirect_args);
-        $this->redirect_fields = array(
+        $this->redirect_fields = [
             'sortby', 'order', 'page', 'nb'
-        );
+        ];
         $this->field_entries = 'feeds';
         $this->caller_title = __('Feeds');
         $this->loadDefaults();
@@ -34,39 +34,39 @@ class zcfsFeedsActionsPage extends dcActionsPage
         $this->core->callBehavior('zcfsFeedsActionsPage', $this->core, $this);
     }
 
-    public function beginPage($breadcrumb='', $head='')
+    public function beginPage($breadcrumb = '', $head = '')
     {
         echo 
-        '<html><head><title>'.__('Feeds server').'</title>'.
-        dcPage::jsLoad('js/_posts_actions.js').
-        $head.
-        '</script></head><body>'.
-        $breadcrumb.
-        '<p><a class="back" href="'.$this->getRedirection(true).'">'.
-        __('Back to feeds list').'</a></p>';
+        '<html><head><title>' . __('Feeds server') . '</title>' .
+        dcPage::jsLoad('js/_posts_actions.js') .
+        $head .
+        '</script></head><body>' .
+        $breadcrumb .
+        '<p><a class="back" href="' . $this->getRedirection(true) . '">' .
+        __('Back to feeds list') . '</a></p>';
     }
 
     public function endPage()
     {
-        echo 
-        '</body></html>';
+        echo '</body></html>';
     }
 
     public function error(Exception $e)
     {
         $this->core->error->add($e->getMessage());
-        $this->beginPage(dcPage::breadcrumb(array(
-            html::escapeHTML($this->core->blog->name) => '',
-            $this->getCallerTitle() => $this->getRedirection(true),
-            __('Feeds actions') => ''
-        )));
+        $this->beginPage(
+            dcPage::breadcrumb([
+                html::escapeHTML($this->core->blog->name) => '',
+                $this->getCallerTitle() => $this->getRedirection(true),
+                __('Feeds actions') => ''
+            ])
+        );
         $this->endPage();
     }
 
     protected function fetchEntries($from)
     {
         if (!empty($from['feeds'])) {
-
             $params['feed_id'] = $from['feeds'];
 
             $feeds = $this->zcfs->getFeeds($params);
@@ -74,11 +74,9 @@ class zcfsFeedsActionsPage extends dcActionsPage
                 $this->entries[$feeds->feed_id] = $feeds->feed_name;
             }
             $this->rs = $feeds;
-        }
-        else {
+        } else {
             $this->rs = $this->core->con->select(
-                "SELECT blog_id FROM ".
-                $this->core->prefix."blog WHERE false"
+                "SELECT blog_id FROM " . $this->core->prefix . "blog WHERE false"
             );
         }
     }
@@ -95,36 +93,36 @@ class zcfsDefaultFeedsActions
     public static function zcfsFeedsActionsPage(dcCore $core, zcfsFeedsActionsPage $ap)
     {
         $ap->addAction(
-            array(__('Change category') => 'changecat'),
-            array('zcfsDefaultFeedsActions', 'doChangeCategory')
+            [__('Change category') => 'changecat'],
+            ['zcfsDefaultFeedsActions', 'doChangeCategory']
         );
         $ap->addAction(
-            array(__('Change update interval') => 'changeint'),
-            array('zcfsDefaultFeedsActions', 'doChangeInterval')
+            [__('Change update interval') => 'changeint'],
+            ['zcfsDefaultFeedsActions', 'doChangeInterval']
         );
         $ap->addAction(
-            array(__('Disable feed update') => 'disablefeed'),
-            array('zcfsDefaultFeedsActions', 'doEnableFeed')
+            [__('Disable feed update') => 'disablefeed'],
+            ['zcfsDefaultFeedsActions', 'doEnableFeed']
         );
         $ap->addAction(
-            array(__('Enable feed update') => 'enablefeed'),
-            array('zcfsDefaultFeedsActions', 'doEnableFeed')
+            [__('Enable feed update') => 'enablefeed'],
+            ['zcfsDefaultFeedsActions', 'doEnableFeed']
         );
         $ap->addAction(
-            array(__('Reset last update') => 'resetupdlast'),
-            array('zcfsDefaultFeedsActions', 'doResetUpdate')
+            [__('Reset last update') => 'resetupdlast'],
+            ['zcfsDefaultFeedsActions', 'doResetUpdate']
         );
         $ap->addAction(
-            array(__('Update (check) feed') => 'updatefeed'),
-            array('zcfsDefaultFeedsActions', 'doUpdateFeed')
+            [__('Update (check) feed') => 'updatefeed'],
+            ['zcfsDefaultFeedsActions', 'doUpdateFeed']
         );
         $ap->addAction(
-            array(__('Delete related posts') => 'deletepost'),
-            array('zcfsDefaultFeedsActions', 'doDeletePost')
+            [__('Delete related posts') => 'deletepost'],
+            ['zcfsDefaultFeedsActions', 'doDeletePost']
         );
         $ap->addAction(
-            array(__('Delete feed (without related posts)') => 'deletefeed'),
-            array('zcfsDefaultFeedsActions', 'doDeleteFeed')
+            [__('Delete feed (without related posts)') => 'deletefeed'],
+            ['zcfsDefaultFeedsActions', 'doDeleteFeed']
         );
     }
 
@@ -162,13 +160,13 @@ class zcfsDefaultFeedsActions
 
     public static function doDeletePost(dcCore $core, zcfsFeedsActionsPage $ap, $post)
     {
-        $types = array(
+        $types = [
             'zoneclearfeed_url',
             'zoneclearfeed_author',
             'zoneclearfeed_site',
             'zoneclearfeed_sitename',
             'zoneclearfeed_id'
-        );
+        ];
 
         $ids = $ap->getIDs();
 
@@ -178,17 +176,17 @@ class zcfsDefaultFeedsActions
 
         foreach($ids as $id) {
 
-            $posts = $ap->zcfs->getPostsByFeed(array(
+            $posts = $ap->zcfs->getPostsByFeed([
                 'feed_id' => $id
-            ));
+            ]);
 
             while($posts->fetch()) {
 
                 $core->blog->delPost($posts->post_id);
                 $core->con->execute(
-                    'DELETE FROM '.$core->prefix.'meta '.
-                    'WHERE post_id = '.$posts->post_id.' '.
-                    'AND meta_type '.$core->con->in($types).' '
+                    'DELETE FROM ' . $core->prefix . 'meta ' .
+                    'WHERE post_id = ' . $posts->post_id . ' ' .
+                    'AND meta_type ' . $core->con->in($types) . ' '
                 );
             }
         }
@@ -297,31 +295,28 @@ class zcfsDefaultFeedsActions
                 count($ids)
             ));
             $ap->redirect(true);
-        }
-        else {
-
+        } else {
             $categories_combo = dcAdminCombos::getCategoriesCombo(
                 $core->blog->getCategories()
             );
 
             $ap->beginPage(
-                dcPage::breadcrumb(
-                    array(
+                dcPage::breadcrumb([
                         html::escapeHTML($core->blog->name) => '',
                         __('Feeds server') => '',
                         $ap->getCallerTitle() => $ap->getRedirection(true),
                         __('Change category for this selection') => ''
-            )));
+            ]));
 
             echo
-            '<form action="'.$ap->getURI().'" method="post">'.
-            $ap->getCheckboxes().
-            '<p><label for="upd_cat_id" class="classic">'.__('Category:').'</label> '.
-            form::combo(array('upd_cat_id'), $categories_combo, '').
-            $core->formNonce().
-            $ap->getHiddenFields().
-            form::hidden(array('action'), 'changecat').
-            '<input type="submit" value="'.__('Save').'" /></p>'.
+            '<form action="' . $ap->getURI() . '" method="post">' .
+            $ap->getCheckboxes() .
+            '<p><label for="upd_cat_id" class="classic">' . __('Category:') . '</label> ' .
+            form::combo(['upd_cat_id'], $categories_combo, '') .
+            $core->formNonce() .
+            $ap->getHiddenFields() .
+            form::hidden(['action'], 'changecat') . 
+            '<input type="submit" value="' . __('Save') . '" /></p>' .
             '</form>';
 
             $ap->endPage();
@@ -359,22 +354,22 @@ class zcfsDefaultFeedsActions
 
             $ap->beginPage(
                 dcPage::breadcrumb(
-                    array(
+                    [
                         html::escapeHTML($core->blog->name) => '',
                         __('Feeds server') => '',
                         $ap->getCallerTitle() => $ap->getRedirection(true),
                         __('Change update frequency for this selection') => ''
-            )));
+            ]));
 
             echo
-            '<form action="'.$ap->getURI().'" method="post">'.
-            $ap->getCheckboxes().
-            '<p><label for="upd_upd_int" class="classic">'.__('Frequency:').'</label> '.
-            form::combo(array('upd_upd_int'), $ap->zcfs->getAllUpdateInterval(), '').
-            $core->formNonce().
-            $ap->getHiddenFields().
-            form::hidden(array('action'), 'changeint').
-            '<input type="submit" value="'.__('Save').'" /></p>'.
+            '<form action="' . $ap->getURI() . '" method="post">' .
+            $ap->getCheckboxes() .
+            '<p><label for="upd_upd_int" class="classic">' . __('Frequency:') . '</label> ' .
+            form::combo(['upd_upd_int'], $ap->zcfs->getAllUpdateInterval(), '') .
+            $core->formNonce() .
+            $ap->getHiddenFields() .
+            form::hidden(['action'], 'changeint') .
+            '<input type="submit" value="' . __('Save') . '" /></p>' .
             '</form>';
 
             $ap->endPage();

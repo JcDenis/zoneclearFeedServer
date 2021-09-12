@@ -2,10 +2,9 @@
 - [ ] fix Dotclear 2.19 compatibility
 - [ ] fix php7.3+ php8.0 compatibility
 - [ ] clean up code
-- [ ] fix license
+- [x] fix license
 - [ ] fix translations
-- [ ] remove all SoCialMe feature as this plugin is dead
-- [ ] add asynchronous update of for feeds
+- [x] remove all SoCialMe feature as this plugin is dead
 - [ ] fix disallow self blog feeds
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors

@@ -28,7 +28,7 @@ $core->url->register(
     'zoneclearFeedsPage',
     'zcfeeds',
     '^zcfeeds(.*?)$',
-    array('zcfsUrlHandler', 'zcFeedsPage')
+    ['zcfsUrlHandler', 'zcFeedsPage']
 );
 
 // Add to report on plugin activityReport

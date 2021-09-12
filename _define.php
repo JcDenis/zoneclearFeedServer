@@ -16,7 +16,7 @@ if (!defined('DC_RC_PATH')) {
 }
 
 $this->registerModule(
-    'zoneclearFeedServer',
+    'Feeds server',
     'Mix your blog with a feeds planet',
     'Jean-Christian Denis, BG, Pierre Van Glabeke',
     '2015.07.19',
