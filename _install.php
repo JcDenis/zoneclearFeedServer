@@ -12,21 +12,19 @@
  */
 
 if (!defined('DC_CONTEXT_ADMIN')) {
-
     return null;
-}
+} 
 
-$dc_min = '2.7';
 $mod_id = 'zoneclearFeedServer';
+$dc_min = $this->modules[$mod_id]['requires'][0][1];
 
 try {
     # Check module version
     if (version_compare(
         $core->getVersion($mod_id),
-        $core->plugins->moduleInfo($mod_id, 'version'),
+        $this->moduleInfo($mod_id, 'version'),
         '>='
     )) {
-
         return null;
     }
 
@@ -41,26 +39,26 @@ try {
     # Tables
     $t = new dbStruct($core->con, $core->prefix);
     $t->zc_feed
-        ->feed_id ('bigint', 0, false)
-        ->feed_creadt ('timestamp', 0, false, 'now()')
-        ->feed_upddt ('timestamp', 0, false, 'now()')
-        ->feed_type ('varchar', 32, false, "'feed'")
-        ->blog_id ('varchar', 32, false)
-        ->cat_id ('bigint', 0, true)
-        ->feed_upd_int ('integer', 0, false, 3600)
-        ->feed_upd_last ('integer', 0, false, 0)
-        ->feed_status ('smallint', 0, false, 0)
-        ->feed_name ('varchar', 255, false)
-        ->feed_desc ('text', 0, true) //!pgsql reserved 'desc'
-        ->feed_url ('varchar', 255, false)
-        ->feed_feed ('varchar', 255, false)
-        ->feed_tags ('varchar', 255, true)
-        ->feed_get_tags ('smallint', 0, false, 1)
-        ->feed_owner ('varchar', 255, false)
-        ->feed_tweeter ('varchar', 64, false) // tweeter ident
-        ->feed_lang ('varchar', 5, true)
-        ->feed_nb_out ('integer', 0, false, 0)
-        ->feed_nb_in ('integer', 0, false, 0)
+        ->feed_id('bigint', 0, false)
+        ->feed_creadt('timestamp', 0, false, 'now()')
+        ->feed_upddt('timestamp', 0, false, 'now()')
+        ->feed_type('varchar', 32, false, "'feed'")
+        ->blog_id('varchar', 32, false)
+        ->cat_id('bigint', 0, true)
+        ->feed_upd_int('integer', 0, false, 3600)
+        ->feed_upd_last('integer', 0, false, 0)
+        ->feed_status('smallint', 0, false, 0)
+        ->feed_name('varchar', 255, false)
+        ->feed_desc('text', 0, true) //!pgsql reserved 'desc'
+        ->feed_url('varchar', 255, false)
+        ->feed_feed('varchar', 255, false)
+        ->feed_tags('varchar', 255, true)
+        ->feed_get_tags('smallint', 0, false, 1)
+        ->feed_owner('varchar', 255, false)
+        ->feed_tweeter('varchar', 64, false) // tweeter ident
+        ->feed_lang('varchar', 5, true)
+        ->feed_nb_out('integer', 0, false, 0)
+        ->feed_nb_in('integer', 0, false, 0)
 
         ->primary('pk_zcfs', 'feed_id')
         ->index('idx_zcfs_type', 'btree', 'feed_type')
@@ -86,12 +84,10 @@ try {
     # Set module version
     $core->setVersion(
         $mod_id,
-        $core->plugins->moduleInfo($mod_id, 'version')
+        $this->moduleInfo($mod_id, 'version')
     );
-
     return true;
-}
-catch (Exception $e) {
+} catch (Exception $e) {
     $core->error->add($e->getMessage());
 
     return false;
