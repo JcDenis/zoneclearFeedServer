@@ -12,17 +12,16 @@
  */
 
 if (!defined('DC_RC_PATH')) {
-
     return null;
 }
 
 $core->addBehavior(
     'initWidgets',
-    array('zoneclearFeedServerWidget', 'adminSource')
+    ['zoneclearFeedServerWidget', 'adminSource']
 );
 $core->addBehavior(
     'initWidgets',
-    array('zoneclearFeedServerWidget', 'adminNumber')
+    ['zoneclearFeedServerWidget', 'adminNumber']
 );
 
 /**
@@ -39,61 +38,54 @@ class zoneclearFeedServerWidget
      */
     public static function adminSource($w)
     {
-        $w->create(
-            'zcfssource',
-            __('Feeds server: sources'),
-            array('zoneclearFeedServerWidget', 'publicSource'),
-            null,
-            __('List sources of feeds')
-        );
-        $w->zcfssource->setting(
-            'title',
-            __('Title:'),
-            __('Feeds sources'),
-            'text'
-        );
-        $w->zcfssource->setting(
-            'sortby',
-            __('Order by:'),
-            'feed_upd_last',
-            'combo',
-            array(
-                __('Last update')    => 'feed_upd_last',
-                __('Name')        => 'lowername',
-                __('Create date')    => 'feed_creadt'
+        $w
+            ->create(
+                'zcfssource',
+                __('Feeds server: sources'),
+                ['zoneclearFeedServerWidget', 'publicSource'],
+                null,
+                __('List sources of feeds')
             )
-        );
-        $w->zcfssource->setting(
-            'sort',
-            __('Sort:'),
-            'desc',
-            'combo',
-            array(
-                __('Ascending')    => 'asc',
-                __('Descending')    => 'desc'
+            ->addTitle(
+                __('Feeds sources'),
             )
-        );
-        $w->zcfssource->setting(
-            'limit',
-            __('Limit:'),
-            10,
-            'text'
-        );
-        $w->zcfssource->setting('pagelink',__('Link to the list of sources:'),__('All sources'));
-        $w->zcfssource->setting(
-            'homeonly',
-            __('Display on:'),
-            0,
-            'combo',
-            array(
-                __('All pages') => 0,
-                __('Home page only') => 1,
-                __('Except on home page') => 2
+           ->setting(
+                'sortby',
+                __('Order by:'),
+                'feed_upd_last',
+                'combo',
+                [
+                    __('Last update') => 'feed_upd_last',
+                    __('Name') => 'lowername',
+                    __('Create date') => 'feed_creadt'
+                ]
             )
-        );
-        $w->zcfssource->setting('content_only',__('Content only'),0,'check');
-        $w->zcfssource->setting('class',__('CSS class:'),'');
-        $w->zcfssource->setting('offline',__('Offline'),0,'check');
+            ->setting(
+                'sort',
+                __('Sort:'),
+                'desc',
+                'combo',
+                [
+                    __('Ascending') => 'asc',
+                    __('Descending') => 'desc'
+                ]
+            )
+            ->setting(
+                'limit',
+                __('Limit:'),
+                10,
+                'text'
+            )
+            ->setting(
+                'pagelink',
+                __('Link to the list of sources:'),
+                __('All sources'),
+                'text'
+            )
+            ->addHomeOnly()
+            ->addContentOnly()
+            ->addClass()
+            ->addOffline();
     }
 
     /**
@@ -103,71 +95,51 @@ class zoneclearFeedServerWidget
      */
     public static function adminNumber($w)
     {
-        $w->create(
-            'zcfsnumber',
-            __('Feeds server: numbers'),
-            array('zoneclearFeedServerWidget', 'publicNumber'),
-            null,
-            __('Show some numbers about feeds')
-        );
-        $w->zcfsnumber->setting(
-            'title',
-            __('Title:')
-            ,__('Feeds numbers'),
-            'text'
-        );
-
-        # Feed
-        $w->zcfsnumber->setting(
-            'feed_show',
-            __('Show feeds count'),
-            1,
-            'check'
-        );
-        $w->zcfsnumber->setting(
-            'feed_title',
-            __('Title for feeds count:'),
-            __('Feeds:'),
-            'text'
-        );
-
-        # Entry
-        $w->zcfsnumber->setting(
-            'entry_show',
-            __('Show entries count'),
-            1,
-            'check'
-        );
-        $w->zcfsnumber->setting(
-            'entry_title',
-            __('Title for entries count:'),
-            __('Entries:'),
-            'text'
-        );
-
-        $w->zcfsnumber->setting(
-            'homeonly',
-            __('Display on:'),
-            0,
-            'combo',
-            array(
-                __('All pages') => 0,
-                __('Home page only') => 1,
-                __('Except on home page') => 2
+        $w
+            ->create(
+                'zcfsnumber',
+                __('Feeds server: numbers'),
+                ['zoneclearFeedServerWidget', 'publicNumber'],
+                null,
+                __('Show some numbers about feeds')
             )
-        );
-        $w->zcfsnumber->setting(
-            'content_only',
-            __('Content only'),
-            0,
-            'check'
-        );
-        $w->zcfsnumber->setting(
-            'class',
-            __('CSS class:'),
-            ''
-        );
-        $w->zcfsnumber->setting('offline',__('Offline'),0,'check');
+            ->addTitle(
+                __('Feeds numbers'),
+            )
+            ->setting(
+                'title',
+                __('Title:')
+                ,__('Feeds numbers'),
+                'text'
+            )
+            ->setting(
+                'feed_show',
+                __('Show feeds count'),
+                1,
+                'check'
+            )
+            ->setting(
+                'feed_title',
+                __('Title for feeds count:'),
+                __('Feeds:'),
+                'text'
+            )
+            ->setting(
+                'entry_show',
+                __('Show entries count'),
+                1,
+                'check'
+            )
+            ->setting(
+                'entry_title',
+                __('Title for entries count:'),
+                __('Entries:'),
+                'text'
+            )
+            ->addHomeOnly()
+            ->addContentOnly()
+            ->addClass()
+            ->addOffline();
     }
 
     /**
@@ -179,19 +151,20 @@ class zoneclearFeedServerWidget
     {
         global $core;
 
-        if ($w->offline)
-            return;
+        if ($w->offline) {
+            return null;
+        }
 
         if (!$core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active 
-         || $w->homeonly == 1 && $core->url->type != 'default' 
-         || $w->homeonly == 2 && $core->url->type == 'default'
+            || $w->homeonly == 1 && !$core->url->isHome($core->url->type)
+            || $w->homeonly == 2 && $core->url->isHome($core->url->type)
         ) {
             return null;
         }
 
-        $p = array();
-        $p['order'] = ($w->sortby && in_array($w->sortby, array('feed_upd_last', 'lowername', 'feed_creadt'))) ? 
-            $w->sortby.' ' : 'feed_upd_last ';
+        $p = [];
+        $p['order'] = ($w->sortby && in_array($w->sortby, ['feed_upd_last', 'lowername', 'feed_creadt'])) ? 
+            $w->sortby . ' ' : 'feed_upd_last ';
         $p['order'] .= $w->sort == 'desc' ? 'DESC' : 'ASC';
         $p['limit'] = abs((integer) $w->limit);
         $p['feed_status'] = 1;
@@ -200,30 +173,36 @@ class zoneclearFeedServerWidget
         $rs = $zc->getFeeds($p);
 
         if ($rs->isEmpty()) {
-
             return null;
         }
 
-        $res = '';
+        $lines = [];
         $i = 1;
         while($rs->fetch()) {
-            $res .= 
-            '<li>'.
-            '<a href="'.$rs->feed_url.'" title="'.$rs->feed_owner.'">'.$rs->feed_name.'</a>'.
-            '</li>';
+            $lines[] = sprintf(
+                '<li><a href="%s" title="%s">%s</a></li>', 
+                $rs->feed_url,
+                $rs->feed_owner,
+                $rs->feed_name
+            );
             $i++;
         }
-
-        $res =
-        ($w->title ? $w->renderTitle(html::escapeHTML($w->title)) : '').
-    '<ul>'.$res.'</ul>';
-
-        if ($w->pagelink) {
-            $res .= '<p><strong><a href="'.$core->blog->url.$core->url->getBase('zoneclearFeedsPage').'">'.
-      html::escapeHTML($w->pagelink).'</a></strong></p>';
+        $pub = '';
+        if ($w->pagelink && $core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
+            $pub = sprintf(
+                '<p><strong><a href="%s">%s</a></strong></p>',
+                $core->blog->url . $core->url->getBase('zoneclearFeedsPage'),
+                html::escapeHTML($w->pagelink)
+            );
         }
 
-        return $w->renderDiv($w->content_only,'zoneclear-sources '.$w->class,'',$res);
+        return $w->renderDiv(
+            $w->content_only,
+            'zoneclear-sources ' . $w->class,
+            '',
+            ($w->title ? $w->renderTitle(html::escapeHTML($w->title)) : '') .
+            sprintf('<ul>%s</ul>', implode('', $lines)) . $pub
+        );
     }
 
     /**
@@ -235,12 +214,13 @@ class zoneclearFeedServerWidget
     {
         global $core;
 
-        if ($w->offline)
+        if ($w->offline) {
             return;
+        }
 
         if (!$core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active 
-         || $w->homeonly == 1 && $core->url->type != 'default' 
-         || $w->homeonly == 2 && $core->url->type == 'default'
+            || $w->homeonly == 1 && !$core->url->isHome($core->url->type)
+            || $w->homeonly == 2 && $core->url->isHome($core->url->type)
         ) {
             return null;
         }
@@ -250,25 +230,24 @@ class zoneclearFeedServerWidget
 
         # Feed
         if ($w->feed_show) {
-            $title = ($w->feed_title ? 
-                '<strong>'.html::escapeHTML($w->feed_title).'</strong> ' : '');
+            $title = ($w->feed_title ? sprintf(
+                '<strong>%s</strong> ', 
+                html::escapeHTML($w->feed_title)
+            ) : '');
 
-            $count = $zc->getFeeds(array(),true)->f(0);
+            $count = $zc->getFeeds([], true)->f(0);
 
-            if ($count == 0) {
-                $text = sprintf(__('no sources'),$count);
-            }
-            elseif ($count == 1) {
-                $text = sprintf(__('one source'),$count);
-            }
-            else {
-                $text = sprintf(__('%d sources'),$count);
-            }
+            $text = $count ? sprintf(__('one source', '%d sources', $count), $count) : __('no sources');
+
             if ($core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
-                $text = '<a href="'.$core->blog->url.$core->url->getBase('zoneclearFeedsPage').'">'.$text.'</a>';
+                $text = sprintf(
+                    '<a href="%s">%s</a>',
+                    $core->blog->url . $core->url->getBase('zoneclearFeedsPage'),
+                    $text
+                );
             }
 
-            $content .= sprintf('<li>%s%s</li>',$title,$text);
+            $content .= sprintf('<li>%s%s</li>', $title, $text);
         }
 
         # Entry
@@ -278,36 +257,30 @@ class zoneclearFeedServerWidget
 
             if (!$feeds->isEmpty()) {
                 while ($feeds->fetch()) {
-                    $count += (integer) $zc->getPostsByFeed(array('feed_id' => $feeds->feed_id), true)->f(0);
+                    $count += (integer) $zc->getPostsByFeed(['feed_id' => $feeds->feed_id], true)->f(0);
                 }
             }
-            $title = ($w->entry_title ? 
-                '<strong>'.html::escapeHTML($w->entry_title).'</strong> ' : '');
+            $title = ($w->entry_title ? sprintf(
+                '<strong>%s</strong> ',
+                html::escapeHTML($w->entry_title)
+            ) : '');
 
-            if ($count == 0) {
-                $text = sprintf(__('no entries'),$count);
-            }
-            elseif ($count == 1) {
-                $text = sprintf(__('one entry'),$count);
-            }
-            else {
-                $text = sprintf(__('%d entries'),$count);
-            }
+            $text = $count ? sprintf(__('one entry', '%d entries', $count), $count) : __('no entries');
 
-            $content .= sprintf('<li>%s%s</li>',$title,$text);
+            $content .= sprintf('<li>%s%s</li>', $title, $text);
         }
 
-        # Nothing to display
         if (!$content) {
-
             return null;
         }
 
         # Display
-        $res =
-        ($w->title ? $w->renderTitle(html::escapeHTML($w->title)) : '').
-    '<ul>'.$content.'</ul>';
-
-        return $w->renderDiv($w->content_only,'zoneclear-number '.$w->class,'',$res);
+        return $w->renderDiv(
+            $w->content_only,
+            'zoneclear-number ' . $w->class,
+            '',
+            ($w->title ? $w->renderTitle(html::escapeHTML($w->title)) : '') .
+            sprintf('<ul>%s</ul>', $content)
+        );
     }
 }
