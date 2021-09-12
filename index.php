@@ -469,7 +469,8 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
             ($feed_id ? __('Edit feed') : __('New feed')) => ''
         )
     ).
-    dcPage::notices();
+    dcPage::notices() .
+    ($feed_id ? '<h3>' . sprintf(__('Edit feed "%s"'), $feed_name) .'</h3>' : '');
 
     # Feed
     if ($can_view_page) {
@@ -490,7 +491,7 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
         }
 
         echo '
-        <div class="multi-part" title="'.__('Feed').'" id="edit-entry">
+        <div' . ($feed_id ? ' class="multi-part" title="'.__('Feed').'"' : '') . ' id="edit-entry">
         <form method="post" action="plugin.php">
 
         <div class="two-cols">'.
@@ -845,12 +846,4 @@ else {
     );
 }
 
-echo 
-'<hr class="clear"/><p class="right modules">
-<a class="module-config" '.
-'href="plugins.php?module=zoneclearFeedServer&amp;conf=1&amp;redir='.
-urlencode('plugin.php?p=zoneclearFeedServer').'">'.__('Configuration').'</a> - 
-zoneclearFeedServer - '.$core->plugins->moduleInfo('zoneclearFeedServer', 'version').'&nbsp;
-<img alt="'.__('zoneclearFeedServer').'" src="index.php?pf=zoneclearFeedServer/icon.png" />
-</p>
-</body></html>';
+echo '</body></html>';
