@@ -12,12 +12,10 @@
  */
 
 if (!defined('DC_CONTEXT_MODULE')) {
-
     return null;
 }
 
-$redir = empty($_REQUEST['redir']) ? 
-    $list->getURL().'#plugins' : $_REQUEST['redir'];
+$redir = empty($_REQUEST['redir']) ? $list->getURL() . '#plugins' : $_REQUEST['redir'];
 
 # -- Get settings --
 $core->blog->settings->addNamespace('zoneclearFeedServer');
@@ -38,17 +36,16 @@ if ($update_limit < 1) {
     $update_limit = 10;
 }
 if (!is_array($post_full_tpl)) {
-    $post_full_tpl = array();
+    $post_full_tpl = [];
 }
 if (!is_array($post_title_redir)) {
-    $post_title_redir = array();
+    $post_title_redir = [];
 }
 
 $zc = new zoneclearFeedServer($core);
 
 # -- Set settings --
 if (!empty($_POST['save'])) {
-
     try {
         $active = !empty($_POST['active']);
         $pub_active = !empty($_POST['pub_active']);
@@ -81,135 +78,119 @@ if (!empty($_POST['save'])) {
         dcPage::addSuccessNotice(
             __('Configuration successfully updated.')
         );
-        http::redirect(
-            $list->getURL('module=zoneclearFeedServer&conf=1&redir='.
-            $list->getRedir())
+        $core->adminurl->redirect(
+            'admin.plugins', 
+            ['module' => 'zoneclearFeedServer', 'conf' => 1, 'redir' => $list->getRedir()]
         );
-    }
-    catch (Exception $e) {
+    } catch (Exception $e) {
         $core->error->add($e->getMessage());
     }
 }
 
 # -- Form combos --
 $combo_admins = $zc->getAllBlogAdmins();
-$combo_pubupd = array(
-    __('Disable') => 0,
+$combo_pubupd = [
+    __('Disable')        => 0,
     __('Before display') => 1,
-    __('After display') => 2,
-    __('Through Ajax') => 3
-);
-$combo_status = array(
+    __('After display')  => 2,
+    __('Through Ajax')   => 3
+];
+$combo_status = [
     __('Unpublished') => 0,
-    __('Published') => 1
-);
-$combo_tagcase = array(
+    __('Published')   => 1
+];
+$combo_tagcase = [
     __('Keep source case') => 0,
     __('First upper case') => 1,
-    __('All lower case') => 2,
-    __('All upper case') => 3
-);
+    __('All lower case')   => 2,
+    __('All upper case')   => 3
+];
 
 $pub_page_url = $core->blog->url.$core->url->getBase('zoneclearFeedsPage');
 
 # -- Display form --
 
 if (!is_writable(DC_TPL_CACHE)) {
-    echo
-    '<p class="error">'.
-    __('Dotclear cache is not writable or not well configured!').
-    '</p>';
+    echo '<p class="error">'. __('Dotclear cache is not writable or not well configured!') . '</p>';
     }
 
 echo '
-
 <div class="fieldset">
-<h4>'.__('Activation').'</h4>
+<h4>' . __('Activation') . '</h4>
 
-<p><label for="active">'.
-form::checkbox('active', 1, $active).
-__('Enable plugin').'</label></p>
-</div>';
+<p><label for="active">' .
+form::checkbox('active', 1, $active) .
+__('Enable plugin') . '</label></p>
+</div>
 
-echo '
 <div class="fieldset">';
 
 if ($core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
-    echo '<p><a class="onblog_link" href="'.$pub_page_url.'" title="'.$pub_page_url.''.'">'.__('View the public list of feeds').'</a></p>';
+    echo sprintf(
+        '<p><a class="onblog_link" href="%s" title="%s">%s</a></p>',
+        $pub_page_url,
+        $pub_page_url,
+        __('View the public list of feeds')
+    );
 }
 
 echo '
-<h4>'.__('Rules').'</h4>
+<h4>' . __('Rules') . '</h4>
 
 <div class="two-boxes">
 
-<p><label for="post_status_new">'.
-__('Status of new posts:').'</label>'.
-form::combo('post_status_new', $combo_status, $post_status_new).'</p>
+<p><label for="post_status_new">' . __('Status of new posts:') . '</label>' .
+form::combo('post_status_new', $combo_status, $post_status_new) . '</p>
 
 <p><label for="feeduser">'.
-__('Owner of entries created by zoneclearFeedServer:').'</label>'.
-form::combo('feeduser', $combo_admins, $feeduser).'</p>
+__('Owner of entries created by zoneclearFeedServer:') . '</label>' .
+form::combo('feeduser', $combo_admins, $feeduser) . '</p>
 
-<p><label for="tag_case">'.
-__('How to transform imported tags:').'</label>'.
-form::combo('tag_case', $combo_tagcase, $tag_case).'</p>
-
-</div><div class="two-boxes">
-
-<p><label for="bhv_pub_upd">'.
-__('Update feeds on public side:').'</label>'.
-form::combo('bhv_pub_upd', $combo_pubupd, $bhv_pub_upd).'</p>
-
-<p><label for="update_limit">'.
-__('Number of feeds to update at one time:').'</label>'.
-form::field('update_limit', 6, 4, $update_limit).'</p>
-
-<p><label for="keep_empty_feed">'.
-form::checkbox('keep_empty_feed', 1, $keep_empty_feed).
-__('Keep active empty feeds').'</label></p>
-
-<p><label for="pub_active">'.
-form::checkbox('pub_active', 1, $pub_active).
-__('Enable public page').'</label></p>
+<p><label for="tag_case">' . __('How to transform imported tags:') . '</label>' .
+form::combo('tag_case', $combo_tagcase, $tag_case) . '</p>
 
 </div><div class="two-boxes">
 
-<p>'.__('Redirect to original post on:').'</p><ul>';
+<p><label for="bhv_pub_upd">' . __('Update feeds on public side:') . '</label>' .
+form::combo('bhv_pub_upd', $combo_pubupd, $bhv_pub_upd) . '</p>
+
+<p><label for="update_limit">' . __('Number of feeds to update at one time:') . '</label>' .
+form::field('update_limit', 6, 4, $update_limit) . '</p>
+
+<p><label for="keep_empty_feed">' .
+form::checkbox('keep_empty_feed', 1, $keep_empty_feed) . __('Keep active empty feeds') . '</label></p>
+
+<p><label for="pub_active">' .
+form::checkbox('pub_active', 1, $pub_active) . __('Enable public page') . '</label></p>
+
+</div><div class="two-boxes">
+
+<p>' . __('Redirect to original post on:') . '</p><ul>';
 
 foreach($zc->getPublicUrlTypes($core) as $k => $v) {
-    echo 
-    '<li><label for="post_title_redir_'.$v.'">'.
-    form::checkbox(
-        array('post_title_redir[]', 'post_title_redir_'.$v),
+    echo sprintf(
+        '<li><label for="post_title_redir_%s">%s%s</label></li>',
         $v,
-        in_array($v, $post_title_redir)
-    ).
-    __($k).'</label></li>';
+        form::checkbox(['post_title_redir[]', 'post_title_redir_' . $v], $v, in_array($v, $post_title_redir)),
+        __($k)
+    );
 }
 echo '
 </ul>
 
 </div><div class="two-boxes">
 
-<p>'.__('Show full content on:').'</p><ul>';
+<p>' . __('Show full content on:') . '</p><ul>';
 
 foreach($zc->getPublicUrlTypes($core) as $k => $v) {
-    echo 
-    '<li><label for="post_full_tpl_'.$v.'">'.
-    form::checkbox(
-        array('post_full_tpl[]', 'post_full_tpl_'.$v),
+    echo sprintf(
+        '<li><label for="post_full_tpl_%s">%s%s</label></li>',
         $v,
-        in_array($v, $post_full_tpl)
-    ).
-    __($k).'</label></li>';
+        form::checkbox(['post_full_tpl[]', 'post_full_tpl_' . $v], $v, in_array($v, $post_full_tpl)),
+        __($k)
+    );
 }
-echo '
-</ul>
 
-</div>
-
-</div>
-';
+echo '</ul></div></div>';
 
 dcPage::helpBlock('zoneclearFeedServer');
