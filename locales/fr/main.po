@@ -1,140 +1,159 @@
 # Language: Français
-# Module: zoneclearFeedServer - 2015.07.19
-# Date: 2015-07-19 16:15:38
-# Translated with translater 2015.03.02
+# Module: zoneclearFeedServer - 2021.09.16
+# Date: 2021-09-16 19:50:53
+# Translated with translater 2021.09.02.1
 
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: zoneclearFeedServer 2015.07.19\n"
+"Project-Id-Version: zoneclearFeedServer 2021.09.16\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2015-07-19T16:15:38+00:00\n"
-"Last-Translator: brol\n"
+"PO-Revision-Date: 2021-09-16T19:50:53+00:00\n"
+"Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: _admin.php:34
-#: _admin.php:94
-#: inc/class.zcfs.feedsactions.php:46
-#: inc/class.zcfs.feedsactions.php:317
-#: inc/class.zcfs.feedsactions.php:370
+#: _admin.php:23
+#: _admin.php:67
+#: inc/class.zcfs.feedsactions.php:40
+#: inc/class.zcfs.feedsactions.php:306
+#: inc/class.zcfs.feedsactions.php:359
 #: index.php:434
 #: index.php:467
-#: index.php:762
-#: index.php:792
+#: index.php:763
+#: index.php:793
 msgid "Feeds server"
 msgstr "Serveur de flux"
 
-#: _admin.php:223
+#: _admin.php:183
 msgid "Edit this feed"
 msgstr "Modifier ce flux"
 
-#: _admin.php:229
+#: _admin.php:190
 msgid "Feed source"
 msgstr "Source du flux"
 
-#: _admin.php:231
+#: _admin.php:192
 msgid "feed URL"
 msgstr "URL du fil"
 
-#: _admin.php:232
+#: _admin.php:193
 msgid "site URL"
 msgstr "URL du site"
 
-#: _config.php:97
+#: _config.php:93
 msgid "Disable"
 msgstr "Désactiver"
 
-#: _config.php:98
+#: _config.php:94
 msgid "Before display"
 msgstr "Avant l'affichage"
 
-#: _config.php:99
+#: _config.php:95
 msgid "After display"
 msgstr "Après l'affichage"
 
-#: _config.php:100
+#: _config.php:96
 msgid "Through Ajax"
 msgstr "À travers Ajax"
 
-#: _config.php:107
+#: _config.php:103
 msgid "Keep source case"
 msgstr "Garder la casse de la source"
 
-#: _config.php:108
+#: _config.php:104
 msgid "First upper case"
 msgstr "Premier caractère en majuscule"
 
-#: _config.php:109
+#: _config.php:105
 msgid "All lower case"
 msgstr "Tout en minuscule"
 
-#: _config.php:110
+#: _config.php:106
 msgid "All upper case"
 msgstr "Tout en majuscule"
 
-#: _config.php:120
+#: _config.php:114
 msgid "Dotclear cache is not writable or not well configured!"
 msgstr "Le cache de Dotclear n'est pas accessible en écriture ou n'est pas configuré !"
 
-#: _config.php:131
+#: _config.php:123
 msgid "Enable plugin"
 msgstr "Activer le plugin"
 
-#: _config.php:138
+#: _config.php:133
 msgid "View the public list of feeds"
 msgstr "Voir la page publique de la liste des flux"
 
-#: _config.php:142
+#: _config.php:138
 msgid "Rules"
 msgstr "Règles"
 
-#: _config.php:147
+#: _config.php:142
 msgid "Status of new posts:"
 msgstr "Status des nouveaux billets :"
 
-#: _config.php:151
+#: _config.php:146
 msgid "Owner of entries created by zoneclearFeedServer:"
 msgstr "Propriétaire des billets créés par zoneclearFeedServer :"
 
-#: _config.php:155
+#: _config.php:149
 msgid "How to transform imported tags:"
 msgstr "Comment tranformer la casse des mots-clés importés :"
 
-#: _config.php:161
+#: _config.php:154
 msgid "Update feeds on public side:"
 msgstr "Mettre à jour les flux depuis la partie publique :"
 
-#: _config.php:165
-msgid "Number of feeds to update at one time:"
-msgstr "Nombre de flux à mettre à jour à la fois :"
+#: _config.php:157
+msgid "Update %s feed(s) at a time."
+msgstr "Mettre à jour %s flux à la fois."
 
-#: _config.php:170
+#: _config.php:161
 msgid "Keep active empty feeds"
 msgstr "Garder actif les flux vides"
 
-#: _config.php:174
+#: _config.php:164
 msgid "Enable public page"
 msgstr "Activer la page publique"
 
-#: _config.php:178
+#: _config.php:168
 msgid "Redirect to original post on:"
 msgstr "Rediriger vers le billet original sur :"
 
-#: _config.php:195
+#: _config.php:183
 msgid "Show full content on:"
 msgstr "Afficher le contenu complet sur :"
 
-#: _public.php:302
+#: _public.php:271
 msgid "Original post on <a href=\"%s\">%s</a>"
 msgstr "Billet original sur <a href=\"%s\">%s</a>"
 
-#: _public.php:313
+#: _public.php:282
 msgid "Read more details about this feed"
 msgstr "Lire plus de détails à propos de ce flux"
 
-#: _public.php:744
+#: _public.php:622
+msgid "no entries"
+msgstr "aucune publication"
+
+#: _public.php:623
+msgid "one entry"
+msgstr "une publication"
+
+#: _public.php:624
+msgid "%d entries"
+msgstr "%d publications"
+
+#: _public.php:706
+#: default-templates/currywurst/zcfeeds.html:4
+#: default-templates/currywurst/zcfeeds.html:18
+#: default-templates/currywurst/zcfeeds.html:42
+#: default-templates/mustek/zcfeeds.html:4
+#: default-templates/mustek/zcfeeds.html:18
+#: default-templates/mustek/zcfeeds.html:42
 msgid "List of feeds"
 msgstr "Liste des sources"
 
@@ -154,19 +173,19 @@ msgstr "effacer les fichiers du plugin"
 msgid "delete the version number"
 msgstr "effacer le numéro de version"
 
-#: _uninstall.php:51
+#: _uninstall.php:50
 msgid "delete all %s settings"
 msgstr "effacer tous les paramètres de %s"
 
-#: _uninstall.php:57
+#: _uninstall.php:56
 msgid "delete %s table"
 msgstr "effacer la table %s"
 
-#: _uninstall.php:63
+#: _uninstall.php:62
 msgid "delete %s plugin files"
 msgstr "effacer les fichiers du plugin %s"
 
-#: _uninstall.php:69
+#: _uninstall.php:68
 msgid "delete %s version number"
 msgstr "effacer la version de %s"
 
@@ -178,18 +197,19 @@ msgstr "Serveur de flux : les sources"
 msgid "List sources of feeds"
 msgstr "Liste des sources du flux"
 
-#: _widgets.php:52
+#: _widgets.php:50
 msgid "Feeds sources"
 msgstr "Sources des flux"
 
-#: _widgets.php:63
+#: _widgets.php:60
 msgid "Create date"
 msgstr "Date de création"
 
-#: _widgets.php:78
+#: _widgets.php:75
 msgid "Limit:"
 msgstr "Limite :"
 
+#: _widgets.php:81
 msgid "Link to the list of sources:"
 msgstr "Lien vers la liste des sources :"
 
@@ -197,180 +217,205 @@ msgstr "Lien vers la liste des sources :"
 msgid "All sources"
 msgstr "Toutes les sources"
 
-#: _widgets.php:108
+#: _widgets.php:101
 msgid "Feeds server: numbers"
 msgstr "Serveur de flux : les chiffres"
 
-#: _widgets.php:111
+#: _widgets.php:104
 msgid "Show some numbers about feeds"
 msgstr "Affciher quelques chiffres à propose du flux"
 
-#: _widgets.php:116
+#: _widgets.php:107
+#: _widgets.php:112
 msgid "Feeds numbers"
 msgstr "Le flux en chiffres"
 
-#: _widgets.php:123
+#: _widgets.php:117
 msgid "Show feeds count"
 msgstr "Afficher le nombre de flux"
 
-#: _widgets.php:129
+#: _widgets.php:123
 msgid "Title for feeds count:"
 msgstr "Titre pour le nombre de flux :"
 
-#: _widgets.php:130
+#: _widgets.php:124
 msgid "Feeds:"
 msgstr "Flux :"
 
-#: _widgets.php:137
+#: _widgets.php:129
 msgid "Show entries count"
 msgstr "Afficher le nombre de billets"
 
-#: _widgets.php:143
+#: _widgets.php:135
 msgid "Title for entries count:"
 msgstr "Titre pour le nombre de billets :"
 
-#: _widgets.php:144
+#: _widgets.php:136
 msgid "Entries:"
 msgstr "Billets :"
 
-#: _widgets.php:259
-msgid "no sources"
-msgstr "aucune source"
-
-#: _widgets.php:262
-msgid "one source"
-msgstr "une source"
-
-#: _widgets.php:265
-msgid "%d sources"
-msgstr "%d sources"
-
-#: _widgets.php:288
-msgid "no entries"
-msgstr "aucun billet"
-
-#: _widgets.php:291
-msgid "one entry"
-msgstr "un billet"
-
-#: inc/class.zcfs.feedsactions.php:33
+#: inc/class.zcfs.feedsactions.php:27
 #: index.php:468
-#: index.php:793
+#: index.php:794
 msgid "Feeds"
 msgstr "Flux de syndication"
 
-#: inc/class.zcfs.feedsactions.php:52
+#: inc/class.zcfs.feedsactions.php:46
 msgid "Back to feeds list"
 msgstr "Retour à la liste des flux"
 
-#: inc/class.zcfs.feedsactions.php:67
+#: inc/class.zcfs.feedsactions.php:61
 msgid "Feeds actions"
 msgstr "Actions sur les flux"
 
-#: inc/class.zcfs.feedsactions.php:108
+#: inc/class.zcfs.feedsactions.php:100
 msgid "Change update interval"
 msgstr "Changer l'interval de mise à jour"
 
-#: inc/class.zcfs.feedsactions.php:112
+#: inc/class.zcfs.feedsactions.php:104
 msgid "Disable feed update"
 msgstr "Désactiver la mise à jour du flux"
 
-#: inc/class.zcfs.feedsactions.php:116
+#: inc/class.zcfs.feedsactions.php:108
 msgid "Enable feed update"
 msgstr "Activer la mise à jour du flux"
 
-#: inc/class.zcfs.feedsactions.php:120
+#: inc/class.zcfs.feedsactions.php:112
 msgid "Reset last update"
 msgstr "Remettre à zéro le chronomètre de mise à jour"
 
-#: inc/class.zcfs.feedsactions.php:124
+#: inc/class.zcfs.feedsactions.php:116
 msgid "Update (check) feed"
 msgstr "Mettre à jour (vérifier) le flux"
 
-#: inc/class.zcfs.feedsactions.php:128
+#: inc/class.zcfs.feedsactions.php:120
 msgid "Delete related posts"
 msgstr "Effacer les billets liés"
 
-#: inc/class.zcfs.feedsactions.php:132
+#: inc/class.zcfs.feedsactions.php:124
 msgid "Delete feed (without related posts)"
 msgstr "Effacer le flux (sans effacer les billets liés)"
 
-#: inc/class.zcfs.feedsactions.php:143
-#: inc/class.zcfs.feedsactions.php:182
-#: inc/class.zcfs.feedsactions.php:213
-#: inc/class.zcfs.feedsactions.php:236
-#: inc/class.zcfs.feedsactions.php:259
-#: inc/class.zcfs.feedsactions.php:286
-#: inc/class.zcfs.feedsactions.php:343
+#: inc/class.zcfs.feedsactions.php:135
+#: inc/class.zcfs.feedsactions.php:174
+#: inc/class.zcfs.feedsactions.php:205
+#: inc/class.zcfs.feedsactions.php:228
+#: inc/class.zcfs.feedsactions.php:251
+#: inc/class.zcfs.feedsactions.php:278
+#: inc/class.zcfs.feedsactions.php:332
 msgid "No feeds selected"
 msgstr "Aucun flux selectionné"
 
-#: inc/class.zcfs.feedsactions.php:203
+#: inc/class.zcfs.feedsactions.php:195
 msgid "Entries have been successfully deleted."
 msgstr "Les billets ont été effacé avec succès."
 
-#: inc/class.zcfs.feedsactions.php:372
+#: inc/class.zcfs.feedsactions.php:361
 msgid "Change update frequency for this selection"
 msgstr "Changer la fréquence de mise à jour pour la selection"
 
-#: inc/class.zcfs.feedsactions.php:378
+#: inc/class.zcfs.feedsactions.php:367
 msgid "Frequency:"
 msgstr "Fréquence :"
 
-#: inc/class.zoneclear.feed.server.php:822
+#: inc/class.zoneclear.feed.server.php:797
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: inc/class.zoneclear.feed.server.php:823
+#: inc/class.zoneclear.feed.server.php:798
 msgid "Enabled"
 msgstr "Activé"
 
-#: inc/class.zoneclear.feed.server.php:835
+#: inc/class.zoneclear.feed.server.php:810
 msgid "Every hour"
 msgstr "Toutes les heures"
 
-#: inc/class.zoneclear.feed.server.php:836
+#: inc/class.zoneclear.feed.server.php:811
 msgid "Every two hours"
 msgstr "Toutes les deux heures"
 
-#: inc/class.zoneclear.feed.server.php:837
+#: inc/class.zoneclear.feed.server.php:812
 msgid "Two times per day"
 msgstr "Deux fois par jour"
 
-#: inc/class.zoneclear.feed.server.php:838
+#: inc/class.zoneclear.feed.server.php:813
 msgid "Every day"
 msgstr "Chaque jour"
 
-#: inc/class.zoneclear.feed.server.php:839
+#: inc/class.zoneclear.feed.server.php:814
 msgid "Every two days"
 msgstr "Tous les deux jours"
 
-#: inc/class.zoneclear.feed.server.php:911
+#: inc/class.zoneclear.feed.server.php:886
 msgid "Home page"
 msgstr "Page d'accueil"
 
-#: inc/class.zoneclear.feed.server.php:912
+#: inc/class.zoneclear.feed.server.php:887
 msgid "Entries pages"
 msgstr "Pages des billets"
 
-#: inc/class.zoneclear.feed.server.php:913
+#: inc/class.zoneclear.feed.server.php:888
 msgid "Tags pages"
 msgstr "Pages des mots-clés"
 
-#: inc/class.zoneclear.feed.server.php:914
+#: inc/class.zoneclear.feed.server.php:889
 msgid "Archives pages"
 msgstr "Pages des archives"
 
-#: inc/class.zoneclear.feed.server.php:915
+#: inc/class.zoneclear.feed.server.php:890
 msgid "Category pages"
 msgstr "Pages de catégories"
+
+#: inc/lib.zcfs.activityreport.php:21
+msgid "Plugin zoneclearFeedServer"
+msgstr "Extension zoneclearFeedServer"
+
+#: inc/lib.zcfs.activityreport.php:28
+msgid "feed creation"
+msgstr "création d'un flux"
+
+#: inc/lib.zcfs.activityreport.php:29
+msgid "A new feed named \"%s\" point to \"%s\" was added by \"%s\""
+msgstr "Un nouveau flux nommé \"%s\" pointant vers \"%s\" a été ajouté par \"%s\""
+
+#: inc/lib.zcfs.activityreport.php:37
+msgid "updating feed info"
+msgstr "mise à jour des informations du flux (administration)"
+
+#: inc/lib.zcfs.activityreport.php:38
+msgid "Feed named \"%s\" point to \"%s\" has been updated by \"%s\""
+msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été mis à jour par \"%s\""
+
+#: inc/lib.zcfs.activityreport.php:46
+msgid "updating feed records"
+msgstr "mise à jour des enregistrements du flux (automatique)"
+
+#: inc/lib.zcfs.activityreport.php:47
+msgid "Records of the feed named \"%s\" have been updated automatically"
+msgstr "Les enregistrements du flux nommé \"%s\" ont été automatiquement mis à jour"
+
+#: inc/lib.zcfs.activityreport.php:55
+msgid "feed deletion"
+msgstr "suppression d'un flux"
+
+#: inc/lib.zcfs.activityreport.php:56
+msgid "Feed named \"%s\" point to \"%s\" has been deleted by \"%s\""
+msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été supprimé par \"%s\""
+
+#: inc/lib.zcfs.activityreport.php:64
+msgid "feed status"
+msgstr "status d'un flux"
+
+#: inc/lib.zcfs.activityreport.php:65
+msgid "Feed named \"%s\" point to \"%s\" has been set to \"%s\""
+msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été marqué comme \"%s\""
 
 #: inc/lib.zcfs.list.php:31
 msgid "There is no feed"
 msgstr "Il n'y a pas de flux"
 
 #: inc/lib.zcfs.list.php:44
-#: index.php:493
+#: index.php:494
 msgid "Feed"
 msgstr "Flux"
 
@@ -385,58 +430,6 @@ msgstr "jamais"
 #: inc/lib.zcfs.list.php:107
 msgid "View entries"
 msgstr "Voir les billets"
-
-#: inc/lib.zcfs.socialmewriter.php:31
-msgid "New Zoneclear post"
-msgstr "Nouveu billet Zoneclear"
-
-#: inc/lib.zcfs.socialmewriter.php:32
-msgid "When a feed has new entry"
-msgstr "Lorsqu'un flux a un nouveau billet"
-
-#: inc/lib.zcfsr.activityreport.php:22
-msgid "Plugin zoneclearFeedServer"
-msgstr "Extension zoneclearFeedServer"
-
-#: inc/lib.zcfsr.activityreport.php:29
-msgid "feed creation"
-msgstr "création d'un flux"
-
-#: inc/lib.zcfsr.activityreport.php:30
-msgid "A new feed named \"%s\" point to \"%s\" was added by \"%s\""
-msgstr "Un nouveau flux nommé \"%s\" pointant vers \"%s\" a été ajouté par \"%s\""
-
-#: inc/lib.zcfsr.activityreport.php:38
-msgid "updating feed info"
-msgstr "mise à jour des informations du flux (administration)"
-
-#: inc/lib.zcfsr.activityreport.php:39
-msgid "Feed named \"%s\" point to \"%s\" has been updated by \"%s\""
-msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été mis à jour par \"%s\""
-
-#: inc/lib.zcfsr.activityreport.php:47
-msgid "updating feed records"
-msgstr "mise à jour des enregistrements du flux (automatique)"
-
-#: inc/lib.zcfsr.activityreport.php:48
-msgid "Records of the feed named \"%s\" have been updated automatically"
-msgstr "Les enregistrements du flux nommé \"%s\" ont été automatiquement mis à jour"
-
-#: inc/lib.zcfsr.activityreport.php:56
-msgid "feed deletion"
-msgstr "suppression d'un flux"
-
-#: inc/lib.zcfsr.activityreport.php:57
-msgid "Feed named \"%s\" point to \"%s\" has been deleted by \"%s\""
-msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été supprimé par \"%s\""
-
-#: inc/lib.zcfsr.activityreport.php:65
-msgid "feed status"
-msgstr "status d'un flux"
-
-#: inc/lib.zcfsr.activityreport.php:66
-msgid "Feed named \"%s\" point to \"%s\" has been set to \"%s\""
-msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été marqué comme \"%s\""
 
 #: index.php:83
 msgid "This feed does not exist."
@@ -487,54 +480,58 @@ msgid "Edit feed"
 msgstr "Edition de flux"
 
 #: index.php:469
-#: index.php:800
+#: index.php:801
 msgid "New feed"
 msgstr "Nouveau flux"
 
-#: index.php:499
+#: index.php:500
 msgid "Feed information"
 msgstr "Information sur le flux"
 
-#: index.php:509
+#: index.php:510
 msgid "Owner:"
 msgstr "Propriétaire :"
 
-#: index.php:515
+#: index.php:516
 msgid "Tweeter or Identica ident:"
 msgstr "Identifiant Twiiter ou Identi.ca :"
 
-#: index.php:521
+#: index.php:522
 msgid "Site URL:"
 msgstr "URL du site :"
 
-#: index.php:545
+#: index.php:546
 msgid "Local settings"
 msgstr "Paramètres locaux"
 
-#: index.php:555
+#: index.php:556
 msgid "Update:"
 msgstr "Mise à jour :"
 
-#: index.php:565
+#: index.php:566
 msgid "Import tags from feed"
 msgstr "Importer les tags depuis le flux"
 
-#: index.php:707
+#: index.php:708
 msgid "Date of update"
 msgstr "Date de mise à jour"
 
-#: index.php:832
+#: index.php:833
 msgid "Selected feeds action:"
 msgstr "Action sur les flux sélectionnés :"
+
+msgid "Number of feeds to update at one time:"
+msgstr "Nombre de flux à mettre à jour à la fois :"
+
+msgid "one source"
+msgstr "une source"
+
+msgid "%d sources"
+msgstr "%d sources"
+
+msgid "no sources"
+msgstr "aucune source"
 
 msgid "Mix your blog with a feeds planet"
 msgstr "Mixer votre blog avec un planet"
 
-msgid "no entries"
-msgstr "aucun billet"
-
-msgid "one entry"
-msgstr "un billet"
-
-msgid "%d entries"
-msgstr "%d billets"
