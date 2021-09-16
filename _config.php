@@ -106,7 +106,7 @@ $combo_tagcase = [
     __('All upper case')   => 3
 ];
 
-$pub_page_url = $core->blog->url.$core->url->getBase('zoneclearFeedsPage');
+$pub_page_url = $core->blog->url . $core->url->getBase('zoneclearFeedsPage');
 
 # -- Display form --
 
@@ -127,7 +127,7 @@ __('Enable plugin') . '</label></p>
 
 if ($core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
     echo sprintf(
-        '<p><a class="onblog_link" href="%s" title="%s">%s</a></p>',
+        '<p><a class="onblog_link outgoing" href="%s" title="%s">%s <img alt="" src="images/outgoing-link.svg"></a></p>',
         $pub_page_url,
         $pub_page_url,
         __('View the public list of feeds')
@@ -154,8 +154,8 @@ form::combo('tag_case', $combo_tagcase, $tag_case) . '</p>
 <p><label for="bhv_pub_upd">' . __('Update feeds on public side:') . '</label>' .
 form::combo('bhv_pub_upd', $combo_pubupd, $bhv_pub_upd) . '</p>
 
-<p><label for="update_limit">' . __('Number of feeds to update at one time:') . '</label>' .
-form::field('update_limit', 6, 4, $update_limit) . '</p>
+<p class="classic"><label for="update_limit" class="ib">' . sprintf(__('Update %s feed(s) at a time.'),
+form::number('update_limit', ['min' => 0, 'max' => 20, 'default' => $update_limit])) . '</label></p>
 
 <p><label for="keep_empty_feed">' .
 form::checkbox('keep_empty_feed', 1, $keep_empty_feed) . __('Keep active empty feeds') . '</label></p>
