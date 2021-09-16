@@ -21,11 +21,11 @@ $this->registerModule(
     'Jean-Christian Denis, BG, Pierre Van Glabeke',
     '2015.07.19',
     [
-        'requires' => [['core', '2.19']],
-        'permissions'   => 'admin',
-        'type'          => 'plugin',
-        'support'       => 'https://github.com/JcDenis/zoneclearFeedServer',
-        'details'       => 'https://plugins.dotaddict.org/dc2/details/pacKman',
-        'repository' => 'https://raw.githubusercontent.com/JcDenis/zoneclearFeedServer/master/dcstore.xml'
+        'requires'    => [['core', '2.19']],
+        'permissions' => 'admin',
+        'type'        => 'plugin',
+        'support'     => 'https://github.com/JcDenis/zoneclearFeedServer',
+        'details'     => 'https://plugins.dotaddict.org/dc2/details/pacKman',
+        'repository'  => 'https://raw.githubusercontent.com/JcDenis/zoneclearFeedServer/master/dcstore.xml'
     ]
 );

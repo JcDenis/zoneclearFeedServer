@@ -18,9 +18,9 @@ It mix your blog with a feeds planet.
 
  zoneclearFeedServer requires: 
 
-  * admin perms for configuration
-  * admin perms to manager feeds
-  * Dotclear 2.7
+  * super admin permission for plugin and services configuration
+  * admin permission to manage feeds
+  * Dotclear 2.19
 
 ## USAGE
 
@@ -33,10 +33,10 @@ go to ''configure plugin'', fill in form.
 Once it's done you can manage your feeds from menu 
 ''Feeds server'' on sidebar or you can add dashboard icon.
 
-## MORE
+## LINKS
 
- * License : GNU GPL v2
- * Source & contribution : [GitHub Page](https://github.com/JcDenis/zoneclearFeedServer)
+ * License : [GNU GPL v2](https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html)
+ * Source & contributions : [GitHub Page](https://github.com/JcDenis/zoneclearFeedServer)
  * Packages & details:  [Dotaddict Page](https://plugins.dotaddict.org/dc2/details/zoneclearFeedServer)
  * Discussion & Help: [Dotclear Forum](http://forum.dotclear.org/viewtopic.php?pid=331158)
 
