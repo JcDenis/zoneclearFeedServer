@@ -69,6 +69,17 @@ class zcfsAdminBehaviors
         ];
     }
 
+    public static function entriesSortbyCombo()
+    {
+        return [
+            __('Date')     => 'post_dt',
+            __('Title')    => 'post_title',
+            __('Category') => 'cat_title',
+            __('Author')   => 'user_id',
+            __('Status')   => 'post_status'
+        ];
+    }
+
     /**
      * Favorites.
      *
@@ -141,6 +152,14 @@ class zcfsAdminBehaviors
                 'entries'  => [true, __('Entries')]
             ]
         ];
+        $cols['zcfs_entries'] = [
+            __('Feeds server: Entries'),
+            [
+                'date'       => [true, __('Date')],
+                'category'   => [true, __('Category')],
+                'author'     => [true, __('Author')]
+            ]
+        ];
     }
 
     /**
@@ -156,7 +175,14 @@ class zcfsAdminBehaviors
             self::feedsSortbyCombo(),
             'lowername',
             'asc',
-            [__('Links per page'), 30]
+            [__('feeds per page'), 30]
+        ];
+        $sorts['zcfs_entries'] = [
+            __('Feeds server: Entries'),
+            self::entriesSortbyCombo(),
+            'post_dt',
+            'desc',
+            [__('entries per page'), 30]
         ];
     }
 

@@ -20,6 +20,7 @@ $d = dirname(__FILE__).'/inc/';
 $__autoload['zoneclearFeedServer'] = $d . 'class.zoneclear.feed.server.php';
 $__autoload['zcfsFeedsList'] = $d . 'lib.zcfs.list.php';
 $__autoload['zcfsEntriesList'] = $d . 'lib.zcfs.list.php';
+$__autoload['adminZcfsPostFilter'] = $d . 'lib.zcfs.list.php';
 $__autoload['zcfsFeedsActionsPage'] = $d . 'class.zcfs.feedsactions.php';
 $__autoload['zcfsDefaultFeedsActions'] = $d . 'class.zcfs.feedsactions.php';
 

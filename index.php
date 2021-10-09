@@ -251,95 +251,16 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
 
     # Prepared entries list
     if ($feed_id && $can_view_page) {
-        try {
-            # Getting categories
-            $categories = $core->blog->getCategories(array(
-                'post_type' => 'post'
-            ));
-
-            # Getting authors
-            $users = $core->blog->getPostsUsers();
-
-            # Getting dates
-            $dates = $core->blog->getDates(array(
-                'type' => 'month'
-            ));
-
-            # Getting langs
-            $langs = $core->blog->getLangs();
-        }
-        catch (Exception $e) {
-            $core->error->add($e->getMessage());
-        }
-
-        # Creating filter combo boxes
-        if (!$core->error->flag()) {
-
-            $users_combo = array_merge(
-                array('-' => ''),
-                dcAdminCombos::getUsersCombo($users)
-            );
-
-            $categories_combo = array_merge(
-                array(
-                    new formSelectOption('-', ''),
-                    new formSelectOption(__('(No cat)'), 'NULL')
-                ),
-                dcAdminCombos::getCategoriesCombo($categories, false)
-            );
-            $categories_values = array();
-            foreach ($categories_combo as $cat) {
-                if (isset($cat->value)) {
-                    $categories_values[$cat->value] = true;
-                }
-            }
-
-            $status_combo = array_merge(
-                array('-' => ''),
-                dcAdminCombos::getPostStatusesCombo()    
-            );
-
-            $selected_combo = array(
-                '-'                => '',
-                __('Selected')        => '1',
-                __('Not selected')    => '0'
-            );
-
-            $dt_m_combo = array_merge(
-                array('-' => ''),
-                dcAdminCombos::getDatesCombo($dates)
-            );
-
-            $lang_combo = array_merge(
-                array('-' => ''),
-                dcAdminCombos::getLangsCombo($langs,false)    
-            );
-
-            $sortby_combo = array(
-                __('Date')    => 'post_dt',
-                __('Title')    => 'post_title',
-                __('Category')    => 'cat_title',
-                __('Author')    => 'user_id',
-                __('Status')    => 'post_status',
-                __('Selected')    => 'post_selected'
-            );
-
-            $order_combo = array(
-                __('Descending')    => 'desc',
-                __('Ascending')    => 'asc'
-            );
-        }
-
         # Posts action
         $posts_actions_page = new dcPostsActionsPage(
             $core,
             'plugin.php',
-            array(
+            [
                 'p'        => 'zoneclearFeedServer',
                 'part'    => 'feed',
                 'feed_id'    => $feed_id,
                 '_ANCHOR'    => 'entries'
-            )
+            ]
         );
 
         if ($posts_actions_page->process()) {
@@ -348,70 +269,28 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
 
         /* Get posts
         -------------------------------------------------------- */
-        $user_id = !empty($_GET['user_id']) ?    $_GET['user_id'] : '';
-        $cat_id = !empty($_GET['cat_id']) ?    $_GET['cat_id'] : '';
-        $status = isset($_GET['status']) ?        $_GET['status'] : '';
-        $selected = isset($_GET['selected']) ?    $_GET['selected'] : '';
-        $month = !empty($_GET['month']) ?        $_GET['month'] : '';
-        $lang = !empty($_GET['lang']) ?        $_GET['lang'] : '';
-        $sortby = !empty($_GET['sortby']) ?    $_GET['sortby'] : 'post_dt';
-        $order = !empty($_GET['order']) ?        $_GET['order'] : 'desc';
+        $post_filter = new adminZcfsPostFilter($core);
+        $post_filter->add('part', 'feed');
+        $post_filter->add('feed_id', $feed_id);
 
-        $show_filters = false;
+        # get list params
+        $params = $post_filter->params();
 
-        $page = !empty($_GET['page']) ? (integer) $_GET['page'] : 1;
-        $nb_per_page =  30;
+        # lexical sort
+        $sortby_lex = [
+            // key in sorty_combo (see above) => field in SQL request
+            'post_title' => 'post_title',
+            'cat_title'  => 'cat_title',
+            'user_id'    => 'P.user_id'];
 
-        if (!empty($_GET['nb']) && (integer) $_GET['nb'] > 0) {
-            if ($nb_per_page != $_GET['nb']) {
-                $show_filters = true;
-            }
-            $nb_per_page = (integer) $_GET['nb'];
-        }
+        # --BEHAVIOR-- adminPostsSortbyLexCombo
+        $core->callBehavior('adminPostsSortbyLexCombo', [& $sortby_lex]);
 
-        $params['limit'] = array((($page-1)*$nb_per_page), $nb_per_page);
+        $params['order'] = (array_key_exists($post_filter->sortby, $sortby_lex) ?
+            $core->con->lexFields($sortby_lex[$post_filter->sortby]) :
+            $post_filter->sortby) . ' ' . $post_filter->order;
+
         $params['no_content'] = true;
-
-        # - User filter
-        if ($user_id !== '' && in_array($user_id, $users_combo)) {
-            $params['user_id'] = $user_id;
-            $show_filters = true;
-        }
-        # - Categories filter
-        if ($cat_id !== '' && in_array($cat_id, $categories_combo)) {
-            $params['cat_id'] = $cat_id;
-            $show_filters = true;
-        }
-        # - Status filter
-        if ($status !== '' && in_array($status, $status_combo)) {
-            $params['post_status'] = $status;
-            $show_filters = true;
-        }
-        # - Selected filter
-        if ($selected !== '' && in_array($selected, $selected_combo)) {
-            $params['post_selected'] = $selected;
-            $show_filters = true;
-        }
-        # - Month filter
-        if ($month !== '' && in_array($month, $dt_m_combo)) {
-            $params['post_month'] = substr($month, 4, 2);
-            $params['post_year'] = substr($month, 0, 4);
-            $show_filters = true;
-        }
-        # - Lang filter
-        if ($lang !== '' && in_array($lang, $lang_combo)) {
-            $params['post_lang'] = $lang;
-            $show_filters = true;
-        }
-        # - Sortby and order filter
-        if ($sortby !== '' && in_array($sortby, $sortby_combo)) {
-            if ($order !== '' && in_array($order, $order_combo)){
-                $params['order'] = $sortby.' '.$order;
-            }
-            if ($sortby != 'post_dt' || $order != 'desc') {
-                $show_filters = true;
-            }
-        }
 
         # Get posts
         try {
@@ -433,25 +312,8 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     echo 
     '<html><head><title>'.__('Feeds server').'</title>'.
     ($feed_id && !$core->error->flag() ?
-        dcPage::jsLoad(
-            'index.php?pf=periodical/js/postsfilter.js'
-        ).
-        '<script type="text/javascript">'."\n".
-        "//<![CDATA["."\n".
-        dcPage::jsVar(
-            'dotclear.msg.show_filters',
-            $show_filters ? 'true':'false'
-        )."\n".
-        dcPage::jsVar(
-            'dotclear.msg.filter_posts_list',
-            __('Show filters and display options')
-        )."\n".
-        dcPage::jsVar(
-            'dotclear.msg.cancel_the_filter',
-            __('Cancel filters and display options')
-        )."\n".
-        "//]]>\n".
-        "</script>\n"
+        $post_filter->js($core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed', 'feed_id' => $feed_id], '&').'#entries') .
+        dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/list.js'))
     : '').
     dcPage::jsPageTabs().
     $next_headlink."\n".$prev_headlink.
@@ -582,73 +444,22 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
 
     # Entries
     if ($feed_id && $can_view_page && !$core->error->flag()) {
-        echo 
-        '<div class="multi-part" title="'.__('Entries').'" id="entries">'.
+        echo '<div class="multi-part" title="'.__('Entries').'" id="entries">';
 
-        '<form action="'.$p_url.'&amp;part=feed#entries" method="get" id="filters-form">'.
+        $post_filter->display(['admin.plugin.zoneclearFeedServer','#entries'], 
+            form::hidden('p', 'zoneclearFeedServer') . 
+            form::hidden('part', 'feed') .
+            form::hidden('feed_id', $feed_id)
+        );
 
-        '<h3 class="out-of-screen-if-js">'.
-        __('Cancel filters and display options').
-        '</h3>'.
-
-        '<div class="table">'.
-        '<div class="cell">'.
-        '<h4>'.__('Filters').'</h4>'.
-        '<p><label for="user_id" class="ib">'.__('Author:').'</label> '.
-        form::combo('user_id',$users_combo,$user_id).'</p>'.
-        '<p><label for="cat_id" class="ib">'.__('Category:').'</label> '.
-        form::combo('cat_id',$categories_combo,$cat_id).'</p>'.
-        '<p><label for="status" class="ib">'.__('Status:').'</label> ' .
-        form::combo('status',$status_combo,$status).'</p> '.
-        '</div>'.
-
-        '<div class="cell filters-sibling-cell">'.
-        '<p><label for="selected" class="ib">'.__('Selected:').'</label> '.
-        form::combo('selected',$selected_combo,$selected).'</p>'.
-        '<p><label for="month" class="ib">'.__('Month:').'</label> '.
-        form::combo('month',$dt_m_combo,$month).'</p>'.
-        '<p><label for="lang" class="ib">'.__('Lang:').'</label> '.
-        form::combo('lang',$lang_combo,$lang).'</p> '.
-        '</div>'.
-
-        '<div class="cell filters-options">'.
-        '<h4>'.__('Display options').'</h4>'.
-        '<p><label for="sortby" class="ib">'.__('Order by:').'</label> '.
-        form::combo('sortby',$sortby_combo,$sortby).'</p>'.
-        '<p><label for="order" class="ib">'.__('Sort:').'</label> '.
-        form::combo('order',$order_combo,$order).'</p>'.
-        '<p><span class="label ib">'.__('Show').'</span> <label for="nb" class="classic">'.
-        form::field('nb', 3, 3, $nb_per_page).' '.
-        __('entries per page').'</label></p>'.
-        '</div>'.
-        '</div>'.
-
-        '<p><input type="submit" value="'.__('Apply filters and display options').'" />'.
-        form::hidden(array('p'), 'zoneclearFeedServer').
-        form::hidden(array('part'), 'feed').
-        form::hidden(array('feed_id') ,$feed_id).
-        '<br class="clear" />'. //Opera sucks
-        '</p>'.
-        '</form>'.
+        # fix pager url
+        $args = $post_filter->values();
+        unset($args['page']);
+        $args['page'] = '%s';
+        $base_url = $core->adminurl->get('admin.plugin.zoneclearFeedServer', $args, '&').'#entries';
 
         # Show posts
-        $post_list->display($page, $nb_per_page,
-
-            $p_url.
-            '&amp;part=feed'.
-            '&amp;tab=entries'.
-            '&amp;feed_id='.$feed_id.
-            '&amp;user_id='.$user_id.
-            '&amp;cat_id='.$cat_id.
-            '&amp;status='.$status.
-            '&amp;selected='.$selected.
-            '&amp;month='.$month.
-            '&amp;lang='.$lang.
-            '&amp;sortby='.$sortby.
-            '&amp;order='.$order.
-            '&amp;nb='.$nb_per_page.
-            '&amp;page=%s',
-
+        $post_list->display($post_filter->page, $post_filter->nb, $base_url,
             '<form action="'.$p_url.'&amp;part=feed#entries" method="post" id="form-entries">'.
             '%s'.
 
@@ -658,21 +469,12 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
             '<p class="col right">'.__('Selected entries action:').' '.
             form::combo('action', $posts_actions_page->getCombo()).
             '<input type="submit" name="save" value="'.__('ok').'" /></p>'.
-            form::hidden(array('part'), 'feed').
-            form::hidden(array('feed_id'), $feed_id).
-            form::hidden(array('user_id'), $user_id).
-            form::hidden(array('cat_id'), $cat_id).
-            form::hidden(array('status'), $status).
-            form::hidden(array('selected'), $selected).
-            form::hidden(array('month'), $month).
-            form::hidden(array('lang'), $lang).
-            form::hidden(array('sortby'), $sortby).
-            form::hidden(array('order'), $order).
-            form::hidden(array('page'), $page).
-            form::hidden(array('nb'), $nb_per_page).
+            $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', $post_filter->values()) .
+            form::hidden('redir', $core->adminurl->get('admin.plugin.zoneclearFeedServer', $post_filter->values())) .
             $core->formNonce().
             '</div>'.
-            '</form>'
+            '</form>',
+            $post_filter->show()
         );
 
         echo 
@@ -720,9 +522,8 @@ else {
     # Display
     echo 
     '<html><head><title>'.__('Feeds server').'</title>'.
-    dcPage::jsVars(['dotclear.filter_reset_url' => $core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feeds'])]) .
-    dcPage::jsFilterControl($feeds_filter->show()) .
-    dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/feedsfilter.js')) .
+    $feeds_filter->js($core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feeds'], '&')) .
+    dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/list.js')) .
     dcPage::jsPageTabs().
 
     # --BEHAVIOR-- packmanAdminHeader

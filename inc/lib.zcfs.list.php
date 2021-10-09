@@ -45,7 +45,7 @@ class zcfsFeedsList extends adminGenericList
                 '<table>' . 
                 '<caption>' . ($filter ? 
                     sprintf(__('List of %s feeds matching the filter.'), $this->rs_count) :
-                    sprintf(__('List of entries (%s)'), $this->rs_count)
+                    sprintf(__('List of feeds (%s)'), $this->rs_count)
                 ) . '</caption>';
 
             $cols = [
@@ -145,40 +145,63 @@ class zcfsFeedsList extends adminGenericList
  */
 class zcfsEntriesList extends adminGenericList
 {
-    public function display($page, $nb_per_page, $url, $enclose='')
+    public function display($page, $nb_per_page, $base_url, $enclose_block = '', $filter = false)
     {
         if ($this->rs->isEmpty()) {
+            echo '<p><strong>' . ($filter ?
+                    __('No entries matches the filter') :
+                    __('No entries')
+                ) . '</strong></p>';
+        } else {
+            $pager = new dcPager($page, $this->rs_count, $nb_per_page, 10);
+            $pager->base_url = $base_url;
 
-            return '<p><strong>'.__('No entry').'</strong></p>';
+            $entries = [];
+            if (isset($_REQUEST['feeds'])) {
+                foreach ($_REQUEST['feeds'] as $v) {
+                    $entries[(integer) $v] = true;
+                }
+            }
+
+            $html_block = '<div class="table-outer clear">' .
+            '<table>' . 
+                '<caption>' . ($filter ? 
+                    sprintf(__('List of %s entries matching the filter.'), $this->rs_count) :
+                    sprintf(__('List of entries (%s)'), $this->rs_count)
+                ) . '</caption>';
+
+            $cols = [
+                'title'    => '<th scope="col" colspan="2" class="first">' . __('Title') . '</th>',
+                'date'     => '<th scope="col">' . __('Date') . '</th>',
+                'author'   => '<th scope="col">' . __('Author') . '</th>',
+                'category' => '<th scope="col">' . __('Category') . '</th>',
+                'status'   => '<th scope="col">' . __('Status') . '</th>'
+            ];
+
+            $cols = new ArrayObject($cols);
+            $this->core->callBehavior('adminZcfsPostListHeader', $this->core, $this->rs, $cols);
+
+            $this->userColumns('zcfs_entries', $cols);
+
+            $html_block .= '<tr>' . implode(iterator_to_array($cols)) . '</tr>%s</table></div>';
+            if ($enclose_block) {
+                $html_block = sprintf($enclose_block, $html_block);
+            }
+
+            echo $pager->getLinks();
+
+            $blocks = explode('%s', $html_block);
+
+            echo $blocks[0];
+
+            while ($this->rs->fetch()) {
+                echo $this->postLine(isset($entries[$this->rs->post_id]));
+            }
+
+            echo $blocks[1];
+
+            echo $pager->getLinks();
         }
-
-        $pager = new dcPager($page, $this->rs_count, $nb_per_page, 10);
-        $pager->base_url    = $url;
-        $pager->html_prev    = $this->html_prev;
-        $pager->html_next    = $this->html_next;
-        $pager->var_page    = 'page';
-
-        $html_block =
-        '<div class="table-outer">'.
-        '<table class="clear"><tr>'.
-        '<th colspan="2">'.__('Title').'</th>'.
-        '<th>'.__('Date').'</th>'.
-        '<th>'.__('Category').'</th>'.
-        '<th>'.__('Author').'</th>'.
-        '<th>'.__('Comments').'</th>'.
-        '<th>'.__('Trackbacks').'</th>'.
-        '<th>'.__('Status').'</th>'.
-        '</tr>%s</table></div>';
-
-        $res = '';
-        while ($this->rs->fetch()) {
-            $res .= $this->postLine();
-        }
-
-        return 
-            $pager->getLinks().
-            sprintf($enclose, sprintf($html_block, $res)).
-            $pager->getLinks();
     }
 
     private function postLine()
@@ -191,36 +214,182 @@ class zcfsEntriesList extends adminGenericList
             sprintf($cat_link,$this->rs->cat_id, html::escapeHTML($this->rs->cat_title)) 
             : __('None');
 
-        $img = '<img alt="%1$s" title="%1$s" src="images/%2$s" />';
+        $img        = '<img alt="%1$s" title="%1$s" src="images/%2$s" />';
+        $img_status = '';
+        $sts_class  = '';
         switch ($this->rs->post_status) {
             case 1:
-                $img_status = sprintf($img, __('published'), 'check-on.png');
+                $img_status = sprintf($img, __('Published'), 'check-on.png');
+                $sts_class  = 'sts-online';
+
                 break;
             case 0:
-                $img_status = sprintf($img, __('unpublished'), 'check-off.png');
+                $img_status = sprintf($img, __('Unpublished'), 'check-off.png');
+                $sts_class  = 'sts-offline';
+
                 break;
             case -1:
-                $img_status = sprintf($img, __('scheduled'), 'scheduled.png');
+                $img_status = sprintf($img, __('Scheduled'), 'scheduled.png');
+                $sts_class  = 'sts-scheduled';
+
                 break;
             case -2:
-                $img_status = sprintf($img, __('pending'), 'check-wrn.png');
+                $img_status = sprintf($img, __('Pending'), 'check-wrn.png');
+                $sts_class  = 'sts-pending';
+
                 break;
         }
 
-        return 
-        '<tr class="line'.($this->rs->post_status != 1 ? ' offline' : '').'"'.
-        ' id="p'.$this->rs->post_id.'">'.
-        '<td class="nowrap">'.
-        form::checkbox(array('entries[]'), $this->rs->post_id, '', '', '', !$this->rs->isEditable()).'</td>'.
-        '<td class="maximal"><a href="'.$this->core->getPostAdminURL($this->rs->post_type, $this->rs->post_id).
-        '" title="'.__('Edit entry').'">'.
-        html::escapeHTML($this->rs->post_title).'</a></td>'.
-        '<td class="nowrap">'.dt::dt2str(__('%Y-%m-%d %H:%M'), $this->rs->post_dt).'</td>'.
-        '<td class="nowrap">'.$cat_title.'</td>'.
-        '<td class="nowrap">'.$this->rs->user_id.'</td>'.
-        '<td class="nowrap">'.$this->rs->nb_comment.'</td>'.
-        '<td class="nowrap">'.$this->rs->nb_trackback.'</td>'.
-        '<td class="nowrap status">'.$img_status.'</td>'.
-        '</tr>';
+        $res = '<tr class="line ' . ($this->rs->post_status != 1 ? 'offline ' : '') . $sts_class . '"' .
+        ' id="p' . $this->rs->post_id . '">';
+
+        $cols = [
+            'check' => '<td class="nowrap minimal">'.
+                form::checkbox(array('entries[]'), $this->rs->post_id, '', '', '', !$this->rs->isEditable()).'</td>',
+            'title'    => '<td scope="row" class="maximal"><a href="' .
+                $this->core->getPostAdminURL($this->rs->post_type, $this->rs->post_id) . '" ' .
+                'title="' . html::escapeHTML($this->rs->getURL()) . '">' .
+                html::escapeHTML(trim(html::clean($this->rs->post_title))) . '</a></td>',
+            'date'     => '<td class="nowrap count">' . dt::dt2str(__('%Y-%m-%d %H:%M'), $this->rs->post_dt) . '</td>',
+            'author'   => '<td class="nowrap">' . html::escapeHTML($this->rs->user_id) . '</td>',
+            'category' => '<td class="nowrap">'.$cat_title.'</td>',
+            'status'   => '<td class="nowrap status">' . $img_status . '</td>'
+        ];
+
+        $cols = new ArrayObject($cols);
+        $this->core->callBehavior('adminZcfsPostListValue', $this->core, $this->rs, $cols);
+
+        $this->userColumns('zcfs_entries', $cols);
+
+        $res .= implode(iterator_to_array($cols));
+        $res .= '</tr>';
+
+        return $res;
+    }
+}
+
+class adminZcfsPostFilter extends adminGenericFilter
+{
+    public function __construct(dcCore $core)
+    {
+        parent::__construct($core, 'zcfs_entries');
+
+        $filters = new arrayObject([
+            dcAdminFilters::getPageFilter(),
+            $this->getPostUserFilter(),
+            $this->getPostCategoriesFilter(),
+            $this->getPostStatusFilter(),
+            $this->getPostMonthFilter()
+        ]);
+
+        # --BEHAVIOR-- adminPostFilter
+        $core->callBehavior('adminZcfsPostFilter', $core, $filters);
+
+        $filters = $filters->getArrayCopy();
+
+        $this->add($filters);
+    }
+
+    /**
+     * Posts users select
+     */
+    public function getPostUserFilter(): ?dcAdminFilter
+    {
+        $users = null;
+        try {
+            $users = $this->core->blog->getPostsUsers();
+            if ($users->isEmpty()) {
+                return null;
+            }
+        } catch (Exception $e) {
+            $this->core->error->add($e->getMessage());
+            return null;
+        }
+
+        $combo = dcAdminCombos::getUsersCombo($users);
+        dcUtils::lexicalKeySort($combo);
+
+        return (new dcAdminFilter('user_id'))
+            ->param()
+            ->title(__('Author:'))
+            ->options(array_merge(
+                ['-' => ''],
+                $combo
+            ))
+            ->prime(true);
+    }
+
+    /**
+     * Posts categories select
+     */
+    public function getPostCategoriesFilter(): ?dcAdminFilter
+    {
+        $categories = null;
+        try {
+            $categories = $this->core->blog->getCategories();
+            if ($categories->isEmpty()) {
+                return null;
+            }
+        } catch (Exception $e) {
+            $this->core->error->add($e->getMessage());
+            return null;
+        }
+
+        $combo = [
+            '-' => '',
+            __('(No cat)') =>  'NULL'
+        ];
+        while ($categories->fetch()) {
+            $combo[
+                str_repeat('&nbsp;', ($categories->level - 1) * 4) .
+                html::escapeHTML($categories->cat_title) . ' (' . $categories->nb_post . ')'
+            ] = $categories->cat_id;
+        }
+
+        return (new dcAdminFilter('cat_id'))
+            ->param()
+            ->title(__('Category:'))
+            ->options($combo)
+            ->prime(true);
+    }
+
+    /**
+     * Posts status select
+     */
+    public function getPostStatusFilter(): dcAdminFilter
+    {
+        return (new dcAdminFilter('status'))
+            ->param('post_status')
+            ->title(__('Status:'))
+            ->options(array_merge(
+                ['-' => ''],
+                dcAdminCombos::getPostStatusesCombo()
+            ));
+    }
+
+    /**
+     * Posts by month select
+     */
+    public function getPostMonthFilter(): ?dcAdminFilter
+    {
+        $dates = null;
+        try {
+            $dates = $this->core->blog->getDates(['type' => 'month']);
+            if ($dates->isEmpty()) {
+                return null;
+            }
+        } catch (Exception $e) {
+            $this->core->error->add($e->getMessage());
+            return null;
+        }
+
+        return (new dcAdminFilter('month'))
+            ->param('post_month', function($f) { return substr($f[0], 4, 2); })
+            ->param('post_year', function($f) { return substr($f[0], 0, 4); })
+            ->title(__('Month:'))
+            ->options(array_merge(
+                ['-' => ''],
+                dcAdminCombos::getDatesCombo($dates)
+            ));
     }
 }
