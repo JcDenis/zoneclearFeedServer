@@ -696,53 +696,13 @@ else {
     );
 
     if ($feeds_actions_page->process()) {
-
         return null;
     }
 
-    # Combos
-    $combo_sortby = array(
-        __('Date')            => 'feed_upddt',
-        __('Name')            => 'lowername',
-        __('Frequency')        => 'feed_upd_int',
-        __('Date of update')    => 'feed_upd_last',
-        __('Status')            => 'feed_status'
-    );
-
-    $combo_order = array(
-        __('Descending')    => 'desc',
-        __('Ascending')    => 'asc'
-    );
-
-    # Prepared lists
-    $show_filters = false;
-    $sortby = !empty($_GET['sortby']) ? $_GET['sortby'] : 'feed_upddt';
-    $order = !empty($_GET['order']) ? $_GET['order'] : 'desc';
-    $page = !empty($_GET['page']) ? (integer) $_GET['page'] : 1;
-    $nb_per_page =  30;
-    if (!empty($_GET['nb']) && (integer) $_GET['nb'] > 0) {
-        if ($nb_per_page != $_GET['nb']) $show_filters = true;
-        $nb_per_page = (integer) $_GET['nb'];
-    }
-
-    $params = array();
-    $params['limit'] = array((($page-1)*$nb_per_page), $nb_per_page);
-
-    if ($sortby != '' && in_array($sortby, $combo_sortby)) {
-        if ($order != '' && in_array($order, $combo_order)) {
-            $params['order'] = $sortby.' '.$order;
-        }
-        if ($sortby != 'feed_upddt' || $order != 'desc') {
-            $show_filters = true;
-        }
-    }
-
-    $pager_base_url = $p_url.
-        '&amp;part=feeds'.
-        '&amp;sortby='.$sortby.
-        '&amp;order='.$order.
-        '&amp;nb='.$nb_per_page.
-        '&amp;page=%s';
+    $feeds_filter = new adminGenericFilter($core, 'zcfs_feeds');
+    $feeds_filter->add('part', 'feeds');
+    $feeds_filter->add(dcAdminFilters::getPageFilter());
+    $params = $feeds_filter->params();
 
     try {
         $feeds = $zcfs->getFeeds($params);
@@ -750,8 +710,7 @@ else {
         $feeds_list = new zcfsFeedsList(
             $core,
             $feeds,
-            $feeds_counter,
-            $pager_base_url
+            $feeds_counter
         );
     }
     catch (Exception $e) {
@@ -761,25 +720,9 @@ else {
     # Display
     echo 
     '<html><head><title>'.__('Feeds server').'</title>'.
-    dcPage::jsLoad(
-        'index.php?pf=zoneclearFeedServer/js/feedsfilter.js'
-    ).
-    '<script type="text/javascript">'."\n".
-    "//<![CDATA["."\n".
-    dcPage::jsVar(
-        'dotclear.msg.show_filters',
-        $show_filters ? 'true':'false'
-    )."\n".
-    dcPage::jsVar(
-        'dotclear.msg.filter_posts_list',
-        __('Show filters and display options')
-    )."\n".
-    dcPage::jsVar(
-        'dotclear.msg.cancel_the_filter',
-        __('Cancel filters and display options')
-    )."\n".
-    "//]]>\n".
-    "</script>\n".
+    dcPage::jsVars(['dotclear.filter_reset_url' => $core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feeds'])]) .
+    dcPage::jsFilterControl($feeds_filter->show()) .
+    dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/feedsfilter.js')) .
     dcPage::jsPageTabs().
 
     # --BEHAVIOR-- packmanAdminHeader
@@ -798,51 +741,24 @@ else {
 
     '<p class="top-add">'.
     '<a class="button add" href="'.$p_url.'&amp;part=feed">'.
-    __('New feed').'</a></p>'.
+    __('New feed').'</a></p>';
 
-    '<form action="'.$p_url.'&amp;part=feeds" method="get" id="filters-form">'.
-    '<h3 class="out-of-screen-if-js">'.__('Show filters and display options').'</h3>'.
+    $feeds_filter->display('admin.plugin.zoneclearFeedServer', form::hidden('p', 'zoneclearFeedServer') . form::hidden('part', 'feeds'));
 
-    '<div class="table">'.
-    '<div class="cell">'.
-    '<p><label for="sortby" class="ib">'.__('Order by:').'</label> '.
-    form::combo('sortby',$combo_sortby, $sortby).'</p>'.
-    '</div>'.
-    '<div class="cell">'.
-    '<p><label for="order" class="ib">'.__('Sort:').'</label> '.
-    form::combo('order',$combo_order, $order).'</p>'.
-    '</div>'.
-    '<div class="cell">'.
-    '<p><span class="label ib">'.__('Show').'</span> <label for="nb" class="classic">'.
-    form::field('nb',3,3,$nb_per_page).' '.
-    __('entries per page').'</label></p>'.
-    '</div>'.
-    '</div>'.
-
-    '<p><input type="submit" value="'.__('Apply filters and display options').'" />'.
-    form::hidden(array('p'), 'zoneclearFeedServer').
-    form::hidden(array('part'), 'feeds').
-    '<br class="clear" /></p>'. //Opera sucks
-    '</form>'.
-
-    $feeds_list->feedsDisplay($page, $nb_per_page, $pager_base_url, 
+    $feeds_list->feedsDisplay($feeds_filter->page, $feeds_filter->nb, 
         '<form action="'.$p_url.'&amp;part=feeds" method="post" id="form-actions">'.
         '%s'.
         '<div class="two-cols">'.
         '<p class="col checkboxes-helpers"></p>'.
         '<p class="col right">'.__('Selected feeds action:').' '.
-        form::combo(array('action'), $feeds_actions_page->getCombo()).
+        form::combo(['action'], $feeds_actions_page->getCombo()).
         '<input type="submit" value="'.__('ok').'" />'.
-        form::hidden(array('sortby'), $sortby).
-        form::hidden(array('order'), $order).
-        form::hidden(array('page'), $page).
-        form::hidden(array('nb'), $nb_per_page).
-        form::hidden(array('p'), 'zoneclearFeedServer').
-        form::hidden(array('part'), 'feeds').
+        $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', $feeds_filter->values(true)) .
         $core->formNonce().
         '</p>'.
         '</div>'.
-        '</form>'
+        '</form>',
+        false
     );
 }
 

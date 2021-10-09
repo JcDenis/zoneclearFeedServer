@@ -37,6 +37,9 @@ if ($core->auth->check('admin', $core->blog->id)) {
 
     # Dashboard icon
     $core->addBehavior('adminDashboardFavorites', ['zcfsAdminBehaviors', 'adminDashboardFavorites']);
+    # User pref
+    $core->addBehavior('adminColumnsLists', ['zcfsAdminBehaviors', 'adminColumnsLists']);
+    $core->addBehavior('adminFiltersLists', ['zcfsAdminBehaviors', 'adminFiltersLists']);
     # Add info about feed on post page sidebar
     $core->addBehavior('adminPostHeaders', ['zcfsAdminBehaviors', 'adminPostHeaders']);
     $core->addBehavior('adminPostFormItems', ['zcfsAdminBehaviors', 'adminPostFormItems']);
@@ -55,6 +58,17 @@ if (version_compare($core->plugins->moduleInfo('tweakurls', 'version'), '0.8', '
  */
 class zcfsAdminBehaviors
 {
+    public static function feedsSortbyCombo()
+    {
+        return [
+            __('Date')           => 'feed_upddt',
+            __('Name')           => 'lowername',
+            __('Frequency')      => 'feed_upd_int',
+            __('Date of update') => 'feed_upd_last',
+            __('Status')         => 'feed_status'
+        ];
+    }
+
     /**
      * Favorites.
      *
@@ -108,6 +122,42 @@ class zcfsAdminBehaviors
             'admin.plugin.zoneclearFeedServer', 
             ['part' => 'feeds', 'sortby' => 'feed_status', 'order' => 'asc']
         );
+    }
+
+    /**
+     * User pref columns lists.
+     *
+     * @param    dcCore      $core dcCore instance
+     * @param    arrayObject $cols Columns
+     */
+    public static function adminColumnsLists(dcCore $core, $cols)
+    {
+        $cols['zcfs_feeds'] = [
+            __('Feeds server: Feeds'),
+            [
+                'desc'   => [true, __('Feed')],
+                'period' => [true, __('Frequency')],
+                'update' => [true, __('Last update')],
+                'entries'  => [true, __('Entries')]
+            ]
+        ];
+    }
+
+    /**
+     * User pref filters options.
+     *
+     * @param    dcCore      $core  dcCore instance
+     * @param    arrayObject $sorts Sort options
+     */
+    public static function adminFiltersLists(dcCore $core, $sorts)
+    {
+        $sorts['zcfs_feeds'] = [
+            __('Feeds server: Feeds'),
+            self::feedsSortbyCombo(),
+            'lowername',
+            'asc',
+            [__('Links per page'), 30]
+        ];
     }
 
     /**

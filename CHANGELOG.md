@@ -1,13 +1,17 @@
  dev
-- [ ] fix Dotclear 2.19 compatibility
-- [ ] fix php7.3+ php8.0 compatibility
-- [ ] clean up code
-- [x] fix license
-- [ ] fix translations
-- [x] remove all SoCialMe feature as this plugin is dead
 - [ ] fix disallow self blog feeds
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
+- [ ] add generic filters
+- [ ] add user pref for columns and filters options
+
+2021.09.16
+- fix Dotclear 2.19 compatibility
+- fix php7.3+ php8.0 compatibility
+- clean up code
+- fix license
+- remove all SoCialMe feature as this plugin is dead
+- cometics fixes on admin pages
 
 2015.07.19 - Pierre Van Glabeke
 - modif lien vers tous les flux
