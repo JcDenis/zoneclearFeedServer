@@ -88,7 +88,7 @@ class zcfsAdminBehaviors
      */
     public static function adminDashboardFavorites(dcCore $core, dcFavorites $favs)
     {
-        $favs->register('zcfs', array(
+        $favs->register('zcfs', [
             'title'        => __('Feeds server'),
             'url'          => $core->adminurl->get('admin.plugin.zoneclearFeedServer'),
             'small-icon'   => dcPage::getPF('zoneclearFeedServer/icon.png'),
@@ -96,7 +96,7 @@ class zcfsAdminBehaviors
             'permissions'  => 'usage,contentadmin',
             'active_cb'    => ['zcfsAdminBehaviors', 'adminDashboardFavoritesActive'],
             'dashboard_cb' => ['zcfsAdminBehaviors', 'adminDashboardFavoritesCallback']
-        ));
+        ]);
     }
 
     /**
@@ -254,7 +254,7 @@ class zcfsAdminBehaviors
                     '<p><a href="%s">%s</a></p>',
                     $core->adminurl->get(
                         'admin.plugin.zoneclearFeedServer', 
-                        ['part' => 'feed', 'feed' => $fid->meta_id]
+                        ['part' => 'feed', 'feed_id' => $fid->meta_id]
                     ),
                     __('Edit this feed')
                 );
