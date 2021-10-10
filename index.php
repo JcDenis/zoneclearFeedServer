@@ -470,6 +470,7 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     $feeds_filter = new adminGenericFilter($core, 'zcfs_feeds');
     $feeds_filter->add('part', 'feeds');
     $feeds_filter->add(dcAdminFilters::getPageFilter());
+    $feeds_filter->add(dcAdminFilters::getSearchFilter());
     $params = $feeds_filter->params();
 
     # feeds
@@ -514,7 +515,7 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     );
 
     $feeds_list->feedsDisplay($feeds_filter->page, $feeds_filter->nb, 
-        '<form action="' . $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', ['part', 'feeds']) . '" method="post" id="form-actions">' .
+        '<form action="' . $core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part', 'feeds']) . '" method="post" id="form-actions">' .
         '%s' .
         '<div class="two-cols">' .
         '<p class="col checkboxes-helpers"></p>' .

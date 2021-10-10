@@ -39,9 +39,9 @@ class zoneclearFeedServer
      */
     public function __construct(dcCore $core)
     {
-        $this->core = $core;
-        $this->con = $core->con;
-        $this->blog = $core->con->escape($core->blog->id);
+        $this->core  = $core;
+        $this->con   = $core->con;
+        $this->blog  = $core->con->escape($core->blog->id);
         $this->table = $core->prefix . 'zc_feed';
     }
 
@@ -87,11 +87,7 @@ class zoneclearFeedServer
         }
 
         # --BEHAVIOR-- zoneclearFeedServerAfterUpdFeed
-        $this->core->callBehavior(
-            'zoneclearFeedServerAfterUpdFeed',
-            $cur,
-            $id
-        );
+        $this->core->callBehavior('zoneclearFeedServerAfterUpdFeed', $cur, $id);
     }
 
     /**
@@ -120,10 +116,7 @@ class zoneclearFeedServer
         }
 
         # --BEHAVIOR-- zoneclearFeedServerAfterAddFeed
-        $this->core->callBehavior(
-            'zoneclearFeedServerAfterAddFeed',
-            $cur
-        );
+        $this->core->callBehavior('zoneclearFeedServerAfterAddFeed', $cur);
 
         return $cur->feed_id;
     }
@@ -166,12 +159,7 @@ class zoneclearFeedServer
         }
 
         # --BEHAVIOR-- zoneclearFeedServerAfterEnableFeed
-        $this->core->callBehavior(
-            'zoneclearFeedServerAfterEnableFeed',
-            $id,
-            $enable,
-            $time
-        );
+        $this->core->callBehavior('zoneclearFeedServerAfterEnableFeed', $id, $enable, $time);
     }
 
     # 
@@ -189,10 +177,7 @@ class zoneclearFeedServer
         }
 
         # --BEHAVIOR-- zoneclearFeedServerBeforeDelFeed
-        $this->core->callBehavior(
-            'zoneclearFeedServerBeforeDelFeed',
-            $id
-        );
+        $this->core->callBehavior('zoneclearFeedServerBeforeDelFeed', $id);
 
         $this->con->execute(sprintf(
             "DELETE FROM %s WHERE feed_id = %s AND blog_id = '%s' ",
@@ -291,6 +276,11 @@ class zoneclearFeedServer
         }
         if (isset($params['feed_status'])) {
             $strReq .= "AND Z.feed_status = " . ((integer) $params['feed_status']) . " ";
+        }
+
+        if (!empty($params['q'])) {
+            $q = $this->con->escape(str_replace('*', '%', strtolower($params['q'])));
+            $strReq .= "AND LOWER(Z.feed_name) LIKE '" . $q . "' ";
         }
 
         if (!empty($params['sql'])) {
