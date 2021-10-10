@@ -12,13 +12,12 @@
  */
 
 if (!defined('DC_CONTEXT_ADMIN')) {
-
     return null;
 }
 
 if ($core->getVersion('zoneclearFeedServer') != 
-    $core->plugins->moduleInfo('zoneclearFeedServer', 'version')) {
-
+    $core->plugins->moduleInfo('zoneclearFeedServer', 'version')
+) {
     return null;
 }
 
@@ -33,92 +32,87 @@ $zcfs = new zoneclearFeedServer($core);
 ############################################################
 
 if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
-
-    $feed_id = '';
-    $feed_name = '';
-    $feed_desc = '';
-    $feed_owner = '';
-    $feed_tweeter = '';
-    $feed_url = '';
-    $feed_feed = '';
-    $feed_lang = $core->auth->getInfo('user_lang');
-    $feed_tags = '';
+    $feed_id       = '';
+    $feed_name     = '';
+    $feed_desc     = '';
+    $feed_owner    = '';
+    $feed_tweeter  = '';
+    $feed_url      = '';
+    $feed_feed     = '';
+    $feed_lang     = $core->auth->getInfo('user_lang');
+    $feed_tags     = '';
     $feed_get_tags = '0';
-    $feed_cat_id = '';
-    $feed_status = '0';
-    $feed_upd_int = 3600;
+    $feed_cat_id   = '';
+    $feed_status   = '0';
+    $feed_upd_int  = 3600;
 
     $can_view_page = true;
 
-    $feed_headlink = '<link rel="%s" title="%s" href="'.$p_url.'&amp;part=feed&amp;feed_id=%s" />';
-    $feed_link = '<a href="'.$p_url.'&amp;part=feed&amp;feed_id=%s" title="%s">%s</a>';
+    $feed_headlink = '<link rel="%s" title="%s" href="' . $p_url . '&amp;part=feed&amp;feed_id=%s" />';
+    $feed_link = '<a href="' . $p_url . '&amp;part=feed&amp;feed_id=%s" title="%s">%s</a>';
 
     $next_link = $prev_link = $next_headlink = $prev_headlink = null;
 
     # Combos
-    $combo_langs = l10n::getISOcodes(true);
-    $combo_status = $zcfs->getAllStatus();
-    $combo_upd_int = $zcfs->getAllUpdateInterval();
-    $combo_categories = array('-' => '');
+    $combo_langs      = l10n::getISOcodes(true);
+    $combo_status     = $zcfs->getAllStatus();
+    $combo_upd_int    = $zcfs->getAllUpdateInterval();
+    $combo_categories = ['-' => ''];
     try {
-        $categories = $core->blog->getCategories(array(
-            'post_type' => 'post'
-        ));
+        $categories = $core->blog->getCategories(['post_type' => 'post']);
         while ($categories->fetch()) {
             $combo_categories[
-                str_repeat('&nbsp;&nbsp;', $categories->level-1).
-                '&bull; '.html::escapeHTML($categories->cat_title)
+                str_repeat('&nbsp;&nbsp;', $categories->level-1) .
+                '&bull; ' . html::escapeHTML($categories->cat_title)
             ] = $categories->cat_id;
         }
-    }
-    catch (Exception $e) {
+    } catch (Exception $e) {
         $core->error->add($e->getMessage());
     }
 
     # Get entry informations
     if (!empty($_REQUEST['feed_id'])) {
-        $feed = $zcfs->getFeeds(array('feed_id' => $_REQUEST['feed_id']));
+        $feed = $zcfs->getFeeds(['feed_id' => $_REQUEST['feed_id']]);
 
         if ($feed->isEmpty()) {
             $core->error->add(__('This feed does not exist.'));
             $can_view_page = false;
-        }
-        else {
-            $feed_id = $feed->feed_id;
-            $feed_name = $feed->feed_name;
-            $feed_desc = $feed->feed_desc;
-            $feed_owner = $feed->feed_owner;
-            $feed_tweeter = $feed->feed_tweeter;
-            $feed_url = $feed->feed_url;
-            $feed_feed = $feed->feed_feed;
-            $feed_lang = $feed->feed_lang;
-            $feed_tags = $feed->feed_tags;
+        }  else {
+            $feed_id       = $feed->feed_id;
+            $feed_name     = $feed->feed_name;
+            $feed_desc     = $feed->feed_desc;
+            $feed_owner    = $feed->feed_owner;
+            $feed_tweeter  = $feed->feed_tweeter;
+            $feed_url      = $feed->feed_url;
+            $feed_feed     = $feed->feed_feed;
+            $feed_lang     = $feed->feed_lang;
+            $feed_tags     = $feed->feed_tags;
             $feed_get_tags = $feed->feed_get_tags;
-            $feed_cat_id = $feed->cat_id;
-            $feed_status = $feed->feed_status;
-            $feed_upd_int = $feed->feed_upd_int;
+            $feed_cat_id   = $feed->cat_id;
+            $feed_status   = $feed->feed_status;
+            $feed_upd_int  = $feed->feed_upd_int;
 
             $next_params = array(
-                'sql' => 'AND feed_id < '.$feed_id.' ',
+                'sql'   => 'AND feed_id < ' . $feed_id . ' ',
                 'limit' => 1
             );
             $next_rs = $zcfs->getFeeds($next_params);
             $prev_params = array(
-                'sql' => 'AND feed_id > '.$feed_id.' ',
+                'sql'   => 'AND feed_id > ' . $feed_id . ' ',
                 'limit' => 1
             );
             $prev_rs = $zcfs->getFeeds($prev_params);
 
             if (!$next_rs->isEmpty()) {
-                $next_link = sprintf($feed_link,$next_rs->feed_id,
-                    html::escapeHTML($next_rs->feed_name), __('next feed').'&nbsp;&#187;');
+                $next_link = sprintf($feed_link, $next_rs->feed_id,
+                    html::escapeHTML($next_rs->feed_name), __('next feed') . '&nbsp;&#187;');
                 $next_headlink = sprintf($feed_headlink, 'next',
                     html::escapeHTML($next_rs->feed_name), $next_rs->feed_id);
             }
 
             if (!$prev_rs->isEmpty()) {
-                $prev_link = sprintf($feed_link,$prev_rs->feed_id,
-                    html::escapeHTML($prev_rs->feed_name), '&#171;&nbsp;'.__('previous feed'));
+                $prev_link = sprintf($feed_link, $prev_rs->feed_id,
+                    html::escapeHTML($prev_rs->feed_name), '&#171;&nbsp;' . __('previous feed'));
                 $prev_headlink = sprintf($feed_headlink, 'previous',
                     html::escapeHTML($prev_rs->feed_name), $prev_rs->feed_id);
             }
@@ -127,20 +121,20 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
 
     if (!empty($_POST['action']) && $_POST['action'] == 'savefeed') {
         try {
-            $feed_name    = $_POST['feed_name'];
-            $feed_desc    = $_POST['feed_desc'];
-            $feed_owner    = $_POST['feed_owner'];
+            $feed_name       = $_POST['feed_name'];
+            $feed_desc       = $_POST['feed_desc'];
+            $feed_owner      = $_POST['feed_owner'];
             $feed_tweeter    = $_POST['feed_tweeter'];
             $feed_url        = $_POST['feed_url'];
-            $feed_feed    = $_POST['feed_feed'];
-            $feed_lang    = $_POST['feed_lang'];
-            $feed_tags    = $_POST['feed_tags'];
-            $feed_get_tags    = empty($_POST['feed_get_tags']) ? 0 : 1;
-            $feed_cat_id    = $_POST['feed_cat_id'];
+            $feed_feed       = $_POST['feed_feed'];
+            $feed_lang       = $_POST['feed_lang'];
+            $feed_tags       = $_POST['feed_tags'];
+            $feed_get_tags   = empty($_POST['feed_get_tags']) ? 0 : 1;
+            $feed_cat_id     = $_POST['feed_cat_id'];
+            $feed_upd_int    = $_POST['feed_upd_int'];
             if (isset($_POST['feed_status'])) {
                 $feed_status = (integer) $_POST['feed_status'];
             }
-            $feed_upd_int    = $_POST['feed_upd_int'];
 
             $testfeed_params['feed_feed'] = $feed_feed;
             if ($feed_id) {
@@ -165,85 +159,63 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
             if ($feed_cat_id != '' && !$get_feed_cat_id) {
                 throw new Exception(__('You must provide valid category.'));
             }        
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $core->error->add($e->getMessage());
         }
     }
 
-    if (!empty($_POST['action']) && $_POST['action'] == 'savefeed' 
-     && !$core->error->flag()
-    ) {
-
+    if (!empty($_POST['action']) && $_POST['action'] == 'savefeed' && !$core->error->flag()) {
         $cur = $zcfs->openCursor();
-        $cur->feed_name = $feed_name;
-        $cur->feed_desc = $feed_desc;
-        $cur->feed_owner = $feed_owner;
-        $cur->feed_tweeter = $feed_tweeter;
-        $cur->feed_url = $feed_url;
-        $cur->feed_feed = $feed_feed;
-        $cur->feed_lang = $feed_lang;
-        $cur->feed_tags = $feed_tags;
+        $cur->feed_name     = $feed_name;
+        $cur->feed_desc     = $feed_desc;
+        $cur->feed_owner    = $feed_owner;
+        $cur->feed_tweeter  = $feed_tweeter;
+        $cur->feed_url      = $feed_url;
+        $cur->feed_feed     = $feed_feed;
+        $cur->feed_lang     = $feed_lang;
+        $cur->feed_tags     = $feed_tags;
         $cur->feed_get_tags = (integer) $feed_get_tags;
-        $cur->cat_id = $feed_cat_id != '' ? (integer) $feed_cat_id : null;
-        $cur->feed_status = (integer) $feed_status;
-        $cur->feed_upd_int = (integer) $feed_upd_int;
+        $cur->cat_id        = $feed_cat_id != '' ? (integer) $feed_cat_id : null;
+        $cur->feed_status   = (integer) $feed_status;
+        $cur->feed_upd_int  = (integer) $feed_upd_int;
 
         # Update feed
         if ($feed_id) {
             try {
                 # --BEHAVIOR-- adminBeforeZoneclearFeedServerFeedUpdate
-                $core->callBehavior(
-                    'adminBeforeZoneclearFeedServerFeedUpdate',
-                    $cur,
-                    $feed_id
-                );
+                $core->callBehavior('adminBeforeZoneclearFeedServerFeedUpdate', $cur, $feed_id);
 
                 $zcfs->updFeed($feed_id, $cur);
 
                 # --BEHAVIOR-- adminAfterZoneclearFeedServerFeedUpdate
-                $core->callBehavior(
-                    'adminAfterZoneclearFeedServerFeedUpdate',
-                    $cur,
-                    $feed_id
-                );
+                $core->callBehavior('adminAfterZoneclearFeedServerFeedUpdate', $cur, $feed_id);
 
                 dcPage::addSuccessNotice(
                     __('Feed successfully updated.')
                 );
-                http::redirect(
-                    $p_url.'&part=feed&feed_id='.$feed_id
+                $core->adminurl->redirect(
+                    'admin.plugin.zoneclearFeedServer', ['part' => 'feed', 'feed_id' => $feed_id]
                 );
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 $core->error->add($e->getMessage());
             }
-        }
-        else {        
+        } else {        
             try {
                 # --BEHAVIOR-- adminBeforeZoneclearFeedServerFeedCreate
-                $core->callBehavior(
-                    'adminBeforeZoneclearFeedServerFeedCreate',
-                    $cur
-                );
+                $core->callBehavior('adminBeforeZoneclearFeedServerFeedCreate', $cur);
 
                 $return_id = $zcfs->addFeed($cur);
 
                 # --BEHAVIOR-- adminAfterZoneclearFeedServerFeedCreate
-                $core->callBehavior(
-                    'adminAfterZoneclearFeedServerFeedCreate',
-                    $cur,
-                    $return_id
-                );
+                $core->callBehavior('adminAfterZoneclearFeedServerFeedCreate', $cur, $return_id);
 
                 dcPage::addSuccessNotice(
                     __('Feed successfully created.')
                 );
-                http::redirect(
-                    $p_url.'&part=feed&feed_id='.$return_id
+                $core->adminurl->redirect(
+                    'admin.plugin.zoneclearFeedServer', ['part' => 'feed', 'feed_id' => $return_id]
                 );
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 $core->error->add($e->getMessage());
             }
         }
@@ -251,29 +223,25 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
 
     # Prepared entries list
     if ($feed_id && $can_view_page) {
-        # Posts action
+        # action
         $posts_actions_page = new dcPostsActionsPage(
             $core,
             'plugin.php',
             [
-                'p'        => 'zoneclearFeedServer',
+                'p'       => 'zoneclearFeedServer',
                 'part'    => 'feed',
-                'feed_id'    => $feed_id,
-                '_ANCHOR'    => 'entries'
+                'feed_id' => $feed_id,
+                '_ANCHOR' => 'entries'
             ]
         );
-
         if ($posts_actions_page->process()) {
             return null;
         }
 
-        /* Get posts
-        -------------------------------------------------------- */
+        # filters
         $post_filter = new adminZcfsPostFilter($core);
         $post_filter->add('part', 'feed');
         $post_filter->add('feed_id', $feed_id);
-
-        # get list params
         $params = $post_filter->params();
 
         # lexical sort
@@ -286,15 +254,14 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
         # --BEHAVIOR-- adminPostsSortbyLexCombo
         $core->callBehavior('adminPostsSortbyLexCombo', [& $sortby_lex]);
 
-        $params['order'] = (array_key_exists($post_filter->sortby, $sortby_lex) ?
+        $params['no_content'] = true;
+        $params['feed_id']    = $feed_id;
+        $params['order']      = (array_key_exists($post_filter->sortby, $sortby_lex) ?
             $core->con->lexFields($sortby_lex[$post_filter->sortby]) :
             $post_filter->sortby) . ' ' . $post_filter->order;
 
-        $params['no_content'] = true;
-
-        # Get posts
+        # posts
         try {
-            $params['feed_id'] = $feed_id;
             $posts = $zcfs->getPostsByFeed($params);
             $counter = $zcfs->getPostsByFeed($params,true);
             $post_list = new zcfsEntriesList(
@@ -302,49 +269,45 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
                 $posts,
                 $counter->f(0)
             );
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $core->error->add($e->getMessage());
         }
     }
 
-    # Display
+    # display
     echo 
-    '<html><head><title>'.__('Feeds server').'</title>'.
+    '<html><head><title>' . __('Feeds server') . '</title>' .
     ($feed_id && !$core->error->flag() ?
         $post_filter->js($core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed', 'feed_id' => $feed_id], '&').'#entries') .
         dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/list.js'))
-    : '').
-    dcPage::jsPageTabs().
-    $next_headlink."\n".$prev_headlink.
+    : '') .
+    dcPage::jsPageTabs() .
+    $next_headlink . "\n" . $prev_headlink .
 
-    # --BEHAVIOR-- packmanAdminHeader
-    $core->callBehavior('zcfsAdminHeader', $core).
+    # --BEHAVIOR-- adminZoneclearFeedServerHeader
+    $core->callBehavior('adminZoneclearFeedServerHeader', $core) .
 
-    '</head><body>'.
+    '</head><body>' .
 
-    dcPage::breadcrumb(
-        array(
-            html::escapeHTML($core->blog->name) => '',
-            __('Feeds server') => '',
-            __('Feeds') => $p_url,
+    dcPage::breadcrumb([
+            html::escapeHTML($core->blog->name)           => '',
+            __('Feeds server')                            => '',
+            __('Feeds')                                   => $p_url,
             ($feed_id ? __('Edit feed') : __('New feed')) => ''
-        )
-    ).
+    ]).
     dcPage::notices() .
     ($feed_id ? '<h3>' . sprintf(__('Edit feed "%s"'), $feed_name) .'</h3>' : '');
 
     # Feed
     if ($can_view_page) {
-
         # nav link
         if ($feed_id && ($next_link || $prev_link)) {
-            echo '<p>';
+            echo '<p class="nav_prevnext">';
             if ($prev_link) {
                 echo $prev_link;
             }
             if ($next_link && $prev_link) {
-                echo ' - ';
+                echo ' | ';
             }
             if ($next_link) {
                 echo $next_link;
@@ -353,134 +316,138 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
         }
 
         echo '
-        <div' . ($feed_id ? ' class="multi-part" title="'.__('Feed').'"' : '') . ' id="edit-entry">
+        <div' . ($feed_id ? ' class="multi-part" title="' . __('Feed') . '"' : '') . ' id="edit-entry">
         <form method="post" action="plugin.php">
 
-        <div class="two-cols">'.
+        <div class="two-cols">' .
 
-        '<div class="col70">'.
-        '<h4>'.__('Feed information').'</h4>'.
+        '<div class="col70">' .
+        '<h4>' . __('Feed information') . '</h4>' .
 
         '<p><label for="feed_name" class="required">
-        <abbr title="'.__('Required field').'">*</abbr>'.
-        __('Name:').'</label>'.
-        form::field('feed_name', 60, 255, $feed_name, 'maximal').
-        '</p>'.
+        <abbr title="' . __('Required field') . '">*</abbr>' .
+        __('Name:') . '</label>' .
+        form::field('feed_name', 60, 255, $feed_name, 'maximal') .
+        '</p>' .
 
         '<p><label for="feed_owner" class="required">
-        <abbr title="'.__('Required field').'">*</abbr>'.
-        __('Owner:').'</label>'.
-        form::field('feed_owner', 60, 255, $feed_owner, 'maximal').
-        '</p>'.
+        <abbr title="' . __('Required field') . '">*</abbr>' .
+        __('Owner:') . '</label>' .
+        form::field('feed_owner', 60, 255, $feed_owner, 'maximal') .
+        '</p>' .
 
         // move this away
-        '<p><label for="feed_tweeter">'.
-        __('Tweeter or Identica ident:').'</label>'.
-        form::field('feed_tweeter', 60, 64, $feed_tweeter, 'maximal').
-        '</p>'.
+        '<p><label for="feed_tweeter">' .
+        __('Tweeter or Identica ident:') . '</label>' .
+        form::field('feed_tweeter', 60, 64, $feed_tweeter, 'maximal') .
+        '</p>' .
 
         '<p><label for="feed_url" class="required">
-        <abbr title="'.__('Required field').'">*</abbr>'.
-        __('Site URL:').'</label>'.
-        form::field('feed_url', 60, 255, $feed_url, 'maximal').
-        '</p>'.
+        <abbr title="' . __('Required field') . '">*</abbr>' .
+        __('Site URL:') . '</label>' .
+        form::field('feed_url', 60, 255, $feed_url, 'maximal') .
+        '</p>' .
 
         '<p><label for="feed_feed" class="required">
-        <abbr title="'.__('Required field').'">*</abbr>'.
-        __('Feed URL:').'</label>'.
-        form::field('feed_feed', 60, 255, $feed_feed, 'maximal').
-        '</p>'.
+        <abbr title="' . __('Required field') . '">*</abbr>' .
+        __('Feed URL:') . '</label>' .
+        form::field('feed_feed', 60, 255, $feed_feed, 'maximal') .
+        '</p>' .
 
-        '<p><label for="feed_desc">'.__('Description:').'</label>'.
-        form::field('feed_desc', 60, 255, $feed_desc, 'maximal').
-        '</p>'.
+        '<p><label for="feed_desc">' . __('Description:') . '</label>' .
+        form::field('feed_desc', 60, 255, $feed_desc, 'maximal') .
+        '</p>' .
 
-        '<p><label for="feed_tags">'.__('Tags:').'</label>'.
-        form::field('feed_tags', 60, 255, $feed_tags, 'maximal').
-        '</p>'.
+        '<p><label for="feed_tags">' . __('Tags:') . '</label>' .
+        form::field('feed_tags', 60, 255, $feed_tags, 'maximal') .
+        '</p>' .
 
-        # --BEHAVIOR-- zoneclearFeedServerFeedForm
-        $core->callBehavior('zoneclearFeedServerFeedForm', $core, $feed_id).
+        # --BEHAVIOR-- adminZoneclearFeedServerFeedForm
+        $core->callBehavior('adminZoneclearFeedServerFeedForm', $core, $feed_id) .
 
-        '</div>'.
+        '</div>' .
 
-        '<div class="col30">'.
-        '<h4>'.__('Local settings').'</h4>'.
+        '<div class="col30">' .
+        '<h4>' . __('Local settings') . '</h4>' .
 
-        '<p><label for="feed_cat_id">'.__('Category:').'</label>'.
-        form::combo('feed_cat_id', $combo_categories, $feed_cat_id, 'maximal').
-        '</p>'.
+        '<p><label for="feed_cat_id">' . __('Category:') . '</label>' .
+        form::combo('feed_cat_id', $combo_categories, $feed_cat_id, 'maximal') .
+        '</p>' .
 
-        '<p><label for="feed_status">'.__('Status:').'</label>'.
-        form::combo('feed_status', $combo_status, $feed_status, 'maximal').
-        '</p>'.
+        '<p><label for="feed_status">' . __('Status:') . '</label>' .
+        form::combo('feed_status', $combo_status, $feed_status, 'maximal') .
+        '</p>' .
 
-        '<p><label for="feed_upd_int">'.__('Update:').'</label>'.
-        form::combo('feed_upd_int', $combo_upd_int, $feed_upd_int, 'maximal').
-        '</p>'.
+        '<p><label for="feed_upd_int">' . __('Update:') . '</label>' .
+        form::combo('feed_upd_int', $combo_upd_int, $feed_upd_int, 'maximal') .
+        '</p>' .
 
-        '<p><label for="feed_lang">'.__('Lang:').'</label>'.
-        form::combo('feed_lang', $combo_langs, $feed_lang, 'maximal').
-        '</p>'.
+        '<p><label for="feed_lang">' . __('Lang:') . '</label>' .
+        form::combo('feed_lang', $combo_langs, $feed_lang, 'maximal') .
+        '</p>' .
 
-        '<p><label for="feed_get_tags" class="classic">'.
-        form::checkbox('feed_get_tags', 1, $feed_get_tags).
-        __('Import tags from feed').'</label></p>'.
+        '<p><label for="feed_get_tags" class="classic">' .
+        form::checkbox('feed_get_tags', 1, $feed_get_tags) .
+        __('Import tags from feed') . '</label></p>' .
 
-        '</div>'.
+        '</div>' .
 
-        '</div>'.
+        '</div>' .
 
-        '<p class="clear">'.
-        form::hidden(array('action'), 'savefeed').
-        form::hidden(array('feed_id'), $feed_id).
-        form::hidden(array('p'), 'zoneclearFeedServer').
-        form::hidden(array('part'), 'feed').
-        $core->formNonce().
-        '<input type="submit" name="save" value="'.__('Save').'" /></p>
+        '<p class="clear">
+        <input type="submit" name="save" value="'.__('Save').' (s)" accesskey="s"/>' .
+        $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', [
+                'part'    => 'feed',
+                'feed_id' => $feed_id,
+                'action'  => 'savefeed'
+        ]) .
+        $core->formNonce() .
+        '</p>
         </form>
         </div>';
     }
 
-    # Entries
+    # entries
     if ($feed_id && $can_view_page && !$core->error->flag()) {
         echo '<div class="multi-part" title="'.__('Entries').'" id="entries">';
 
+        # show filters
         $post_filter->display(['admin.plugin.zoneclearFeedServer','#entries'], 
-            form::hidden('p', 'zoneclearFeedServer') . 
-            form::hidden('part', 'feed') .
-            form::hidden('feed_id', $feed_id)
+            $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', [
+                'part'    => 'feed',
+                'feed_id' => $feed_id
+            ])
         );
 
         # fix pager url
         $args = $post_filter->values();
         unset($args['page']);
         $args['page'] = '%s';
-        $base_url = $core->adminurl->get('admin.plugin.zoneclearFeedServer', $args, '&').'#entries';
 
-        # Show posts
-        $post_list->display($post_filter->page, $post_filter->nb, $base_url,
-            '<form action="'.$p_url.'&amp;part=feed#entries" method="post" id="form-entries">'.
-            '%s'.
+        # show posts
+        $post_list->display(
+            $post_filter->page, 
+            $post_filter->nb, 
+            $core->adminurl->get('admin.plugin.zoneclearFeedServer', $args, '&') . '#entries',
+            '<form action="' . $core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed']) . '#entries" method="post" id="form-entries">'.
+            '%s' .
 
-            '<div class="two-cols">'.
-            '<p class="col checkboxes-helpers"></p>'.
+            '<div class="two-cols">' .
+            '<p class="col checkboxes-helpers"></p>' .
 
-            '<p class="col right">'.__('Selected entries action:').' '.
-            form::combo('action', $posts_actions_page->getCombo()).
-            '<input type="submit" name="save" value="'.__('ok').'" /></p>'.
+            '<p class="col right">' . __('Selected entries action:') . ' ' .
+            form::combo('action', $posts_actions_page->getCombo()) .
+            '<input type="submit" name="save" value="' . __('ok') . '" /></p>' .
             $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', $post_filter->values()) .
             form::hidden('redir', $core->adminurl->get('admin.plugin.zoneclearFeedServer', $post_filter->values())) .
-            $core->formNonce().
-            '</div>'.
+            $core->formNonce() .
+            '</div>' .
             '</form>',
             $post_filter->show()
         );
 
-        echo 
-        '</div>';
+        echo '</div>';
     }
-}
 
 ############################################################
 #
@@ -488,24 +455,24 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
 #
 ############################################################
 
-else {
-
-    # Actions page
+} else {
+    # actions
     $feeds_actions_page = new zcfsFeedsActionsPage(
         $core,
         'plugin.php',
-        array('p' => 'zoneclearFeedServer', 'part' => 'feeds')
+        ['p' => 'zoneclearFeedServer', 'part' => 'feeds']
     );
-
     if ($feeds_actions_page->process()) {
         return null;
     }
 
+    # filters
     $feeds_filter = new adminGenericFilter($core, 'zcfs_feeds');
     $feeds_filter->add('part', 'feeds');
     $feeds_filter->add(dcAdminFilters::getPageFilter());
     $params = $feeds_filter->params();
 
+    # feeds
     try {
         $feeds = $zcfs->getFeeds($params);
         $feeds_counter = $zcfs->getFeeds($params, true)->f(0);
@@ -514,52 +481,52 @@ else {
             $feeds,
             $feeds_counter
         );
-    }
-    catch (Exception $e) {
+    } catch (Exception $e) {
         $core->error->add($e->getMessage());
     }
 
-    # Display
+    # display
     echo 
-    '<html><head><title>'.__('Feeds server').'</title>'.
+    '<html><head><title>' . __('Feeds server') . '</title>' .
     $feeds_filter->js($core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feeds'], '&')) .
     dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/list.js')) .
-    dcPage::jsPageTabs().
+    dcPage::jsPageTabs() .
 
-    # --BEHAVIOR-- packmanAdminHeader
-    $core->callBehavior('zcfsAdminHeader', $core).
+    # --BEHAVIOR-- adminZoneclearFeedServerHeader
+    $core->callBehavior('adminZoneclearFeedServerHeader', $core) .
 
-    '</head><body>'.
+    '</head><body>' .
 
-    dcPage::breadcrumb(
-        array(
+    dcPage::breadcrumb([
             html::escapeHTML($core->blog->name) => '',
             __('Feeds server') => '',
             __('Feeds') => ''
-        )
-    ).
-    dcPage::notices().
+    ]).
+    dcPage::notices() .
 
-    '<p class="top-add">'.
-    '<a class="button add" href="'.$p_url.'&amp;part=feed">'.
-    __('New feed').'</a></p>';
+    '<p class="top-add">' .
+    '<a class="button add" href="' . $core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed']) . '">' .
+    __('New feed') . '</a></p>';
 
-    $feeds_filter->display('admin.plugin.zoneclearFeedServer', form::hidden('p', 'zoneclearFeedServer') . form::hidden('part', 'feeds'));
+    $feeds_filter->display(
+        'admin.plugin.zoneclearFeedServer', 
+        $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', ['part', 'feeds'])
+    );
 
     $feeds_list->feedsDisplay($feeds_filter->page, $feeds_filter->nb, 
-        '<form action="'.$p_url.'&amp;part=feeds" method="post" id="form-actions">'.
-        '%s'.
-        '<div class="two-cols">'.
-        '<p class="col checkboxes-helpers"></p>'.
-        '<p class="col right">'.__('Selected feeds action:').' '.
-        form::combo(['action'], $feeds_actions_page->getCombo()).
-        '<input type="submit" value="'.__('ok').'" />'.
+        '<form action="' . $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', ['part', 'feeds']) . '" method="post" id="form-actions">' .
+        '%s' .
+        '<div class="two-cols">' .
+        '<p class="col checkboxes-helpers"></p>' .
+        '<p class="col right">' . __('Selected feeds action:') . ' ' .
+        form::combo(['action'], $feeds_actions_page->getCombo()) .
+        '<input type="submit" value="' . __('ok') . '" />' .
         $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', $feeds_filter->values(true)) .
-        $core->formNonce().
-        '</p>'.
-        '</div>'.
+        $core->formNonce() .
+        '</p>' .
+        '</div>' .
         '</form>',
-        false
+        $feeds_filter->show()
     );
 }
 
