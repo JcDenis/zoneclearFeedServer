@@ -290,9 +290,8 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     '</head><body>' .
 
     dcPage::breadcrumb([
-            html::escapeHTML($core->blog->name)           => '',
-            __('Feeds server')                            => '',
-            __('Feeds')                                   => $p_url,
+            __('Plugins')                                 => '',
+            __('Feeds server')                            => $p_url,
             ($feed_id ? __('Edit feed') : __('New feed')) => ''
     ]).
     dcPage::notices() .
@@ -499,9 +498,8 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     '</head><body>' .
 
     dcPage::breadcrumb([
-            html::escapeHTML($core->blog->name) => '',
-            __('Feeds server') => '',
-            __('Feeds') => ''
+            __('Plugins')      => '',
+            __('Feeds server') => ''
     ]).
     dcPage::notices() .
 
