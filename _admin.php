@@ -61,11 +61,11 @@ class zcfsAdminBehaviors
     public static function feedsSortbyCombo()
     {
         return [
-            __('Date')           => 'feed_upddt',
-            __('Name')           => 'lowername',
-            __('Frequency')      => 'feed_upd_int',
-            __('Date of update') => 'feed_upd_last',
-            __('Status')         => 'feed_status'
+            __('Date')        => 'feed_upddt',
+            __('Name')        => 'lowername',
+            __('Frequency')   => 'feed_upd_int',
+            __('Update date') => 'feed_upd_last',
+            __('Status')      => 'feed_status'
         ];
     }
 

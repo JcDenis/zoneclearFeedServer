@@ -2,8 +2,10 @@
 - [ ] fix disallow self blog feeds
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
-- [ ] add generic filters
-- [ ] add user pref for columns and filters options
+- add generic filters
+- add user pref for columns and filters options
+- fix redirections, page title, posts feed form
+- update translation
 
 2021.09.16
 - fix Dotclear 2.19 compatibility

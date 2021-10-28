@@ -12,7 +12,6 @@
  */
 
 if (!defined('DC_CONTEXT_ADMIN')) {
-
     return null;
 }
 
@@ -268,6 +267,12 @@ class zcfsEntriesList extends adminGenericList
     }
 }
 
+/**
+ * @ingroup DC_PLUGIN_ZONECLEARFEEDSERVER
+ * @brief Feeds server - Posts list filters methods
+ * @since 2.20
+ * @see  adminGenericFilter for more info
+ */
 class adminZcfsPostFilter extends adminGenericFilter
 {
     public function __construct(dcCore $core)
