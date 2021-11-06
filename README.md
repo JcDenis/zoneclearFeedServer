@@ -3,7 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/JcDenis/zoneclearFeedServer)](https://github.com/JcDenis/zoneclearFeedServer/releases)
 [![Date](https://img.shields.io/github/release-date/JcDenis/zoneclearFeedServer)](https://github.com/JcDenis/zoneclearFeedServer/releases)
 [![Issues](https://img.shields.io/github/issues/JcDenis/zoneclearFeedServer)](https://github.com/JcDenis/zoneclearFeedServer/issues)
-[![Dotclear](https://img.shields.io/badge/dotclear-v2.19-blue.svg)](https://fr.dotclear.org/download)
+[![Dotclear](https://img.shields.io/badge/dotclear-v2.20-blue.svg)](https://fr.dotclear.org/download)
 [![Dotaddict](https://img.shields.io/badge/dotaddict-official-green.svg)](https://plugins.dotaddict.org/dc2/details/zoneclearFeedServer)
 [![License](https://img.shields.io/github/license/JcDenis/zoneclearFeedServer)](https://github.com/JcDenis/zoneclearFeedServer/blob/master/LICENSE)
 
@@ -20,7 +20,7 @@ It mix your blog with a feeds planet.
 
   * super admin permission for plugin and services configuration
   * admin permission to manage feeds
-  * Dotclear 2.19
+  * Dotclear 2.20
 
 ## USAGE
 

@@ -2,6 +2,8 @@
 - [ ] fix disallow self blog feeds
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
+
+2021.11.06
 - add generic filters (dc 2.20)
 - add user pref for columns and filters options (dc 2.20)
 - fix redirections, page title, posts feed form

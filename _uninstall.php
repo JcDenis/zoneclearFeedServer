@@ -17,90 +17,90 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 $mod_id = 'zoneclearFeedServer';
 
 $this->addUserAction(
-    /* type */    
+    /* type */
     'settings',
-    /* action */    
+    /* action */
     'delete_all',
-    /* ns */        
+    /* ns */
     $mod_id,
-    /* desc */    
+    /* desc */
     __('delete all settings')
 );
 $this->addUserAction(
-    /* type */    
+    /* type */
     'tables',
-    /* action */    
+    /* action */
     'delete',
-    /* ns */        
+    /* ns */
     'zc_feed',
-    /* desc */    
+    /* desc */
     __('delete table')
 );
 $this->addUserAction(
-    /* type */    
+    /* type */
     'plugins',
-    /* action */    
+    /* action */
     'delete',
-    /* ns */        
+    /* ns */
     $mod_id,
-    /* desc */    
+    /* desc */
     __('delete plugin files')
 );
 $this->addUserAction(
-    /* type */    
+    /* type */
     'versions',
-    /* action */    
+    /* action */
     'delete',
-    /* ns */        
+    /* ns */
     $mod_id,
-    /* desc */    
+    /* desc */
     __('delete the version number')
 );
 
 $this->addDirectAction(
-    /* type */    
+    /* type */
     'settings',
-    /* action */    
+    /* action */
     'delete_all',
-    /* ns */        
+    /* ns */
     $mod_id,
-    /* desc */    
+    /* desc */
     sprintf(__('delete all %s settings'), $mod_id)
 );
 $this->addDirectAction(
-    /* type */    
+    /* type */
     'tables',
-    /* action */    
+    /* action */
     'delete',
-    /* ns */        
+    /* ns */
     'zc_feed',
-    /* desc */    
+    /* desc */
     sprintf(__('delete %s table'), $mod_id)
 );
 $this->addDirectAction(
-    /* type */    
+    /* type */
     'plugins',
-    /* action */    
+    /* action */
     'delete',
-    /* ns */        
+    /* ns */
     $mod_id,
-    /* desc */    
+    /* desc */
     sprintf(__('delete %s plugin files'), $mod_id)
 );
 $this->addDirectAction(
-    /* type */    
+    /* type */
     'versions',
-    /* action */    
+    /* action */
     'delete',
-    /* ns */        
+    /* ns */
     $mod_id,
-    /* desc */    
+    /* desc */
     sprintf(__('delete %s version number'), $mod_id)
 );
 $this->addDirectCallback(
-    /* function */    
+    /* function */
     'zoneclearfeedServerUninstall',
-    /* desc */    
+    /* desc */
     'delete feeds relations'
 );
 

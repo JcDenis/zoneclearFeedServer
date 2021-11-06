@@ -1,12 +1,13 @@
+<?xml version="1.0"?>
 <modules xmlns:da="http://dotaddict.org/da/">
-<module id="zoneclearFeedServer">
-<name>Feeds server</name>
-<version>2021.09.16</version>
-<author>Jean-Christian Denis, BG, Pierre Van Glabeke</author>
-<desc>Mix your blog with a feeds planet</desc>
-<file>https://github.com/JcDenis/zoneclearFeedServer/releases/download/v2021.09.16/plugin-zoneclearFeedServer.zip</file>
-<da:dcmin>2.19</da:dcmin>
-<da:details>https://plugins.dotaddict.org/dc2/details/pacKman</da:details>
-<da:support>https://github.com/JcDenis/zoneclearFeedServer</da:support>
-</module>
+  <module id="zoneclearFeedServer">
+    <name>Feeds server</name>
+    <version>2021.11.06</version>
+    <author>Jean-Christian Denis, BG, Pierre Van Glabeke</author>
+    <desc>Mix your blog with a feeds planet</desc>
+    <file>https://github.com/JcDenis/zoneclearFeedServer/releases/download/v2021.11.06/plugin-zoneclearFeedServer.zip</file>
+    <da:dcmin>2.20</da:dcmin>
+    <da:details>https://plugins.dotaddict.org/dc2/details/pacKman</da:details>
+    <da:support>https://github.com/JcDenis/zoneclearFeedServer</da:support>
+  </module>
 </modules>
