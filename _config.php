@@ -1,16 +1,15 @@
 <?php
 /**
  * @brief zoneclearFeedServer, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_CONTEXT_MODULE')) {
     return null;
 }
@@ -21,16 +20,16 @@ $redir = empty($_REQUEST['redir']) ? $list->getURL() . '#plugins' : $_REQUEST['r
 $core->blog->settings->addNamespace('zoneclearFeedServer');
 $s = $core->blog->settings->zoneclearFeedServer;
 
-$active = (boolean) $s->zoneclearFeedServer_active;
-$pub_active = (boolean) $s->zoneclearFeedServer_pub_active;
-$post_status_new = (boolean) $s->zoneclearFeedServer_post_status_new;
-$bhv_pub_upd = (integer) $s->zoneclearFeedServer_bhv_pub_upd;
-$update_limit = (integer) $s->zoneclearFeedServer_update_limit;
-$keep_empty_feed = (boolean) $s->zoneclearFeedServer_keep_empty_feed;
-$tag_case = (integer) $s->zoneclearFeedServer_tag_case;
-$post_full_tpl = @unserialize($s->zoneclearFeedServer_post_full_tpl);
+$active           = (bool) $s->zoneclearFeedServer_active;
+$pub_active       = (bool) $s->zoneclearFeedServer_pub_active;
+$post_status_new  = (bool) $s->zoneclearFeedServer_post_status_new;
+$bhv_pub_upd      = (int) $s->zoneclearFeedServer_bhv_pub_upd;
+$update_limit     = (int) $s->zoneclearFeedServer_update_limit;
+$keep_empty_feed  = (bool) $s->zoneclearFeedServer_keep_empty_feed;
+$tag_case         = (int) $s->zoneclearFeedServer_tag_case;
+$post_full_tpl    = @unserialize($s->zoneclearFeedServer_post_full_tpl);
 $post_title_redir = @unserialize($s->zoneclearFeedServer_post_title_redir);
-$feeduser = (string) $s->zoneclearFeedServer_user;
+$feeduser         = (string) $s->zoneclearFeedServer_user;
 
 if ($update_limit < 1) {
     $update_limit = 10;
@@ -47,16 +46,16 @@ $zc = new zoneclearFeedServer($core);
 # -- Set settings --
 if (!empty($_POST['save'])) {
     try {
-        $active = !empty($_POST['active']);
-        $pub_active = !empty($_POST['pub_active']);
-        $post_status_new = !empty($_POST['post_status_new']);
-        $bhv_pub_upd = (integer) $_POST['bhv_pub_upd'];
-        $limit = abs((integer) $_POST['update_limit']);
-        $keep_empty_feed = !empty($_POST['keep_empty_feed']);
-        $tag_case = (integer) $_POST['tag_case'];
-        $post_full_tpl = $_POST['post_full_tpl'];
+        $active           = !empty($_POST['active']);
+        $pub_active       = !empty($_POST['pub_active']);
+        $post_status_new  = !empty($_POST['post_status_new']);
+        $bhv_pub_upd      = (int) $_POST['bhv_pub_upd'];
+        $limit            = abs((int) $_POST['update_limit']);
+        $keep_empty_feed  = !empty($_POST['keep_empty_feed']);
+        $tag_case         = (int) $_POST['tag_case'];
+        $post_full_tpl    = $_POST['post_full_tpl'];
         $post_title_redir = $_POST['post_title_redir'];
-        $feeduser = (string) $_POST['feeduser'];
+        $feeduser         = (string) $_POST['feeduser'];
 
         if ($limit < 1) {
             $limit = 10;
@@ -79,7 +78,7 @@ if (!empty($_POST['save'])) {
             __('Configuration successfully updated.')
         );
         $core->adminurl->redirect(
-            'admin.plugins', 
+            'admin.plugins',
             ['module' => 'zoneclearFeedServer', 'conf' => 1, 'redir' => $list->getRedir()]
         );
     } catch (Exception $e) {
@@ -111,8 +110,8 @@ $pub_page_url = $core->blog->url . $core->url->getBase('zoneclearFeedsPage');
 # -- Display form --
 
 if (!is_writable(DC_TPL_CACHE)) {
-    echo '<p class="error">'. __('Dotclear cache is not writable or not well configured!') . '</p>';
-    }
+    echo '<p class="error">' . __('Dotclear cache is not writable or not well configured!') . '</p>';
+}
 
 echo '
 <div class="fieldset">
@@ -142,7 +141,7 @@ echo '
 <p><label for="post_status_new">' . __('Status of new posts:') . '</label>' .
 form::combo('post_status_new', $combo_status, $post_status_new) . '</p>
 
-<p><label for="feeduser">'.
+<p><label for="feeduser">' .
 __('Owner of entries created by zoneclearFeedServer:') . '</label>' .
 form::combo('feeduser', $combo_admins, $feeduser) . '</p>
 
@@ -154,8 +153,10 @@ form::combo('tag_case', $combo_tagcase, $tag_case) . '</p>
 <p><label for="bhv_pub_upd">' . __('Update feeds on public side:') . '</label>' .
 form::combo('bhv_pub_upd', $combo_pubupd, $bhv_pub_upd) . '</p>
 
-<p class="classic"><label for="update_limit" class="ib">' . sprintf(__('Update %s feed(s) at a time.'),
-form::number('update_limit', ['min' => 0, 'max' => 20, 'default' => $update_limit])) . '</label></p>
+<p class="classic"><label for="update_limit" class="ib">' . sprintf(
+    __('Update %s feed(s) at a time.'),
+    form::number('update_limit', ['min' => 0, 'max' => 20, 'default' => $update_limit])
+) . '</label></p>
 
 <p><label for="keep_empty_feed">' .
 form::checkbox('keep_empty_feed', 1, $keep_empty_feed) . __('Keep active empty feeds') . '</label></p>
@@ -167,7 +168,7 @@ form::checkbox('pub_active', 1, $pub_active) . __('Enable public page') . '</lab
 
 <p>' . __('Redirect to original post on:') . '</p><ul>';
 
-foreach($zc->getPublicUrlTypes($core) as $k => $v) {
+foreach ($zc->getPublicUrlTypes($core) as $k => $v) {
     echo sprintf(
         '<li><label for="post_title_redir_%s">%s%s</label></li>',
         $v,
@@ -182,7 +183,7 @@ echo '
 
 <p>' . __('Show full content on:') . '</p><ul>';
 
-foreach($zc->getPublicUrlTypes($core) as $k => $v) {
+foreach ($zc->getPublicUrlTypes($core) as $k => $v) {
     echo sprintf(
         '<li><label for="post_full_tpl_%s">%s%s</label></li>',
         $v,

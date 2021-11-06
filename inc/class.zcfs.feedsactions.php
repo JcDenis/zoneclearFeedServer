@@ -1,16 +1,15 @@
 <?php
 /**
  * @brief zoneclearFeedServer, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 class zcfsFeedsActionsPage extends dcActionsPage
 {
     public $zcfs;
@@ -24,7 +23,7 @@ class zcfsFeedsActionsPage extends dcActionsPage
             'sortby', 'order', 'page', 'nb'
         ];
         $this->field_entries = 'feeds';
-        $this->caller_title = __('Feeds');
+        $this->caller_title  = __('Feeds');
         $this->loadDefaults();
     }
 
@@ -36,7 +35,7 @@ class zcfsFeedsActionsPage extends dcActionsPage
 
     public function beginPage($breadcrumb = '', $head = '')
     {
-        echo 
+        echo
         '<html><head><title>' . __('Feeds server') . '</title>' .
         dcPage::jsLoad('js/_posts_actions.js') .
         $head .
@@ -57,8 +56,8 @@ class zcfsFeedsActionsPage extends dcActionsPage
         $this->beginPage(
             dcPage::breadcrumb([
                 html::escapeHTML($this->core->blog->name) => '',
-                $this->getCallerTitle() => $this->getRedirection(true),
-                __('Feeds actions') => ''
+                $this->getCallerTitle()                   => $this->getRedirection(true),
+                __('Feeds actions')                       => ''
             ])
         );
         $this->endPage();
@@ -70,13 +69,13 @@ class zcfsFeedsActionsPage extends dcActionsPage
             $params['feed_id'] = $from['feeds'];
 
             $feeds = $this->zcfs->getFeeds($params);
-            while ($feeds->fetch())    {
+            while ($feeds->fetch()) {
                 $this->entries[$feeds->feed_id] = $feeds->feed_name;
             }
             $this->rs = $feeds;
         } else {
             $this->rs = $this->core->con->select(
-                "SELECT blog_id FROM " . $this->core->prefix . "blog WHERE false"
+                'SELECT blog_id FROM ' . $this->core->prefix . 'blog WHERE false'
             );
         }
     }
@@ -129,13 +128,13 @@ class zcfsDefaultFeedsActions
     public static function doEnableFeed(dcCore $core, zcfsFeedsActionsPage $ap, $post)
     {
         $enable = $ap->getAction() == 'enablefeed';
-        $ids = $ap->getIDs();
+        $ids    = $ap->getIDs();
 
         if (empty($ids)) {
             throw new Exception(__('No feeds selected'));
         }
 
-        foreach($ids as $id) {
+        foreach ($ids as $id) {
             $ap->zcfs->enableFeed($id, $enable);
         }
 
@@ -151,8 +150,7 @@ class zcfsDefaultFeedsActions
                     '%d feed has been successfully disabled.',
                     '%d feeds have been successfully disabled.',
                     count($ids)
-                )
-            ,
+                ),
             count($ids)
         ));
         $ap->redirect(true);
@@ -174,14 +172,12 @@ class zcfsDefaultFeedsActions
             throw new Exception(__('No feeds selected'));
         }
 
-        foreach($ids as $id) {
-
+        foreach ($ids as $id) {
             $posts = $ap->zcfs->getPostsByFeed([
                 'feed_id' => $id
             ]);
 
-            while($posts->fetch()) {
-
+            while ($posts->fetch()) {
                 $core->blog->delPost($posts->post_id);
                 $core->con->execute(
                     'DELETE FROM ' . $core->prefix . 'meta ' .
@@ -192,7 +188,7 @@ class zcfsDefaultFeedsActions
         }
 
         dcPage::addSuccessNotice(
-                __('Entries have been successfully deleted.')
+            __('Entries have been successfully deleted.')
         );
         $ap->redirect(true);
     }
@@ -205,7 +201,7 @@ class zcfsDefaultFeedsActions
             throw new Exception(__('No feeds selected'));
         }
 
-        foreach($ids as $id) {
+        foreach ($ids as $id) {
             $ap->zcfs->delFeed($id);
         }
 
@@ -228,7 +224,7 @@ class zcfsDefaultFeedsActions
             throw new Exception(__('No feeds selected'));
         }
 
-        foreach($ids as $id) {
+        foreach ($ids as $id) {
             $ap->zcfs->checkFeedsUpdate($id, true);
         }
 
@@ -251,8 +247,8 @@ class zcfsDefaultFeedsActions
             throw new Exception(__('No feeds selected'));
         }
 
-        foreach($ids as $id) {
-            $cur = $ap->zcfs->openCursor();
+        foreach ($ids as $id) {
+            $cur                = $ap->zcfs->openCursor();
             $cur->feed_upd_last = 0;
             $ap->zcfs->updFeed($id, $cur);
             $ap->zcfs->checkFeedsUpdate($id, true);
@@ -278,10 +274,10 @@ class zcfsDefaultFeedsActions
                 throw new Exception(__('No feeds selected'));
             }
 
-            $cat_id = abs((integer) $post['upd_cat_id']);
+            $cat_id = abs((int) $post['upd_cat_id']);
 
-            foreach($ids as $id) {
-                $cur = $ap->zcfs->openCursor();
+            foreach ($ids as $id) {
+                $cur         = $ap->zcfs->openCursor();
                 $cur->cat_id = $cat_id == 0 ? null : $cat_id;
                 $ap->zcfs->updFeed($id, $cur);
             }
@@ -302,11 +298,12 @@ class zcfsDefaultFeedsActions
 
             $ap->beginPage(
                 dcPage::breadcrumb([
-                        html::escapeHTML($core->blog->name) => '',
-                        __('Feeds server') => '',
-                        $ap->getCallerTitle() => $ap->getRedirection(true),
-                        __('Change category for this selection') => ''
-            ]));
+                    html::escapeHTML($core->blog->name)      => '',
+                    __('Feeds server')                       => '',
+                    $ap->getCallerTitle()                    => $ap->getRedirection(true),
+                    __('Change category for this selection') => ''
+                ])
+            );
 
             echo
             '<form action="' . $ap->getURI() . '" method="post">' .
@@ -315,7 +312,7 @@ class zcfsDefaultFeedsActions
             form::combo(['upd_cat_id'], $categories_combo, '') .
             $core->formNonce() .
             $ap->getHiddenFields() .
-            form::hidden(['action'], 'changecat') . 
+            form::hidden(['action'], 'changecat') .
             '<input type="submit" value="' . __('Save') . '" /></p>' .
             '</form>';
 
@@ -332,10 +329,10 @@ class zcfsDefaultFeedsActions
                 throw new Exception(__('No feeds selected'));
             }
 
-            $upd_int = abs((integer) $post['upd_upd_int']);
+            $upd_int = abs((int) $post['upd_upd_int']);
 
-            foreach($ids as $id) {
-                $cur = $ap->zcfs->openCursor();
+            foreach ($ids as $id) {
+                $cur               = $ap->zcfs->openCursor();
                 $cur->feed_upd_int = $upd_int;
                 $ap->zcfs->updFeed($id, $cur);
             }
@@ -349,17 +346,17 @@ class zcfsDefaultFeedsActions
                 count($ids)
             ));
             $ap->redirect(true);
-        }
-        else {
-
+        } else {
             $ap->beginPage(
                 dcPage::breadcrumb(
                     [
-                        html::escapeHTML($core->blog->name) => '',
-                        __('Feeds server') => '',
-                        $ap->getCallerTitle() => $ap->getRedirection(true),
+                        html::escapeHTML($core->blog->name)              => '',
+                        __('Feeds server')                               => '',
+                        $ap->getCallerTitle()                            => $ap->getRedirection(true),
                         __('Change update frequency for this selection') => ''
-            ]));
+                    ]
+                )
+            );
 
             echo
             '<form action="' . $ap->getURI() . '" method="post">' .

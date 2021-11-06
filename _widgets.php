@@ -1,16 +1,15 @@
 <?php
 /**
  * @brief zoneclearFeedServer, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_RC_PATH')) {
     return null;
 }
@@ -33,7 +32,7 @@ class zoneclearFeedServerWidget
 {
     /**
      * Widget configuration for sources list.
-     * 
+     *
      * @param  dcWidget $w dcWidget instance
      */
     public static function adminSource($w)
@@ -50,23 +49,23 @@ class zoneclearFeedServerWidget
                 __('Feeds sources'),
             )
            ->setting(
-                'sortby',
-                __('Order by:'),
-                'feed_upd_last',
-                'combo',
-                [
-                    __('Last update') => 'feed_upd_last',
-                    __('Name') => 'lowername',
-                    __('Create date') => 'feed_creadt'
-                ]
-            )
+               'sortby',
+               __('Order by:'),
+               'feed_upd_last',
+               'combo',
+               [
+                   __('Last update') => 'feed_upd_last',
+                   __('Name')        => 'lowername',
+                   __('Create date') => 'feed_creadt'
+               ]
+           )
             ->setting(
                 'sort',
                 __('Sort:'),
                 'desc',
                 'combo',
                 [
-                    __('Ascending') => 'asc',
+                    __('Ascending')  => 'asc',
                     __('Descending') => 'desc'
                 ]
             )
@@ -90,7 +89,7 @@ class zoneclearFeedServerWidget
 
     /**
      * Widget configuration for feeds info.
-     * 
+     *
      * @param  dcWidget $w dcWidget instance
      */
     public static function adminNumber($w)
@@ -108,8 +107,8 @@ class zoneclearFeedServerWidget
             )
             ->setting(
                 'title',
-                __('Title:')
-                ,__('Feeds numbers'),
+                __('Title:'),
+                __('Feeds numbers'),
                 'text'
             )
             ->setting(
@@ -144,7 +143,7 @@ class zoneclearFeedServerWidget
 
     /**
      * Widget for sources list.
-     * 
+     *
      * @param  dcWidget $w dcWidget instance
      */
     public static function publicSource($w)
@@ -155,18 +154,18 @@ class zoneclearFeedServerWidget
             return null;
         }
 
-        if (!$core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active 
+        if (!$core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
             || $w->homeonly == 1 && !$core->url->isHome($core->url->type)
             || $w->homeonly == 2 && $core->url->isHome($core->url->type)
         ) {
             return null;
         }
 
-        $p = [];
-        $p['order'] = ($w->sortby && in_array($w->sortby, ['feed_upd_last', 'lowername', 'feed_creadt'])) ? 
+        $p          = [];
+        $p['order'] = ($w->sortby && in_array($w->sortby, ['feed_upd_last', 'lowername', 'feed_creadt'])) ?
             $w->sortby . ' ' : 'feed_upd_last ';
         $p['order'] .= $w->sort == 'desc' ? 'DESC' : 'ASC';
-        $p['limit'] = abs((integer) $w->limit);
+        $p['limit']       = abs((int) $w->limit);
         $p['feed_status'] = 1;
 
         $zc = new zoneclearFeedServer($core);
@@ -177,10 +176,10 @@ class zoneclearFeedServerWidget
         }
 
         $lines = [];
-        $i = 1;
-        while($rs->fetch()) {
+        $i     = 1;
+        while ($rs->fetch()) {
             $lines[] = sprintf(
-                '<li><a href="%s" title="%s">%s</a></li>', 
+                '<li><a href="%s" title="%s">%s</a></li>',
                 $rs->feed_url,
                 $rs->feed_owner,
                 $rs->feed_name
@@ -207,7 +206,7 @@ class zoneclearFeedServerWidget
 
     /**
      * Widget for feeds info.
-     * 
+     *
      * @param  dcWidget $w dcWidget instance
      */
     public static function publicNumber($w)
@@ -218,20 +217,20 @@ class zoneclearFeedServerWidget
             return;
         }
 
-        if (!$core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active 
+        if (!$core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
             || $w->homeonly == 1 && !$core->url->isHome($core->url->type)
             || $w->homeonly == 2 && $core->url->isHome($core->url->type)
         ) {
             return null;
         }
 
-        $zc = new zoneclearFeedServer($core);
+        $zc      = new zoneclearFeedServer($core);
         $content = '';
 
         # Feed
         if ($w->feed_show) {
             $title = ($w->feed_title ? sprintf(
-                '<strong>%s</strong> ', 
+                '<strong>%s</strong> ',
                 html::escapeHTML($w->feed_title)
             ) : '');
 
@@ -257,7 +256,7 @@ class zoneclearFeedServerWidget
 
             if (!$feeds->isEmpty()) {
                 while ($feeds->fetch()) {
-                    $count += (integer) $zc->getPostsByFeed(['feed_id' => $feeds->feed_id], true)->f(0);
+                    $count += (int) $zc->getPostsByFeed(['feed_id' => $feeds->feed_id], true)->f(0);
                 }
             }
             $title = ($w->entry_title ? sprintf(

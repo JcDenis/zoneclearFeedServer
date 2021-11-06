@@ -7,14 +7,14 @@
 
 $opts = getopt('d:c:b:u:h');
 
-function help($status=0)
+function help($status = 0)
 {
     echo
-    "Options: \n".
-    " -h shows this help\n".
-    " -d DotClear root path\n".
-    " -c DotClear conf path\n".
-    " -b Blog ID\n".
+    "Options: \n" .
+    " -h shows this help\n" .
+    " -d DotClear root path\n" .
+    " -c DotClear conf path\n" .
+    " -b Blog ID\n" .
     " -u User ID\n\n";
     exit($status);
 }
@@ -46,37 +46,37 @@ if (isset($opts['b'])) {
 }
 
 if (!$dc_root || !is_dir($dc_root)) {
-    fwrite(STDERR,"DotClear root path is not defined\n\n");
+    fwrite(STDERR, "DotClear root path is not defined\n\n");
     help(1);
 }
 
 if (!$dc_conf || !is_readable($dc_conf)) {
-    fwrite(STDERR,"DotClear configuration not found\n\n");
+    fwrite(STDERR, "DotClear configuration not found\n\n");
     help(1);
 }
 
 if (!$blog_id) {
-    fwrite(STDERR,"Blog ID is not defined\n\n");
+    fwrite(STDERR, "Blog ID is not defined\n\n");
     help(1);
 }
 
 $_SERVER['DC_RC_PATH'] = $dc_conf;
 unset($dc_conf);
 
-define('DC_BLOG_ID',$blog_id);
+define('DC_BLOG_ID', $blog_id);
 unset($blog_id);
 
-require $dc_root.'/inc/prepend.php';
+require $dc_root . '/inc/prepend.php';
 unset($dc_root);
 
 $core->setBlog(DC_BLOG_ID);
 if ($core->blog->id == null) {
-    fwrite(STDERR,"Blog is not defined\n");
+    fwrite(STDERR, "Blog is not defined\n");
     exit(1);
 }
 
 if (!isset($opts['u']) || !$core->auth->checkUser($opts['u'])) {
-    fwrite(STDERR,"Unable to set user\n");
+    fwrite(STDERR, "Unable to set user\n");
     exit(1);
 }
 
@@ -88,6 +88,6 @@ try {
     $zc = new zoneclearFeedServer($core);
     $zc->checkFeedsUpdate();
 } catch (Exception $e) {
-    fwrite(STDERR,$e->getMessage()."\n");
+    fwrite(STDERR, $e->getMessage() . "\n");
     exit(1);
 }

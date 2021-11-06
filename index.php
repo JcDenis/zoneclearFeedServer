@@ -1,22 +1,20 @@
 <?php
 /**
  * @brief zoneclearFeedServer, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
 
-if ($core->getVersion('zoneclearFeedServer') != 
-    $core->plugins->moduleInfo('zoneclearFeedServer', 'version')
+if ($core->getVersion('zoneclearFeedServer') != $core->plugins->moduleInfo('zoneclearFeedServer', 'version')
 ) {
     return null;
 }
@@ -49,7 +47,7 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     $can_view_page = true;
 
     $feed_headlink = '<link rel="%s" title="%s" href="' . $p_url . '&amp;part=feed&amp;feed_id=%s" />';
-    $feed_link = '<a href="' . $p_url . '&amp;part=feed&amp;feed_id=%s" title="%s">%s</a>';
+    $feed_link     = '<a href="' . $p_url . '&amp;part=feed&amp;feed_id=%s" title="%s">%s</a>';
 
     $next_link = $prev_link = $next_headlink = $prev_headlink = null;
 
@@ -58,11 +56,12 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     $combo_status     = $zcfs->getAllStatus();
     $combo_upd_int    = $zcfs->getAllUpdateInterval();
     $combo_categories = ['-' => ''];
+
     try {
         $categories = $core->blog->getCategories(['post_type' => 'post']);
         while ($categories->fetch()) {
             $combo_categories[
-                str_repeat('&nbsp;&nbsp;', $categories->level-1) .
+                str_repeat('&nbsp;&nbsp;', $categories->level - 1) .
                 '&bull; ' . html::escapeHTML($categories->cat_title)
             ] = $categories->cat_id;
         }
@@ -77,7 +76,7 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
         if ($feed->isEmpty()) {
             $core->error->add(__('This feed does not exist.'));
             $can_view_page = false;
-        }  else {
+        } else {
             $feed_id       = $feed->feed_id;
             $feed_name     = $feed->feed_name;
             $feed_desc     = $feed->feed_desc;
@@ -92,53 +91,69 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
             $feed_status   = $feed->feed_status;
             $feed_upd_int  = $feed->feed_upd_int;
 
-            $next_params = array(
+            $next_params = [
                 'sql'   => 'AND feed_id < ' . $feed_id . ' ',
                 'limit' => 1
-            );
-            $next_rs = $zcfs->getFeeds($next_params);
-            $prev_params = array(
+            ];
+            $next_rs     = $zcfs->getFeeds($next_params);
+            $prev_params = [
                 'sql'   => 'AND feed_id > ' . $feed_id . ' ',
                 'limit' => 1
-            );
+            ];
             $prev_rs = $zcfs->getFeeds($prev_params);
 
             if (!$next_rs->isEmpty()) {
-                $next_link = sprintf($feed_link, $next_rs->feed_id,
-                    html::escapeHTML($next_rs->feed_name), __('next feed') . '&nbsp;&#187;');
-                $next_headlink = sprintf($feed_headlink, 'next',
-                    html::escapeHTML($next_rs->feed_name), $next_rs->feed_id);
+                $next_link = sprintf(
+                    $feed_link,
+                    $next_rs->feed_id,
+                    html::escapeHTML($next_rs->feed_name),
+                    __('next feed') . '&nbsp;&#187;'
+                );
+                $next_headlink = sprintf(
+                    $feed_headlink,
+                    'next',
+                    html::escapeHTML($next_rs->feed_name),
+                    $next_rs->feed_id
+                );
             }
 
             if (!$prev_rs->isEmpty()) {
-                $prev_link = sprintf($feed_link, $prev_rs->feed_id,
-                    html::escapeHTML($prev_rs->feed_name), '&#171;&nbsp;' . __('previous feed'));
-                $prev_headlink = sprintf($feed_headlink, 'previous',
-                    html::escapeHTML($prev_rs->feed_name), $prev_rs->feed_id);
+                $prev_link = sprintf(
+                    $feed_link,
+                    $prev_rs->feed_id,
+                    html::escapeHTML($prev_rs->feed_name),
+                    '&#171;&nbsp;' . __('previous feed')
+                );
+                $prev_headlink = sprintf(
+                    $feed_headlink,
+                    'previous',
+                    html::escapeHTML($prev_rs->feed_name),
+                    $prev_rs->feed_id
+                );
             }
         }
     }
 
     if (!empty($_POST['action']) && $_POST['action'] == 'savefeed') {
         try {
-            $feed_name       = $_POST['feed_name'];
-            $feed_desc       = $_POST['feed_desc'];
-            $feed_owner      = $_POST['feed_owner'];
-            $feed_tweeter    = $_POST['feed_tweeter'];
-            $feed_url        = $_POST['feed_url'];
-            $feed_feed       = $_POST['feed_feed'];
-            $feed_lang       = $_POST['feed_lang'];
-            $feed_tags       = $_POST['feed_tags'];
-            $feed_get_tags   = empty($_POST['feed_get_tags']) ? 0 : 1;
-            $feed_cat_id     = $_POST['feed_cat_id'];
-            $feed_upd_int    = $_POST['feed_upd_int'];
+            $feed_name     = $_POST['feed_name'];
+            $feed_desc     = $_POST['feed_desc'];
+            $feed_owner    = $_POST['feed_owner'];
+            $feed_tweeter  = $_POST['feed_tweeter'];
+            $feed_url      = $_POST['feed_url'];
+            $feed_feed     = $_POST['feed_feed'];
+            $feed_lang     = $_POST['feed_lang'];
+            $feed_tags     = $_POST['feed_tags'];
+            $feed_get_tags = empty($_POST['feed_get_tags']) ? 0 : 1;
+            $feed_cat_id   = $_POST['feed_cat_id'];
+            $feed_upd_int  = $_POST['feed_upd_int'];
             if (isset($_POST['feed_status'])) {
-                $feed_status = (integer) $_POST['feed_status'];
+                $feed_status = (int) $_POST['feed_status'];
             }
 
             $testfeed_params['feed_feed'] = $feed_feed;
             if ($feed_id) {
-                $testfeed_params['sql'] ='AND feed_id <> '.$feed_id.' ';
+                $testfeed_params['sql'] = 'AND feed_id <> ' . $feed_id . ' ';
             }
             if ($zcfs->getFeeds($testfeed_params, true)->f(0)) {
                 throw new Exception(__('Record with same feed URL already exists.'));
@@ -158,14 +173,14 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
             $get_feed_cat_id = $core->blog->getCategory($feed_cat_id);
             if ($feed_cat_id != '' && !$get_feed_cat_id) {
                 throw new Exception(__('You must provide valid category.'));
-            }        
+            }
         } catch (Exception $e) {
             $core->error->add($e->getMessage());
         }
     }
 
     if (!empty($_POST['action']) && $_POST['action'] == 'savefeed' && !$core->error->flag()) {
-        $cur = $zcfs->openCursor();
+        $cur                = $zcfs->openCursor();
         $cur->feed_name     = $feed_name;
         $cur->feed_desc     = $feed_desc;
         $cur->feed_owner    = $feed_owner;
@@ -174,10 +189,10 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
         $cur->feed_feed     = $feed_feed;
         $cur->feed_lang     = $feed_lang;
         $cur->feed_tags     = $feed_tags;
-        $cur->feed_get_tags = (integer) $feed_get_tags;
-        $cur->cat_id        = $feed_cat_id != '' ? (integer) $feed_cat_id : null;
-        $cur->feed_status   = (integer) $feed_status;
-        $cur->feed_upd_int  = (integer) $feed_upd_int;
+        $cur->feed_get_tags = (int) $feed_get_tags;
+        $cur->cat_id        = $feed_cat_id != '' ? (int) $feed_cat_id : null;
+        $cur->feed_status   = (int) $feed_status;
+        $cur->feed_upd_int  = (int) $feed_upd_int;
 
         # Update feed
         if ($feed_id) {
@@ -194,12 +209,13 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
                     __('Feed successfully updated.')
                 );
                 $core->adminurl->redirect(
-                    'admin.plugin.zoneclearFeedServer', ['part' => 'feed', 'feed_id' => $feed_id]
+                    'admin.plugin.zoneclearFeedServer',
+                    ['part' => 'feed', 'feed_id' => $feed_id]
                 );
             } catch (Exception $e) {
                 $core->error->add($e->getMessage());
             }
-        } else {        
+        } else {
             try {
                 # --BEHAVIOR-- adminBeforeZoneclearFeedServerFeedCreate
                 $core->callBehavior('adminBeforeZoneclearFeedServerFeedCreate', $cur);
@@ -213,7 +229,8 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
                     __('Feed successfully created.')
                 );
                 $core->adminurl->redirect(
-                    'admin.plugin.zoneclearFeedServer', ['part' => 'feed', 'feed_id' => $return_id]
+                    'admin.plugin.zoneclearFeedServer',
+                    ['part' => 'feed', 'feed_id' => $return_id]
                 );
             } catch (Exception $e) {
                 $core->error->add($e->getMessage());
@@ -262,8 +279,8 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
 
         # posts
         try {
-            $posts = $zcfs->getPostsByFeed($params);
-            $counter = $zcfs->getPostsByFeed($params,true);
+            $posts     = $zcfs->getPostsByFeed($params);
+            $counter   = $zcfs->getPostsByFeed($params, true);
             $post_list = new zcfsEntriesList(
                 $core,
                 $posts,
@@ -275,10 +292,10 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     }
 
     # display
-    echo 
+    echo
     '<html><head><title>' . __('Feeds server') . '</title>' .
     ($feed_id && !$core->error->flag() ?
-        $post_filter->js($core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed', 'feed_id' => $feed_id], '&').'#entries') .
+        $post_filter->js($core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed', 'feed_id' => $feed_id], '&') . '#entries') .
         dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/list.js'))
     : '') .
     dcPage::jsPageTabs() .
@@ -290,12 +307,12 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     '</head><body>' .
 
     dcPage::breadcrumb([
-            __('Plugins')                                 => '',
-            __('Feeds server')                            => $p_url,
-            ($feed_id ? __('Edit feed') : __('New feed')) => ''
-    ]).
+        __('Plugins')                                 => '',
+        __('Feeds server')                            => $p_url,
+        ($feed_id ? __('Edit feed') : __('New feed')) => ''
+    ]) .
     dcPage::notices() .
-    ($feed_id ? '<h3>' . sprintf(__('Edit feed "%s"'), $feed_name) .'</h3>' : '');
+    ($feed_id ? '<h3>' . sprintf(__('Edit feed "%s"'), $feed_name) . '</h3>' : '');
 
     # Feed
     if ($can_view_page) {
@@ -394,11 +411,11 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
         '</div>' .
 
         '<p class="clear">
-        <input type="submit" name="save" value="'.__('Save').' (s)" accesskey="s"/>' .
+        <input type="submit" name="save" value="' . __('Save') . ' (s)" accesskey="s"/>' .
         $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', [
-                'part'    => 'feed',
-                'feed_id' => $feed_id,
-                'action'  => 'savefeed'
+            'part'    => 'feed',
+            'feed_id' => $feed_id,
+            'action'  => 'savefeed'
         ]) .
         $core->formNonce() .
         '</p>
@@ -408,10 +425,11 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
 
     # entries
     if ($feed_id && $can_view_page && !$core->error->flag()) {
-        echo '<div class="multi-part" title="'.__('Entries').'" id="entries">';
+        echo '<div class="multi-part" title="' . __('Entries') . '" id="entries">';
 
         # show filters
-        $post_filter->display(['admin.plugin.zoneclearFeedServer','#entries'], 
+        $post_filter->display(
+            ['admin.plugin.zoneclearFeedServer','#entries'],
             $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', [
                 'part'    => 'feed',
                 'feed_id' => $feed_id
@@ -425,10 +443,10 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
 
         # show posts
         $post_list->display(
-            $post_filter->page, 
-            $post_filter->nb, 
+            $post_filter->page,
+            $post_filter->nb,
             $core->adminurl->get('admin.plugin.zoneclearFeedServer', $args, '&') . '#entries',
-            '<form action="' . $core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed']) . '#entries" method="post" id="form-entries">'.
+            '<form action="' . $core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed']) . '#entries" method="post" id="form-entries">' .
             '%s' .
 
             '<div class="two-cols">' .
@@ -448,12 +466,11 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
         echo '</div>';
     }
 
-############################################################
+    ############################################################
 #
 # All feeds
 #
 ############################################################
-
 } else {
     # actions
     $feeds_actions_page = new zcfsFeedsActionsPage(
@@ -474,9 +491,9 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
 
     # feeds
     try {
-        $feeds = $zcfs->getFeeds($params);
+        $feeds         = $zcfs->getFeeds($params);
         $feeds_counter = $zcfs->getFeeds($params, true)->f(0);
-        $feeds_list = new zcfsFeedsList(
+        $feeds_list    = new zcfsFeedsList(
             $core,
             $feeds,
             $feeds_counter
@@ -486,7 +503,7 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     }
 
     # display
-    echo 
+    echo
     '<html><head><title>' . __('Feeds server') . '</title>' .
     $feeds_filter->js($core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feeds'], '&')) .
     dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/list.js')) .
@@ -498,9 +515,9 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     '</head><body>' .
 
     dcPage::breadcrumb([
-            __('Plugins')      => '',
-            __('Feeds server') => ''
-    ]).
+        __('Plugins')      => '',
+        __('Feeds server') => ''
+    ]) .
     dcPage::notices() .
 
     '<p class="top-add">' .
@@ -508,11 +525,13 @@ if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     __('New feed') . '</a></p>';
 
     $feeds_filter->display(
-        'admin.plugin.zoneclearFeedServer', 
+        'admin.plugin.zoneclearFeedServer',
         $core->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', ['part', 'feeds'])
     );
 
-    $feeds_list->feedsDisplay($feeds_filter->page, $feeds_filter->nb, 
+    $feeds_list->feedsDisplay(
+        $feeds_filter->page,
+        $feeds_filter->nb,
         '<form action="' . $core->adminurl->get('admin.plugin.zoneclearFeedServer', ['part', 'feeds']) . '" method="post" id="form-actions">' .
         '%s' .
         '<div class="two-cols">' .

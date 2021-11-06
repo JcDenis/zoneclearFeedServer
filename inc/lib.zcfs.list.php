@@ -1,16 +1,15 @@
 <?php
 /**
  * @brief zoneclearFeedServer, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
@@ -36,13 +35,13 @@ class zcfsFeedsList extends adminGenericList
             $entries = [];
             if (isset($_REQUEST['feeds'])) {
                 foreach ($_REQUEST['feeds'] as $v) {
-                    $entries[(integer) $v] = true;
+                    $entries[(int) $v] = true;
                 }
             }
-            $html_block = 
-                '<div class="table-outer">' .
-                '<table>' . 
-                '<caption>' . ($filter ? 
+            $html_block = '<div class="table-outer">' .
+                '<table>' .
+                '<caption>' . (
+                    $filter ?
                     sprintf(__('List of %s feeds matching the filter.'), $this->rs_count) :
                     sprintf(__('List of feeds (%s)'), $this->rs_count)
                 ) . '</caption>';
@@ -84,44 +83,46 @@ class zcfsFeedsList extends adminGenericList
 
     private function feedsLine($checked)
     {
-        $combo_status = zoneclearFeedServer::getAllStatus();
+        $combo_status  = zoneclearFeedServer::getAllStatus();
         $combo_upd_int = zoneclearFeedServer::getAllUpdateInterval();
-        $status = $this->rs->feed_status ? 
+        $status        = $this->rs->feed_status ?
             '<img src="images/check-on.png" alt="enable" />' :
             '<img src="images/check-off.png" alt="disable" />';
 
         $entries_count = $this->rs->zc->getPostsByFeed(['feed_id' => $this->rs->feed_id], true)->f(0);
-        $shunk_feed = $this->rs->feed_feed;
+        $shunk_feed    = $this->rs->feed_feed;
         if (strlen($shunk_feed) > 83) {
-            $shunk_feed = substr($shunk_feed,0,50).'...'.substr($shunk_feed,-20);
+            $shunk_feed = substr($shunk_feed, 0, 50) . '...' . substr($shunk_feed, -20);
         }
 
         $url = 'plugin.php?p=zoneclearFeedServer&amp;part=feed&amp;feed_id=' . $this->rs->feed_id;
 
         $cols = [
-            'check' => '<td class="nowrap minimal">' . 
-                form::checkbox(['feeds[]'], $this->rs->feed_id, ['checked' => $checked]) . 
+            'check' => '<td class="nowrap minimal">' .
+                form::checkbox(['feeds[]'], $this->rs->feed_id, ['checked' => $checked]) .
                 '</td>',
             'title' => '<td class="nowrap" scope="row">' .
                 '<a href="' . $url . '#feed" title="' . __('Edit') . '">' . html::escapeHTML($this->rs->feed_name) . '</a>' .
                 '</td>',
-            'desc'   => '<td class="nowrap maximal">' .
-                '<a href="' . $this->rs->feed_feed . '" title="' . html::escapeHTML($this->rs->feed_desc) . '">' . html::escapeHTML($shunk_feed) . '</a>'. 
+            'desc' => '<td class="nowrap maximal">' .
+                '<a href="' . $this->rs->feed_feed . '" title="' . html::escapeHTML($this->rs->feed_desc) . '">' . html::escapeHTML($shunk_feed) . '</a>' .
                 '</td>',
-            'period'       => '<td class="nowrap minimal count">' . 
-                array_search($this->rs->feed_upd_int,$combo_upd_int) . 
+            'period' => '<td class="nowrap minimal count">' .
+                array_search($this->rs->feed_upd_int, $combo_upd_int) .
                 '</td>',
-            'update'       => '<td class="nowrap minimal count">' . 
-                ($this->rs->feed_upd_last < 1 ? 
-                    __('never') : 
+            'update' => '<td class="nowrap minimal count">' .
+                (
+                    $this->rs->feed_upd_last < 1 ?
+                    __('never') :
                     dt::str(__('%Y-%m-%d %H:%M'), $this->rs->feed_upd_last, $this->rs->zc->core->auth->getInfo('user_tz'))
                 ) . '</td>',
-            'entries'   => '<td class="nowrap minimal count">' . 
-                ($entries_count ? 
+            'entries' => '<td class="nowrap minimal count">' .
+                (
+                    $entries_count ?
                     '<a href="' . $url . '#entries" title="' . __('View entries') . '">' . $entries_count . '</a>' :
                     $entries_count
                 ) . '</td>',
-            'status'     => '<td class="nowrap minimal status">' . $status . '</td>'
+            'status' => '<td class="nowrap minimal status">' . $status . '</td>'
         ];
 
         $cols = new ArrayObject($cols);
@@ -129,7 +130,7 @@ class zcfsFeedsList extends adminGenericList
 
         $this->userColumns('zcfs_feeds', $cols);
 
-        return 
+        return
             '<tr class="line ' . ($this->rs->feed_status ? '' : 'offline ') . '" id="p' . $this->rs->feed_id . '">' .
             implode(iterator_to_array($cols)) .
             '</tr>';
@@ -147,24 +148,26 @@ class zcfsEntriesList extends adminGenericList
     public function display($page, $nb_per_page, $base_url, $enclose_block = '', $filter = false)
     {
         if ($this->rs->isEmpty()) {
-            echo '<p><strong>' . ($filter ?
+            echo '<p><strong>' . (
+                $filter ?
                     __('No entries matches the filter') :
                     __('No entries')
-                ) . '</strong></p>';
+            ) . '</strong></p>';
         } else {
-            $pager = new dcPager($page, $this->rs_count, $nb_per_page, 10);
+            $pager           = new dcPager($page, $this->rs_count, $nb_per_page, 10);
             $pager->base_url = $base_url;
 
             $entries = [];
             if (isset($_REQUEST['feeds'])) {
                 foreach ($_REQUEST['feeds'] as $v) {
-                    $entries[(integer) $v] = true;
+                    $entries[(int) $v] = true;
                 }
             }
 
             $html_block = '<div class="table-outer clear">' .
-            '<table>' . 
-                '<caption>' . ($filter ? 
+            '<table>' .
+                '<caption>' . (
+                    $filter ?
                     sprintf(__('List of %s entries matching the filter.'), $this->rs_count) :
                     sprintf(__('List of entries (%s)'), $this->rs_count)
                 ) . '</caption>';
@@ -206,11 +209,11 @@ class zcfsEntriesList extends adminGenericList
     private function postLine()
     {
         $cat_link = $this->core->auth->check('categories', $this->core->blog->id) ?
-            '<a href="category.php?id=%s" title="'.__('Edit category').'">%s</a>' 
+            '<a href="category.php?id=%s" title="' . __('Edit category') . '">%s</a>'
             : '%2$s';
 
-        $cat_title = $this->rs->cat_title ? 
-            sprintf($cat_link,$this->rs->cat_id, html::escapeHTML($this->rs->cat_title)) 
+        $cat_title = $this->rs->cat_title ?
+            sprintf($cat_link, $this->rs->cat_id, html::escapeHTML($this->rs->cat_title))
             : __('None');
 
         $img        = '<img alt="%1$s" title="%1$s" src="images/%2$s" />';
@@ -243,15 +246,15 @@ class zcfsEntriesList extends adminGenericList
         ' id="p' . $this->rs->post_id . '">';
 
         $cols = [
-            'check' => '<td class="nowrap minimal">'.
-                form::checkbox(array('entries[]'), $this->rs->post_id, '', '', '', !$this->rs->isEditable()).'</td>',
-            'title'    => '<td scope="row" class="maximal"><a href="' .
+            'check' => '<td class="nowrap minimal">' .
+                form::checkbox(['entries[]'], $this->rs->post_id, '', '', '', !$this->rs->isEditable()) . '</td>',
+            'title' => '<td scope="row" class="maximal"><a href="' .
                 $this->core->getPostAdminURL($this->rs->post_type, $this->rs->post_id) . '" ' .
                 'title="' . html::escapeHTML($this->rs->getURL()) . '">' .
                 html::escapeHTML(trim(html::clean($this->rs->post_title))) . '</a></td>',
             'date'     => '<td class="nowrap count">' . dt::dt2str(__('%Y-%m-%d %H:%M'), $this->rs->post_dt) . '</td>',
             'author'   => '<td class="nowrap">' . html::escapeHTML($this->rs->user_id) . '</td>',
-            'category' => '<td class="nowrap">'.$cat_title.'</td>',
+            'category' => '<td class="nowrap">' . $cat_title . '</td>',
             'status'   => '<td class="nowrap status">' . $img_status . '</td>'
         ];
 
@@ -301,6 +304,7 @@ class adminZcfsPostFilter extends adminGenericFilter
     public function getPostUserFilter(): ?dcAdminFilter
     {
         $users = null;
+
         try {
             $users = $this->core->blog->getPostsUsers();
             if ($users->isEmpty()) {
@@ -308,6 +312,7 @@ class adminZcfsPostFilter extends adminGenericFilter
             }
         } catch (Exception $e) {
             $this->core->error->add($e->getMessage());
+
             return null;
         }
 
@@ -330,6 +335,7 @@ class adminZcfsPostFilter extends adminGenericFilter
     public function getPostCategoriesFilter(): ?dcAdminFilter
     {
         $categories = null;
+
         try {
             $categories = $this->core->blog->getCategories();
             if ($categories->isEmpty()) {
@@ -337,12 +343,13 @@ class adminZcfsPostFilter extends adminGenericFilter
             }
         } catch (Exception $e) {
             $this->core->error->add($e->getMessage());
+
             return null;
         }
 
         $combo = [
-            '-' => '',
-            __('(No cat)') =>  'NULL'
+            '-'            => '',
+            __('(No cat)') => 'NULL'
         ];
         while ($categories->fetch()) {
             $combo[
@@ -378,6 +385,7 @@ class adminZcfsPostFilter extends adminGenericFilter
     public function getPostMonthFilter(): ?dcAdminFilter
     {
         $dates = null;
+
         try {
             $dates = $this->core->blog->getDates(['type' => 'month']);
             if ($dates->isEmpty()) {
@@ -385,12 +393,13 @@ class adminZcfsPostFilter extends adminGenericFilter
             }
         } catch (Exception $e) {
             $this->core->error->add($e->getMessage());
+
             return null;
         }
 
         return (new dcAdminFilter('month'))
-            ->param('post_month', function($f) { return substr($f[0], 4, 2); })
-            ->param('post_year', function($f) { return substr($f[0], 0, 4); })
+            ->param('post_month', function ($f) { return substr($f[0], 4, 2); })
+            ->param('post_year', function ($f) { return substr($f[0], 0, 4); })
             ->title(__('Month:'))
             ->options(array_merge(
                 ['-' => ''],

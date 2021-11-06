@@ -1,16 +1,15 @@
 <?php
 /**
  * @brief zoneclearFeedServer, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
@@ -24,14 +23,14 @@ $_menu['Plugins']->addItem(
     $core->adminurl->get('admin.plugin.zoneclearFeedServer'),
     dcPage::getPF('zoneclearFeedServer/icon.png'),
     preg_match(
-        '/' . preg_quote($core->adminurl->get('admin.plugin.zoneclearFeedServer')) . '(&.*)?$/', 
+        '/' . preg_quote($core->adminurl->get('admin.plugin.zoneclearFeedServer')) . '(&.*)?$/',
         $_SERVER['REQUEST_URI']
     ),
     $core->auth->check('admin', $core->blog->id)
 );
 
 # Delete related info about feed post in meta table
-$core->addBehavior('adminBeforePostDelete',['zcfsAdminBehaviors', 'adminBeforePostDelete']);
+$core->addBehavior('adminBeforePostDelete', ['zcfsAdminBehaviors', 'adminBeforePostDelete']);
 
 if ($core->auth->check('admin', $core->blog->id)) {
 
@@ -47,7 +46,6 @@ if ($core->auth->check('admin', $core->blog->id)) {
 
 # Take care about tweakurls (thanks Mathieu M.)
 if (version_compare($core->plugins->moduleInfo('tweakurls', 'version'), '0.8', '>=')) {
-
     $core->addbehavior('zcfsAfterPostCreate', ['zoneclearFeedServer', 'tweakurlsAfterPostCreate']);
 }
 
@@ -107,8 +105,8 @@ class zcfsAdminBehaviors
      */
     public static function adminDashboardFavoritesActive($request, $params)
     {
-        return $request == 'plugin.php' 
-            && isset($params['p']) 
+        return $request == 'plugin.php'
+            && isset($params['p'])
             && $params['p'] == 'zoneclearFeedServer';
     }
 
@@ -127,10 +125,10 @@ class zcfsAdminBehaviors
             return null;
         }
 
-        $fav['title'] .= '<br />'.sprintf(__('%s feed disabled', '%s feeds disabled', $count), $count);
+        $fav['title'] .= '<br />' . sprintf(__('%s feed disabled', '%s feeds disabled', $count), $count);
         $fav['large-icon'] = dcPage::getPF('zoneclearFeedServer/icon-big-update.png');
-        $fav['url'] = $core->adminurl->get(
-            'admin.plugin.zoneclearFeedServer', 
+        $fav['url']        = $core->adminurl->get(
+            'admin.plugin.zoneclearFeedServer',
             ['part' => 'feeds', 'sortby' => 'feed_status', 'order' => 'asc']
         );
     }
@@ -146,18 +144,18 @@ class zcfsAdminBehaviors
         $cols['zcfs_feeds'] = [
             __('Feeds server: Feeds'),
             [
-                'desc'   => [true, __('Feed')],
-                'period' => [true, __('Frequency')],
-                'update' => [true, __('Last update')],
-                'entries'  => [true, __('Entries')]
+                'desc'    => [true, __('Feed')],
+                'period'  => [true, __('Frequency')],
+                'update'  => [true, __('Last update')],
+                'entries' => [true, __('Entries')]
             ]
         ];
         $cols['zcfs_entries'] = [
             __('Feeds server: Entries'),
             [
-                'date'       => [true, __('Date')],
-                'category'   => [true, __('Category')],
-                'author'     => [true, __('Author')]
+                'date'     => [true, __('Date')],
+                'category' => [true, __('Category')],
+                'author'   => [true, __('Author')]
             ]
         ];
     }
@@ -188,7 +186,7 @@ class zcfsAdminBehaviors
 
     /**
      * Add javascript for toggle to post edition page header.
-     * 
+     *
      * @return string Page header
      */
     public static function adminPostHeaders()
@@ -198,7 +196,7 @@ class zcfsAdminBehaviors
 
     /**
      * Add form to post sidebar.
-     * 
+     *
      * @param  ArrayObject $main_items    Main items
      * @param  ArrayObject $sidebar_items Sidebar items
      * @param  record      $post          Post record or null
@@ -253,7 +251,7 @@ class zcfsAdminBehaviors
                 $edit = sprintf(
                     '<p><a href="%s">%s</a></p>',
                     $core->adminurl->get(
-                        'admin.plugin.zoneclearFeedServer', 
+                        'admin.plugin.zoneclearFeedServer',
                         ['part' => 'feed', 'feed_id' => $fid->meta_id]
                     ),
                     __('Edit this feed')
@@ -261,8 +259,7 @@ class zcfsAdminBehaviors
             }
         }
 
-        $sidebar_items['options-box']['items']['zcfs'] = 
-            '<div id="zcfs">'.
+        $sidebar_items['options-box']['items']['zcfs'] = '<div id="zcfs">' .
             '<h5>' . __('Feed source') . '</h5>' .
             '<p>' .
             '<a href="' . $url . '" title="' . $author . ' - ' . $url . '">' . __('feed URL') . '</a> - ' .
@@ -274,7 +271,7 @@ class zcfsAdminBehaviors
 
     /**
      * Delete related info about feed post in meta table.
-     * 
+     *
      * @param  integer $post_id Post id
      */
     public static function adminBeforePostDelete($post_id)
@@ -283,14 +280,14 @@ class zcfsAdminBehaviors
 
         $core->con->execute(
             'DELETE FROM ' . $core->prefix . 'meta ' .
-            'WHERE post_id = ' . ((integer) $post_id) . ' ' .
+            'WHERE post_id = ' . ((int) $post_id) . ' ' .
             'AND meta_type ' . $core->con->in([
                 'zoneclearfeed_url',
                 'zoneclearfeed_author',
                 'zoneclearfeed_site',
                 'zoneclearfeed_sitename',
                 'zoneclearfeed_id'
-            ]).' '
+            ]) . ' '
         );
     }
 }

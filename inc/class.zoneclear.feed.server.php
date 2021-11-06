@@ -1,16 +1,15 @@
 <?php
 /**
  * @brief zoneclearFeedServer, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_RC_PATH')) {
     return null;
 }
@@ -22,8 +21,8 @@ if (!defined('DC_RC_PATH')) {
  */
 class zoneclearFeedServer
 {
-    public static $nethttp_timeout = 5;
-    public static $nethttp_agent = 'zoneclearFeedServer - http://zoneclear.org';
+    public static $nethttp_timeout     = 5;
+    public static $nethttp_agent       = 'zoneclearFeedServer - http://zoneclear.org';
     public static $nethttp_maxredirect = 2;
 
     public $core;
@@ -34,7 +33,7 @@ class zoneclearFeedServer
 
     /**
      * Constructor.
-     * 
+     *
      * @param dcCore $core dcCore instance
      */
     public function __construct(dcCore $core)
@@ -47,7 +46,7 @@ class zoneclearFeedServer
 
     /**
      * Short openCursor.
-     * 
+     *
      * @return cursor cursor instance
      */
     public function openCursor()
@@ -57,7 +56,7 @@ class zoneclearFeedServer
 
     /**
      * Update feed record.
-     * 
+     *
      * @param  integer $id  Feed id
      * @param  cursor  $cur cursor instance
      */
@@ -66,7 +65,7 @@ class zoneclearFeedServer
         $this->con->writeLock($this->table);
 
         try {
-            $id = (integer) $id;
+            $id = (int) $id;
 
             if ($id < 1) {
                 throw new Exception(__('No such ID'));
@@ -83,6 +82,7 @@ class zoneclearFeedServer
             $this->trigger();
         } catch (Exception $e) {
             $this->con->unlock();
+
             throw $e;
         }
 
@@ -100,10 +100,10 @@ class zoneclearFeedServer
         $this->con->writeLock($this->table);
 
         try {
-            $cur->feed_id = $this->getNextId();
-            $cur->blog_id = $this->blog;
+            $cur->feed_id     = $this->getNextId();
+            $cur->blog_id     = $this->blog;
             $cur->feed_creadt = date('Y-m-d H:i:s');
-            $cur->feed_upddt = date('Y-m-d H:i:s');
+            $cur->feed_upddt  = date('Y-m-d H:i:s');
 
             //add getFeedCursor here
 
@@ -112,6 +112,7 @@ class zoneclearFeedServer
             $this->trigger();
         } catch (Exception $e) {
             $this->con->unlock();
+
             throw $e;
         }
 
@@ -123,7 +124,7 @@ class zoneclearFeedServer
 
     /**
      * Quick enable / disable feed.
-     * 
+     *
      * @param  integer $id     Feed Id
      * @param  boolean $enable Enable or disable feed
      * @param  integer  $time  Force update time
@@ -131,7 +132,7 @@ class zoneclearFeedServer
     public function enableFeed($id, $enable = true, $time = null)
     {
         try {
-            $id = (integer) $id;
+            $id = (int) $id;
 
             if ($id < 1) {
                 throw new Exception(__('No such ID'));
@@ -140,10 +141,10 @@ class zoneclearFeedServer
             $cur = $this->openCursor();
             $this->con->writeLock($this->table);
 
-            $cur->feed_upddt = date('Y-m-d H:i:s');
-            $cur->feed_status = (integer) $enable;
+            $cur->feed_upddt  = date('Y-m-d H:i:s');
+            $cur->feed_status = (int) $enable;
             if (null !== $time) {
-                $cur->feed_upd_last = (integer) $time;
+                $cur->feed_upd_last = (int) $time;
             }
 
             $cur->update(sprintf(
@@ -155,6 +156,7 @@ class zoneclearFeedServer
             $this->trigger();
         } catch (Exception $e) {
             $this->con->unlock();
+
             throw $e;
         }
 
@@ -162,15 +164,15 @@ class zoneclearFeedServer
         $this->core->callBehavior('zoneclearFeedServerAfterEnableFeed', $id, $enable, $time);
     }
 
-    # 
+    #
     /**
      * Delete record (this not deletes post).
-     * 
+     *
      * @param  integer $id Feed Id
      */
     public function delFeed($id)
     {
-        $id = (integer) $id;
+        $id = (int) $id;
 
         if ($id < 1) {
             throw new Exception(__('No such ID'));
@@ -190,22 +192,20 @@ class zoneclearFeedServer
 
     /**
      * Get related posts.
-     * 
+     *
      * @param  array   $params     Query params
      * @param  boolean $count_only Return only result count
      * @return record              record instance
      */
-    public function getPostsByFeed($params = array(), $count_only = false)
+    public function getPostsByFeed($params = [], $count_only = false)
     {
         if (!isset($params['feed_id'])) {
             return null;
         }
 
-        $params['from'] = 
-        'LEFT JOIN ' . $this->core->prefix . 'meta F ' .
+        $params['from'] = 'LEFT JOIN ' . $this->core->prefix . 'meta F ' .
         'ON P.post_id = F.post_id ';
-        $params['sql'] = 
-        "AND P.blog_id = '" . $this->blog . "' " .
+        $params['sql'] = "AND P.blog_id = '" . $this->blog . "' " .
         "AND F.meta_type = 'zoneclearfeed_id' " .
         "AND F.meta_id = '" . $this->con->escape($params['feed_id']) . "' ";
 
@@ -216,12 +216,12 @@ class zoneclearFeedServer
 
     /**
      * Get feed record.
-     * 
+     *
      * @param  array   $params     Query params
      * @param  boolean $count_only Return only result count
      * @return record              record instance
      */
-    public function getFeeds($params = array(), $count_only = false)
+    public function getFeeds($params = [], $count_only = false)
     {
         if ($count_only) {
             $strReq = 'SELECT count(Z.feed_id) ';
@@ -231,8 +231,7 @@ class zoneclearFeedServer
                 $content_req .= implode(', ', $params['columns']) . ', ';
             }
 
-            $strReq =
-            'SELECT Z.feed_id, Z.feed_creadt, Z.feed_upddt, Z.feed_type, ' .
+            $strReq = 'SELECT Z.feed_id, Z.feed_creadt, Z.feed_upddt, Z.feed_type, ' .
             'Z.blog_id, Z.cat_id, ' .
             'Z.feed_upd_int, Z.feed_upd_last, Z.feed_status, ' .
             $content_req .
@@ -243,8 +242,7 @@ class zoneclearFeedServer
             'C.cat_title, C.cat_url, C.cat_desc ';
         }
 
-        $strReq .= 
-        'FROM ' . $this->table . ' Z ' .
+        $strReq .= 'FROM ' . $this->table . ' Z ' .
         'LEFT OUTER JOIN ' . $this->core->prefix . 'category C ON Z.cat_id = C.cat_id ';
 
         if (!empty($params['from'])) {
@@ -261,9 +259,9 @@ class zoneclearFeedServer
 
         if (!empty($params['feed_id'])) {
             if (is_array($params['feed_id'])) {
-                array_walk($params['feed_id'], function(&$v, $k) { if($v !== null) { $v = (integer) $v; }});
+                array_walk($params['feed_id'], function (&$v, $k) { if ($v !== null) { $v = (int) $v; }});
             } else {
-                $params['feed_id'] = [(integer) $params['feed_id']];
+                $params['feed_id'] = [(int) $params['feed_id']];
             }
             $strReq .= 'AND Z.feed_id ' . $this->con->in($params['feed_id']);
         }
@@ -275,7 +273,7 @@ class zoneclearFeedServer
             $strReq .= "AND Z.feed_url = '" . $this->con->escape($params['feed_url']) . "' ";
         }
         if (isset($params['feed_status'])) {
-            $strReq .= "AND Z.feed_status = " . ((integer) $params['feed_status']) . " ";
+            $strReq .= 'AND Z.feed_status = ' . ((int) $params['feed_status']) . ' ';
         }
 
         if (!empty($params['q'])) {
@@ -299,7 +297,7 @@ class zoneclearFeedServer
             $strReq .= $this->con->limit($params['limit']);
         }
 
-        $rs = $this->con->select($strReq);
+        $rs     = $this->con->select($strReq);
         $rs->zc = $this;
 
         return $rs;
@@ -307,7 +305,7 @@ class zoneclearFeedServer
 
     /**
      * Get next table id.
-     * 
+     *
      * @return record record instance
      */
     private function getNextId()
@@ -319,7 +317,7 @@ class zoneclearFeedServer
 
     /**
      * Lock a file to see if an update is ongoing.
-     * 
+     *
      * @return boolean True if file is locked
      */
     public function lockUpdate()
@@ -327,14 +325,14 @@ class zoneclearFeedServer
         try {
             # Need flock function
             if (!function_exists('flock')) {
-                throw New Exception("Can't call php function named flock");
+                throw new Exception("Can't call php function named flock");
             }
             # Cache writable ?
             if (!is_writable(DC_TPL_CACHE)) {
                 throw new Exception("Can't write in cache fodler");
             }
             # Set file path
-            $f_md5 = md5($this->blog);
+            $f_md5       = md5($this->blog);
             $cached_file = sprintf(
                 '%s/%s/%s/%s/%s.txt',
                 DC_TPL_CACHE,
@@ -353,18 +351,18 @@ class zoneclearFeedServer
             if (!file_exists($cached_file)) {
                 !$fp = @fopen($cached_file, 'w');
                 if ($fp === false) {
-                    throw New Exception("Can't create file");
+                    throw new Exception("Can't create file");
                 }
                 fwrite($fp, '1', strlen('1'));
                 fclose($fp);
             }
             # Open file
             if (!($fp = @fopen($cached_file, 'r+'))) {
-                throw New Exception("Can't open file");
+                throw new Exception("Can't open file");
             }
             # Lock file
             if (!flock($fp, LOCK_EX)) {
-                throw New Exception("Can't lock file");
+                throw new Exception("Can't lock file");
             }
             $this->lock = $fp;
 
@@ -378,7 +376,6 @@ class zoneclearFeedServer
 
     /**
      * Unlock file of update process.
-     * 
      */
     public function unlockUpdate()
     {
@@ -388,7 +385,7 @@ class zoneclearFeedServer
 
     /**
      * Check and add/update post related to record if needed.
-     * 
+     *
      * @param  integer  $id   Feed Id
      * @param  boolean $throw Throw exception or end silently
      * @return boolean        True if process succeed
@@ -408,11 +405,11 @@ class zoneclearFeedServer
 
         dt::setTZ($this->core->blog->settings->system->blog_timezone);
         $time = time();
-        $s = $this->core->blog->settings->zoneclearFeedServer;
+        $s    = $this->core->blog->settings->zoneclearFeedServer;
 
         # All feeds or only one (from admin)
         $f = !$id ?
-            $this->getFeeds(['feed_status' => 1, 'order' => 'feed_upd_last ASC']) : 
+            $this->getFeeds(['feed_status' => 1, 'order' => 'feed_upd_last ASC']) :
             $this->getFeeds(['feed_id' => $id]);
 
         # No feed
@@ -423,10 +420,10 @@ class zoneclearFeedServer
         # Set feeds user
         $this->enableUser($s->zoneclearFeedServer_user);
 
-        $updates = false;
+        $updates  = false;
         $loop_mem = [];
 
-        $limit = abs((integer) $s->zoneclearFeedServer_update_limit);
+        $limit = abs((int) $s->zoneclearFeedServer_update_limit);
         if ($limit < 1) {
             $limit = 10;
         }
@@ -435,9 +432,9 @@ class zoneclearFeedServer
         $cur_post = $this->con->openCursor($this->core->prefix . 'post');
         $cur_meta = $this->con->openCursor($this->core->prefix . 'meta');
 
-        while($f->fetch()) {
+        while ($f->fetch()) {
             # Check if feed need update
-            if ($id || $i < $limit && $f->feed_status == 1 
+            if ($id || $i < $limit && $f->feed_status == 1
                 && $time > $f->feed_upd_last + $f->feed_upd_int
             ) {
                 $i++;
@@ -455,8 +452,8 @@ class zoneclearFeedServer
                     $i++;
 
                 # Not updated since last visit
-                } elseif (!$id 
-                    && '' != $feed->pubdate 
+                } elseif (!$id
+                    && '' != $feed->pubdate
                     && strtotime($feed->pubdate) < $f->feed_upd_last
                 ) {
                     # Set update time of this feed
@@ -481,7 +478,7 @@ class zoneclearFeedServer
                             continue;
                         }
 
-                        $item_link = $this->con->escape($item_link);
+                        $item_link              = $this->con->escape($item_link);
                         $is_new_published_entry = false;
 
                         # Not updated since last visit
@@ -499,9 +496,9 @@ class zoneclearFeedServer
                         $old_post = $this->con->select(
                             'SELECT P.post_id, P.post_status ' .
                             'FROM ' . $this->core->prefix . 'post P ' .
-                            'INNER JOIN ' . $this->core->prefix . 'meta M '.
+                            'INNER JOIN ' . $this->core->prefix . 'meta M ' .
                             'ON P.post_id = M.post_id ' .
-                            "WHERE blog_id='" . $this->blog . "' " . 
+                            "WHERE blog_id='" . $this->blog . "' " .
                             "AND meta_type = 'zoneclearfeed_url' " .
                             "AND meta_id = '" . $item_link . "' "
                         );
@@ -512,20 +509,20 @@ class zoneclearFeedServer
                         if ($f->cat_id) {
                             $cur_post->cat_id = $f->cat_id;
                         }
-                        $post_content = $item->content ? $item->content : $item->description;
-                        $cur_post->post_content = html::absoluteURLs($post_content,$feed->link);
-                        $cur_post->post_title = $item->title ? $item->title : text::cutString(html::clean($cur_post->post_content), 60);
-                        $creator = $item->creator ? $item->creator : $f->feed_owner;
+                        $post_content           = $item->content ? $item->content : $item->description;
+                        $cur_post->post_content = html::absoluteURLs($post_content, $feed->link);
+                        $cur_post->post_title   = $item->title ? $item->title : text::cutString(html::clean($cur_post->post_content), 60);
+                        $creator                = $item->creator ? $item->creator : $f->feed_owner;
 
                         try {
                             # Create entry
                             if ($old_post->isEmpty()) {
                                 # Post
-                                $cur_post->user_id = $this->core->auth->userID();
-                                $cur_post->post_format = 'xhtml';
-                                $cur_post->post_status = (integer) $s->zoneclearFeedServer_post_status_new;
+                                $cur_post->user_id           = $this->core->auth->userID();
+                                $cur_post->post_format       = 'xhtml';
+                                $cur_post->post_status       = (int) $s->zoneclearFeedServer_post_status_new;
                                 $cur_post->post_open_comment = 0;
-                                $cur_post->post_open_tb = 0;
+                                $cur_post->post_open_tb      = 0;
 
                                 # --BEHAVIOR-- zoneclearFeedServerBeforePostCreate
                                 $this->core->callBehavior(
@@ -550,7 +547,7 @@ class zoneclearFeedServer
                                     $is_new_published_entry = true;
                                 }
 
-                            # Update entry
+                                # Update entry
                             } else {
                                 $post_id = $old_post->post_id;
 
@@ -570,7 +567,7 @@ class zoneclearFeedServer
                                 # Quick delete old meta
                                 $this->con->execute(
                                     'DELETE FROM ' . $this->core->prefix . 'meta ' .
-                                    'WHERE post_id = ' . $post_id . ' ' . 
+                                    'WHERE post_id = ' . $post_id . ' ' .
                                     "AND meta_type LIKE 'zoneclearfeed_%' "
                                 );
                                 # Delete old tags
@@ -589,37 +586,37 @@ class zoneclearFeedServer
                             }
 
                             # Quick add new meta
-                            $meta = new ArrayObject();
+                            $meta          = new ArrayObject();
                             $meta->tweeter = $f->feed_tweeter;
 
                             $cur_meta->clean();
-                            $cur_meta->post_id = $post_id;
+                            $cur_meta->post_id   = $post_id;
                             $cur_meta->meta_type = 'zoneclearfeed_url';
-                            $cur_meta->meta_id = $meta->url = $item_link;
+                            $cur_meta->meta_id   = $meta->url   = $item_link;
                             $cur_meta->insert();
 
                             $cur_meta->clean();
-                            $cur_meta->post_id = $post_id;
+                            $cur_meta->post_id   = $post_id;
                             $cur_meta->meta_type = 'zoneclearfeed_author';
-                            $cur_meta->meta_id = $meta->author = $creator;
+                            $cur_meta->meta_id   = $meta->author   = $creator;
                             $cur_meta->insert();
 
                             $cur_meta->clean();
-                            $cur_meta->post_id = $post_id;
+                            $cur_meta->post_id   = $post_id;
                             $cur_meta->meta_type = 'zoneclearfeed_site';
-                            $cur_meta->meta_id = $meta->site = $f->feed_url;
+                            $cur_meta->meta_id   = $meta->site   = $f->feed_url;
                             $cur_meta->insert();
 
                             $cur_meta->clean();
-                            $cur_meta->post_id = $post_id;
+                            $cur_meta->post_id   = $post_id;
                             $cur_meta->meta_type = 'zoneclearfeed_sitename';
-                            $cur_meta->meta_id = $meta->sitename = $f->feed_name;
+                            $cur_meta->meta_id   = $meta->sitename   = $f->feed_name;
                             $cur_meta->insert();
 
                             $cur_meta->clean();
-                            $cur_meta->post_id = $post_id;
+                            $cur_meta->post_id   = $post_id;
                             $cur_meta->meta_type = 'zoneclearfeed_id';
-                            $cur_meta->meta_id = $meta->id = $f->feed_id;
+                            $cur_meta->meta_id   = $meta->id   = $f->feed_id;
                             $cur_meta->insert();
 
                             # Add new tags
@@ -627,8 +624,8 @@ class zoneclearFeedServer
                             if ($f->feed_get_tags) {
 
                                 # Some feed subjects contains more than one tag
-                                foreach($item->subject as $subjects) {
-                                    $tmp = $this->core->meta->splitMetaValues($subjects);
+                                foreach ($item->subject as $subjects) {
+                                    $tmp  = $this->core->meta->splitMetaValues($subjects);
                                     $tags = array_merge($tags, $tmp);
                                 }
                                 $tags = array_unique($tags);
@@ -637,10 +634,16 @@ class zoneclearFeedServer
                             foreach ($tags as $tag) {
 
                                 # Change tags case
-                                switch((integer) $s->zoneclearFeedServer_tag_case) {
-                                    case 3: $tag = strtoupper($tag);          break;
-                                    case 2: $tag = strtolower($tag);          break;
-                                    case 1: $tag = ucfirst(strtolower($tag)); break;
+                                switch ((int) $s->zoneclearFeedServer_tag_case) {
+                                    case 3: $tag = strtoupper($tag);
+
+break;
+                                    case 2: $tag = strtolower($tag);
+
+break;
+                                    case 1: $tag = ucfirst(strtolower($tag));
+
+break;
                                     default: /* do nothing */                 break;
                                 }
                                 if (!in_array($tag, $formated_tags)) {
@@ -663,11 +666,11 @@ class zoneclearFeedServer
                                 $cur_post,
                                 $meta
                             );
-
                         } catch (Exception $e) {
                             $this->con->rollback();
                             $this->enableUser(false);
                             $this->unlockUpdate();
+
                             throw $e;
                         }
                         $updates = true;
@@ -684,7 +687,7 @@ class zoneclearFeedServer
 
     /**
      * Set permission to update post table.
-     * 
+     *
      * @param  boolean $enable Enable or disable perm
      */
     public function enableUser($enable = false)
@@ -694,7 +697,7 @@ class zoneclearFeedServer
             if (!$this->core->auth->checkUser($enable)) {
                 throw new Exception('Unable to set user');
             }
-        # Disable
+            # Disable
         } else {
             $this->core->auth = null;
             $this->core->auth = new dcAuth($this->core);
@@ -703,14 +706,14 @@ class zoneclearFeedServer
 
     /**
      * Read and parse external feeds.
-     * 
+     *
      * @param  string      $f Feed URL
      * @return arrayObject    Parsed feed
      */
     public static function readFeed($f)
     {
         try {
-            $feed_reader = new feedReader;
+            $feed_reader = new feedReader();
             $feed_reader->setCacheDir(DC_TPL_CACHE);
             $feed_reader->setTimeout(self::$nethttp_timeout);
             $feed_reader->setMaxRedirects(self::$nethttp_maxredirect);
@@ -732,13 +735,13 @@ class zoneclearFeedServer
 
     /**
      * Check if an URL is well formed
-     * 
+     *
      * @param  string $url URL
      * @return Boolean     True if URL is allowed
      */
     public static function validateURL($url)
     {
-        return false !== strpos($url, 'http://') 
+        return false !== strpos($url, 'http://')
             || false !== strpos($url, 'https://');
     }
 
@@ -746,7 +749,7 @@ class zoneclearFeedServer
      * Get full URL.
      *
      * Know bugs: anchor is not well parsed.
-     * 
+     *
      * @param  string $root Root URL
      * @param  string $url  An URL
      * @return string       Parse URL
@@ -778,7 +781,7 @@ class zoneclearFeedServer
 
     /**
      * Get list of feeds status.
-     * 
+     *
      * @return array List of names/values of feeds status
      */
     public static function getAllStatus()
@@ -791,7 +794,7 @@ class zoneclearFeedServer
 
     /**
      * Get list of predefined interval.
-     * 
+     *
      * @return array List of Name/time of intervals
      */
     public static function getAllUpdateInterval()
@@ -808,7 +811,7 @@ class zoneclearFeedServer
 
     /**
      * Get list of (super)admins of current blog.
-     * 
+     *
      * @return array List of UserCNs/UserIds
      */
     public function getAllBlogAdmins()
@@ -840,8 +843,8 @@ class zoneclearFeedServer
             'FROM ' . $this->con->escapeSystem($this->core->prefix . 'user') . ' U ' .
             'LEFT JOIN ' . $this->con->escapeSystem($this->core->prefix . 'permissions') . ' P ' .
             'ON U.user_id=P.user_id ' .
-            'WHERE U.user_status = 1 '.
-            "AND P.blog_id = '"  .$this->blog . "' " .
+            'WHERE U.user_status = 1 ' .
+            "AND P.blog_id = '" . $this->blog . "' " .
             "AND P.permissions LIKE '%|admin|%' "
         );
 
@@ -862,13 +865,13 @@ class zoneclearFeedServer
 
     /**
      * Get list of urls where entries could be hacked.
-     * 
+     *
      * @param  dcCore $core dcCore instance
      * @return array        List of names/types of URLs
      */
     public static function getPublicUrlTypes(dcCore $core)
     {
-        $types = array();
+        $types = [];
 
         # --BEHAVIOR-- zoneclearFeedServerPublicUrlTypes
         $core->callBehavior('zoneclearFeedServerPublicUrlTypes', $types);
@@ -885,7 +888,7 @@ class zoneclearFeedServer
 
     /**
      * Take care about plugin tweakurls (thanks Mathieu M.).
-     * 
+     *
      * @param  cursor  $cur cursor instance
      * @param  integer $id  Post Id
      */
@@ -893,6 +896,6 @@ class zoneclearFeedServer
     {
         global $core;
         $cur->post_url = tweakUrls::tweakBlogURL($cur->post_url);
-        $core->auth->sudo(array($core->blog, 'updPost'), $id, $cur);
+        $core->auth->sudo([$core->blog, 'updPost'], $id, $cur);
     }
 }

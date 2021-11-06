@@ -1,19 +1,18 @@
 <?php
 /**
  * @brief zoneclearFeedServer, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
-} 
+}
 
 $mod_id = 'zoneclearFeedServer';
 $dc_min = $this->modules[$mod_id]['requires'][0][1];
@@ -29,11 +28,13 @@ try {
     }
 
     # Check Dotclear version
-    if (!method_exists('dcUtils', 'versionsCompare') 
+    if (!method_exists('dcUtils', 'versionsCompare')
         || dcUtils::versionsCompare(DC_VERSION, $dc_min, '<', false)
     ) {
         throw new Exception(sprintf(
-            '%s requires Dotclear %s', $mod_id, $dc_min
+            '%s requires Dotclear %s',
+            $mod_id,
+            $dc_min
         ));
     }
 
@@ -65,7 +66,7 @@ try {
         ->index('idx_zcfs_type', 'btree', 'feed_type')
         ->index('idx_zcfs_blog', 'btree', 'blog_id');
 
-    $ti = new dbStruct($core->con, $core->prefix);
+    $ti      = new dbStruct($core->con, $core->prefix);
     $changes = $ti->synchronize($t);
 
     # Settings
@@ -78,15 +79,16 @@ try {
     $s->put('zoneclearFeedServer_update_limit', 1, 'integer', 'Number of feeds to update at one time', false, true);
     $s->put('zoneclearFeedServer_keep_empty_feed', false, 'boolean', 'Keep active empty feeds', false, true);
     $s->put('zoneclearFeedServer_tag_case', 0, 'integer', 'How to transform imported tags', false, true);
-    $s->put('zoneclearFeedServer_user', '', 'string','User id that has right on post', false, true);
-    $s->put('zoneclearFeedServer_post_full_tpl', serialize(array('post', 'category', 'tag', 'archive')), 'string', 'List of templates types for full feed', false, true);
-    $s->put('zoneclearFeedServer_post_title_redir', serialize(array('feed')), 'string', 'List of templates types for redirection to original post', false, true);
+    $s->put('zoneclearFeedServer_user', '', 'string', 'User id that has right on post', false, true);
+    $s->put('zoneclearFeedServer_post_full_tpl', serialize(['post', 'category', 'tag', 'archive']), 'string', 'List of templates types for full feed', false, true);
+    $s->put('zoneclearFeedServer_post_title_redir', serialize(['feed']), 'string', 'List of templates types for redirection to original post', false, true);
 
     # Set module version
     $core->setVersion(
         $mod_id,
         $this->moduleInfo($mod_id, 'version')
     );
+
     return true;
 } catch (Exception $e) {
     $core->error->add($e->getMessage());
