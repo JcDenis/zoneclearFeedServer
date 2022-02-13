@@ -203,15 +203,21 @@ class zoneclearFeedServer
             return null;
         }
 
-        $params['from'] = 'LEFT JOIN ' . $this->core->prefix . 'meta F ' .
-        'ON P.post_id = F.post_id ';
+        $sql = new dcSelectStatement($this->core, 'zcfs');
+        $sql->join((new dcJoinStatement($this->core, 'zcfs'))
+                   ->type('LEFT')
+                   ->from($this->core->prefix . 'meta F')
+                   ->on('P.post_id = F.post_id')
+                   ->statement()
+        );
+
         $params['sql'] = "AND P.blog_id = '" . $this->blog . "' " .
         "AND F.meta_type = 'zoneclearfeed_id' " .
         "AND F.meta_id = '" . $this->con->escape($params['feed_id']) . "' ";
 
         unset($params['feed_id']);
 
-        return $this->core->blog->getPosts($params, $count_only);
+        return $this->core->blog->getPosts($params, $count_only, $sql);
     }
 
     /**

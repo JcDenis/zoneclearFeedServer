@@ -51,7 +51,7 @@ try {
         ->feed_upd_last('integer', 0, false, 0)
         ->feed_status('smallint', 0, false, 0)
         ->feed_name('varchar', 255, false)
-        ->feed_desc('text', 0, true) //!pgsql reserved 'desc'
+        ->feed_desc('text', null, true) //!pgsql reserved 'desc'
         ->feed_url('varchar', 255, false)
         ->feed_feed('varchar', 255, false)
         ->feed_tags('varchar', 255, true)

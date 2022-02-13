@@ -3,6 +3,9 @@
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
 
+2022.02.13
+- Fix sqlStatement errors (dc 2.21)
+
 2021.11.06
 - add generic filters (dc 2.20)
 - add user pref for columns and filters options (dc 2.20)

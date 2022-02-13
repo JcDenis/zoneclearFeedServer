@@ -20,7 +20,7 @@ It mix your blog with a feeds planet.
 
   * super admin permission for plugin and services configuration
   * admin permission to manage feeds
-  * Dotclear 2.20
+  * Dotclear 2.21
 
 ## USAGE
 

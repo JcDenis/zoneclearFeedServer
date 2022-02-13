@@ -18,9 +18,9 @@ $this->registerModule(
     'Feeds server',
     'Mix your blog with a feeds planet',
     'Jean-Christian Denis, BG, Pierre Van Glabeke',
-    '2021.11.06',
+    '2022.02.13',
     [
-        'requires'    => [['core', '2.20']],
+        'requires'    => [['core', '2.21']],
         'permissions' => 'admin',
         'type'        => 'plugin',
         'support'     => 'https://github.com/JcDenis/zoneclearFeedServer',
