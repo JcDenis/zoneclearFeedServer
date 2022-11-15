@@ -20,7 +20,7 @@ $dc_min = $this->modules[$mod_id]['requires'][0][1];
 try {
     # Check module version
     if (version_compare(
-        $core->getVersion($mod_id),
+        dcCore::app()->getVersion($mod_id),
         $this->moduleInfo($mod_id, 'version'),
         '>='
     )) {
@@ -39,7 +39,7 @@ try {
     }
 
     # Tables
-    $t = new dbStruct($core->con, $core->prefix);
+    $t = new dbStruct(dcCore::app()->con, dcCore::app()->prefix);
     $t->zc_feed
         ->feed_id('bigint', 0, false)
         ->feed_creadt('timestamp', 0, false, 'now()')
@@ -66,12 +66,12 @@ try {
         ->index('idx_zcfs_type', 'btree', 'feed_type')
         ->index('idx_zcfs_blog', 'btree', 'blog_id');
 
-    $ti      = new dbStruct($core->con, $core->prefix);
+    $ti      = new dbStruct(dcCore::app()->con, dcCore::app()->prefix);
     $changes = $ti->synchronize($t);
 
     # Settings
-    $core->blog->settings->addNamespace('zoneclearFeedServer');
-    $s = $core->blog->settings->zoneclearFeedServer;
+    dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
+    $s = dcCore::app()->blog->settings->zoneclearFeedServer;
     $s->put('zoneclearFeedServer_active', false, 'boolean', 'Enable zoneclearBlogServer', false, true);
     $s->put('zoneclearFeedServer_pub_active', false, 'boolean', 'Enable public page of list of feeds', false, true);
     $s->put('zoneclearFeedServer_post_status_new', true, 'boolean', 'Enable auto publish new posts', false, true);
@@ -84,14 +84,14 @@ try {
     $s->put('zoneclearFeedServer_post_title_redir', serialize(['feed']), 'string', 'List of templates types for redirection to original post', false, true);
 
     # Set module version
-    $core->setVersion(
+    dcCore::app()->setVersion(
         $mod_id,
         $this->moduleInfo($mod_id, 'version')
     );
 
     return true;
 } catch (Exception $e) {
-    $core->error->add($e->getMessage());
+    dcCore::app()->error->add($e->getMessage());
 
     return false;
 }

@@ -10,17 +10,17 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-class zcfsFeedsActionsPage extends dcActionsPage
+class zcfsFeedsActionsPage extends dcActions
 {
     public $zcfs;
 
-    public function __construct(dcCore $core, $uri, $redirect_args = [])
+    public function __construct($uri, $redirect_args = [])
     {
-        $this->zcfs = new zoneclearFeedServer($core);
+        $this->zcfs = new zoneclearFeedServer();
 
-        parent::__construct($core, $uri, $redirect_args);
+        parent::__construct($uri, $redirect_args);
         $this->redirect_fields = [
-            'sortby', 'order', 'page', 'nb'
+            'sortby', 'order', 'page', 'nb',
         ];
         $this->field_entries = 'feeds';
         $this->caller_title  = __('Feeds');
@@ -29,8 +29,8 @@ class zcfsFeedsActionsPage extends dcActionsPage
 
     protected function loadDefaults()
     {
-        zcfsDefaultFeedsActions::zcfsFeedsActionsPage($this->core, $this);
-        $this->core->callBehavior('zcfsFeedsActionsPage', $this->core, $this);
+        zcfsDefaultFeedsActions::zcfsFeedsActionsPage($this);
+        dcCore::app()->callBehavior('zcfsFeedsActionsPage', $this);
     }
 
     public function beginPage($breadcrumb = '', $head = '')
@@ -52,12 +52,12 @@ class zcfsFeedsActionsPage extends dcActionsPage
 
     public function error(Exception $e)
     {
-        $this->core->error->add($e->getMessage());
+        dcCore::app()->error->add($e->getMessage());
         $this->beginPage(
             dcPage::breadcrumb([
-                html::escapeHTML($this->core->blog->name) => '',
-                $this->getCallerTitle()                   => $this->getRedirection(true),
-                __('Feeds actions')                       => ''
+                html::escapeHTML(dcCore::app()->blog->name) => '',
+                $this->getCallerTitle()                     => $this->getRedirection(true),
+                __('Feeds actions')                         => '',
             ])
         );
         $this->endPage();
@@ -74,8 +74,8 @@ class zcfsFeedsActionsPage extends dcActionsPage
             }
             $this->rs = $feeds;
         } else {
-            $this->rs = $this->core->con->select(
-                'SELECT blog_id FROM ' . $this->core->prefix . 'blog WHERE false'
+            $this->rs = dcCore::app()->con->select(
+                'SELECT blog_id FROM ' . dcCore::app()->prefix . 'blog WHERE false'
             );
         }
     }
@@ -89,7 +89,7 @@ class zcfsFeedsActionsPage extends dcActionsPage
  */
 class zcfsDefaultFeedsActions
 {
-    public static function zcfsFeedsActionsPage(dcCore $core, zcfsFeedsActionsPage $ap)
+    public static function zcfsFeedsActionsPage(zcfsFeedsActionsPage $ap)
     {
         $ap->addAction(
             [__('Change category') => 'changecat'],
@@ -125,7 +125,7 @@ class zcfsDefaultFeedsActions
         );
     }
 
-    public static function doEnableFeed(dcCore $core, zcfsFeedsActionsPage $ap, $post)
+    public static function doEnableFeed(zcfsFeedsActionsPage $ap, $post)
     {
         $enable = $ap->getAction() == 'enablefeed';
         $ids    = $ap->getIDs();
@@ -138,7 +138,7 @@ class zcfsDefaultFeedsActions
             $ap->zcfs->enableFeed($id, $enable);
         }
 
-        dcPage::addSuccessNotice(sprintf(
+        dcAdminNotices::addSuccessNotice(sprintf(
             $enable ?
                 __(
                     '%d feed has been successfully enabled.',
@@ -156,14 +156,14 @@ class zcfsDefaultFeedsActions
         $ap->redirect(true);
     }
 
-    public static function doDeletePost(dcCore $core, zcfsFeedsActionsPage $ap, $post)
+    public static function doDeletePost(zcfsFeedsActionsPage $ap, $post)
     {
         $types = [
             'zoneclearfeed_url',
             'zoneclearfeed_author',
             'zoneclearfeed_site',
             'zoneclearfeed_sitename',
-            'zoneclearfeed_id'
+            'zoneclearfeed_id',
         ];
 
         $ids = $ap->getIDs();
@@ -174,26 +174,26 @@ class zcfsDefaultFeedsActions
 
         foreach ($ids as $id) {
             $posts = $ap->zcfs->getPostsByFeed([
-                'feed_id' => $id
+                'feed_id' => $id,
             ]);
 
             while ($posts->fetch()) {
-                $core->blog->delPost($posts->post_id);
-                $core->con->execute(
-                    'DELETE FROM ' . $core->prefix . 'meta ' .
+                dcCore::app()->blog->delPost($posts->post_id);
+                dcCore::app()->con->execute(
+                    'DELETE FROM ' . dcCore::app()->prefix . dcMeta::META_TABLE_NAME . ' ' .
                     'WHERE post_id = ' . $posts->post_id . ' ' .
-                    'AND meta_type ' . $core->con->in($types) . ' '
+                    'AND meta_type ' . dcCore::app()->con->in($types) . ' '
                 );
             }
         }
 
-        dcPage::addSuccessNotice(
+        dcAdminNotices::addSuccessNotice(
             __('Entries have been successfully deleted.')
         );
         $ap->redirect(true);
     }
 
-    public static function doDeleteFeed(dcCore $core, zcfsFeedsActionsPage $ap, $post)
+    public static function doDeleteFeed(zcfsFeedsActionsPage $ap, $post)
     {
         $ids = $ap->getIDs();
 
@@ -205,7 +205,7 @@ class zcfsDefaultFeedsActions
             $ap->zcfs->delFeed($id);
         }
 
-        dcPage::addSuccessNotice(sprintf(
+        dcAdminNotices::addSuccessNotice(sprintf(
             __(
                 '%d feed has been successfully deleted.',
                 '%d feeds have been successfully deleted.',
@@ -216,7 +216,7 @@ class zcfsDefaultFeedsActions
         $ap->redirect(true);
     }
 
-    public static function doUpdateFeed(dcCore $core, zcfsFeedsActionsPage $ap, $post)
+    public static function doUpdateFeed(zcfsFeedsActionsPage $ap, $post)
     {
         $ids = $ap->getIDs();
 
@@ -228,7 +228,7 @@ class zcfsDefaultFeedsActions
             $ap->zcfs->checkFeedsUpdate($id, true);
         }
 
-        dcPage::addSuccessNotice(sprintf(
+        dcAdminNotices::addSuccessNotice(sprintf(
             __(
                 '%d feed has been successfully updated.',
                 '%d feeds have been successfully updated.',
@@ -239,7 +239,7 @@ class zcfsDefaultFeedsActions
         $ap->redirect(true);
     }
 
-    public static function doResetUpdate(dcCore $core, zcfsFeedsActionsPage $ap, $post)
+    public static function doResetUpdate(zcfsFeedsActionsPage $ap, $post)
     {
         $ids = $ap->getIDs();
 
@@ -254,7 +254,7 @@ class zcfsDefaultFeedsActions
             $ap->zcfs->checkFeedsUpdate($id, true);
         }
 
-        dcPage::addSuccessNotice(sprintf(
+        dcAdminNotices::addSuccessNotice(sprintf(
             __(
                 'Last update of %s feed successfully reseted.',
                 'Last update of %s feeds successfully reseted.',
@@ -265,7 +265,7 @@ class zcfsDefaultFeedsActions
         $ap->redirect(true);
     }
 
-    public static function doChangeCategory(dcCore $core, zcfsFeedsActionsPage $ap, $post)
+    public static function doChangeCategory(zcfsFeedsActionsPage $ap, $post)
     {
         if (isset($post['upd_cat_id'])) {
             $ids = $ap->getIDs();
@@ -282,7 +282,7 @@ class zcfsDefaultFeedsActions
                 $ap->zcfs->updFeed($id, $cur);
             }
 
-            dcPage::addSuccessNotice(sprintf(
+            dcAdminNotices::addSuccessNotice(sprintf(
                 __(
                     'Category of %s feed successfully changed.',
                     'Category of %s feeds successfully changed.',
@@ -293,15 +293,15 @@ class zcfsDefaultFeedsActions
             $ap->redirect(true);
         } else {
             $categories_combo = dcAdminCombos::getCategoriesCombo(
-                $core->blog->getCategories()
+                dcCore::app()->blog->getCategories()
             );
 
             $ap->beginPage(
                 dcPage::breadcrumb([
-                    html::escapeHTML($core->blog->name)      => '',
-                    __('Feeds server')                       => '',
-                    $ap->getCallerTitle()                    => $ap->getRedirection(true),
-                    __('Change category for this selection') => ''
+                    html::escapeHTML(dcCore::app()->blog->name) => '',
+                    __('Feeds server')                          => '',
+                    $ap->getCallerTitle()                       => $ap->getRedirection(true),
+                    __('Change category for this selection')    => '',
                 ])
             );
 
@@ -310,7 +310,7 @@ class zcfsDefaultFeedsActions
             $ap->getCheckboxes() .
             '<p><label for="upd_cat_id" class="classic">' . __('Category:') . '</label> ' .
             form::combo(['upd_cat_id'], $categories_combo, '') .
-            $core->formNonce() .
+            dcCore::app()->formNonce() .
             $ap->getHiddenFields() .
             form::hidden(['action'], 'changecat') .
             '<input type="submit" value="' . __('Save') . '" /></p>' .
@@ -320,7 +320,7 @@ class zcfsDefaultFeedsActions
         }
     }
 
-    public static function doChangeInterval(dcCore $core, zcfsFeedsActionsPage $ap, $post)
+    public static function doChangeInterval(zcfsFeedsActionsPage $ap, $post)
     {
         if (isset($post['upd_upd_int'])) {
             $ids = $ap->getIDs();
@@ -337,7 +337,7 @@ class zcfsDefaultFeedsActions
                 $ap->zcfs->updFeed($id, $cur);
             }
 
-            dcPage::addSuccessNotice(sprintf(
+            dcAdminNotices::addSuccessNotice(sprintf(
                 __(
                     'Update frequency of %s feed successfully changed.',
                     'Update frequency of %s feeds successfully changed.',
@@ -350,10 +350,10 @@ class zcfsDefaultFeedsActions
             $ap->beginPage(
                 dcPage::breadcrumb(
                     [
-                        html::escapeHTML($core->blog->name)              => '',
+                        html::escapeHTML(dcCore::app()->blog->name)      => '',
                         __('Feeds server')                               => '',
                         $ap->getCallerTitle()                            => $ap->getRedirection(true),
-                        __('Change update frequency for this selection') => ''
+                        __('Change update frequency for this selection') => '',
                     ]
                 )
             );
@@ -363,7 +363,7 @@ class zcfsDefaultFeedsActions
             $ap->getCheckboxes() .
             '<p><label for="upd_upd_int" class="classic">' . __('Frequency:') . '</label> ' .
             form::combo(['upd_upd_int'], $ap->zcfs->getAllUpdateInterval(), '') .
-            $core->formNonce() .
+            dcCore::app()->formNonce() .
             $ap->getHiddenFields() .
             form::hidden(['action'], 'changeint') .
             '<input type="submit" value="' . __('Save') . '" /></p>' .

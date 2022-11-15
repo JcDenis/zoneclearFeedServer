@@ -7,7 +7,7 @@
 
 $opts = getopt('d:c:b:u:h');
 
-function help($status = 0)
+function zchelp($status = 0)
 {
     echo
     "Options: \n" .
@@ -20,7 +20,7 @@ function help($status = 0)
 }
 
 if (isset($opts['h'])) {
-    help();
+    zchelp();
 }
 
 $dc_root = null;
@@ -47,17 +47,17 @@ if (isset($opts['b'])) {
 
 if (!$dc_root || !is_dir($dc_root)) {
     fwrite(STDERR, "DotClear root path is not defined\n\n");
-    help(1);
+    zchelp(1);
 }
 
 if (!$dc_conf || !is_readable($dc_conf)) {
     fwrite(STDERR, "DotClear configuration not found\n\n");
-    help(1);
+    zchelp(1);
 }
 
 if (!$blog_id) {
     fwrite(STDERR, "Blog ID is not defined\n\n");
-    help(1);
+    zchelp(1);
 }
 
 $_SERVER['DC_RC_PATH'] = $dc_conf;
@@ -69,23 +69,23 @@ unset($blog_id);
 require $dc_root . '/inc/prepend.php';
 unset($dc_root);
 
-$core->setBlog(DC_BLOG_ID);
-if ($core->blog->id == null) {
+dcCore::app()->setBlog(DC_BLOG_ID);
+if (dcCore::app()->blog->id == null) {
     fwrite(STDERR, "Blog is not defined\n");
     exit(1);
 }
 
-if (!isset($opts['u']) || !$core->auth->checkUser($opts['u'])) {
+if (!isset($opts['u']) || !dcCore::app()->auth->checkUser($opts['u'])) {
     fwrite(STDERR, "Unable to set user\n");
     exit(1);
 }
 
-$core->plugins->loadModules(DC_PLUGINS_ROOT);
+dcCore::app()->plugins->loadModules(DC_PLUGINS_ROOT);
 
-$core->blog->settings->addNamespace('zoneclearFeedServer');
+dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
 
 try {
-    $zc = new zoneclearFeedServer($core);
+    $zc = new zoneclearFeedServer();
     $zc->checkFeedsUpdate();
 } catch (Exception $e) {
     fwrite(STDERR, $e->getMessage() . "\n");

@@ -22,6 +22,8 @@ if (!defined('DC_CONTEXT_ADMIN')) {
  */
 class zcfsFeedsList extends adminGenericList
 {
+    private $zc = null;
+
     public function feedsDisplay($page, $nb_per_page, $enclose_block = '', $filter = false)
     {
         if ($this->rs->isEmpty()) {
@@ -31,8 +33,9 @@ class zcfsFeedsList extends adminGenericList
                 echo '<p><strong>' . __('No feeds') . '</strong></p>';
             }
         } else {
-            $pager   = new dcPager($page, $this->rs_count, $nb_per_page, 10);
-            $entries = [];
+            $this->zc = new zoneclearFeedServer();
+            $pager    = new dcPager($page, $this->rs_count, $nb_per_page, 10);
+            $entries  = [];
             if (isset($_REQUEST['feeds'])) {
                 foreach ($_REQUEST['feeds'] as $v) {
                     $entries[(int) $v] = true;
@@ -52,11 +55,11 @@ class zcfsFeedsList extends adminGenericList
                 'period'  => '<th scope="col">' . __('Frequency') . '</th>',
                 'update'  => '<th scope="col">' . __('Last update') . '</th>',
                 'entries' => '<th scope="col">' . __('Entries') . '</th>',
-                'status'  => '<th scope="col">' . __('Status') . '</th>'
+                'status'  => '<th scope="col">' . __('Status') . '</th>',
             ];
             $cols = new ArrayObject($cols);
 
-            $this->core->callBehavior('adminZcfsFeedsListHeader', $this->core, $this->rs, $cols);
+            dcCore::app()->callBehavior('adminZcfsFeedsListHeader', $this->rs, $cols);
 
             $this->userColumns('zcfs_feeds', $cols);
 
@@ -89,7 +92,7 @@ class zcfsFeedsList extends adminGenericList
             '<img src="images/check-on.png" alt="enable" />' :
             '<img src="images/check-off.png" alt="disable" />';
 
-        $entries_count = $this->rs->zc->getPostsByFeed(['feed_id' => $this->rs->feed_id], true)->f(0);
+        $entries_count = $this->zc->getPostsByFeed(['feed_id' => $this->rs->feed_id], true)->f(0);
         $shunk_feed    = $this->rs->feed_feed;
         if (strlen($shunk_feed) > 83) {
             $shunk_feed = substr($shunk_feed, 0, 50) . '...' . substr($shunk_feed, -20);
@@ -114,7 +117,7 @@ class zcfsFeedsList extends adminGenericList
                 (
                     $this->rs->feed_upd_last < 1 ?
                     __('never') :
-                    dt::str(__('%Y-%m-%d %H:%M'), $this->rs->feed_upd_last, $this->rs->zc->core->auth->getInfo('user_tz'))
+                    dt::str(__('%Y-%m-%d %H:%M'), (int) $this->rs->feed_upd_last, dcCore::app()->auth->getInfo('user_tz'))
                 ) . '</td>',
             'entries' => '<td class="nowrap minimal count">' .
                 (
@@ -122,11 +125,11 @@ class zcfsFeedsList extends adminGenericList
                     '<a href="' . $url . '#entries" title="' . __('View entries') . '">' . $entries_count . '</a>' :
                     $entries_count
                 ) . '</td>',
-            'status' => '<td class="nowrap minimal status">' . $status . '</td>'
+            'status' => '<td class="nowrap minimal status">' . $status . '</td>',
         ];
 
         $cols = new ArrayObject($cols);
-        $this->core->callBehavior('adminZcfsFeedsListValue', $this->core, $this->rs, $cols);
+        dcCore::app()->callBehavior('adminZcfsFeedsListValue', $this->rs, $cols);
 
         $this->userColumns('zcfs_feeds', $cols);
 
@@ -177,11 +180,11 @@ class zcfsEntriesList extends adminGenericList
                 'date'     => '<th scope="col">' . __('Date') . '</th>',
                 'author'   => '<th scope="col">' . __('Author') . '</th>',
                 'category' => '<th scope="col">' . __('Category') . '</th>',
-                'status'   => '<th scope="col">' . __('Status') . '</th>'
+                'status'   => '<th scope="col">' . __('Status') . '</th>',
             ];
 
             $cols = new ArrayObject($cols);
-            $this->core->callBehavior('adminZcfsPostListHeader', $this->core, $this->rs, $cols);
+            dcCore::app()->callBehavior('adminZcfsPostListHeader', $this->rs, $cols);
 
             $this->userColumns('zcfs_entries', $cols);
 
@@ -197,7 +200,7 @@ class zcfsEntriesList extends adminGenericList
             echo $blocks[0];
 
             while ($this->rs->fetch()) {
-                echo $this->postLine(isset($entries[$this->rs->post_id]));
+                echo $this->postLine();
             }
 
             echo $blocks[1];
@@ -208,7 +211,7 @@ class zcfsEntriesList extends adminGenericList
 
     private function postLine()
     {
-        $cat_link = $this->core->auth->check('categories', $this->core->blog->id) ?
+        $cat_link = dcCore::app()->auth->check('categories', dcCore::app()->blog->id) ?
             '<a href="category.php?id=%s" title="' . __('Edit category') . '">%s</a>'
             : '%2$s';
 
@@ -249,17 +252,17 @@ class zcfsEntriesList extends adminGenericList
             'check' => '<td class="nowrap minimal">' .
                 form::checkbox(['entries[]'], $this->rs->post_id, '', '', '', !$this->rs->isEditable()) . '</td>',
             'title' => '<td scope="row" class="maximal"><a href="' .
-                $this->core->getPostAdminURL($this->rs->post_type, $this->rs->post_id) . '" ' .
+                dcCore::app()->getPostAdminURL($this->rs->post_type, $this->rs->post_id) . '" ' .
                 'title="' . html::escapeHTML($this->rs->getURL()) . '">' .
                 html::escapeHTML(trim(html::clean($this->rs->post_title))) . '</a></td>',
             'date'     => '<td class="nowrap count">' . dt::dt2str(__('%Y-%m-%d %H:%M'), $this->rs->post_dt) . '</td>',
             'author'   => '<td class="nowrap">' . html::escapeHTML($this->rs->user_id) . '</td>',
             'category' => '<td class="nowrap">' . $cat_title . '</td>',
-            'status'   => '<td class="nowrap status">' . $img_status . '</td>'
+            'status'   => '<td class="nowrap status">' . $img_status . '</td>',
         ];
 
         $cols = new ArrayObject($cols);
-        $this->core->callBehavior('adminZcfsPostListValue', $this->core, $this->rs, $cols);
+        dcCore::app()->callBehavior('adminZcfsPostListValue', $this->rs, $cols);
 
         $this->userColumns('zcfs_entries', $cols);
 
@@ -278,20 +281,20 @@ class zcfsEntriesList extends adminGenericList
  */
 class adminZcfsPostFilter extends adminGenericFilter
 {
-    public function __construct(dcCore $core)
+    public function __construct()
     {
-        parent::__construct($core, 'zcfs_entries');
+        parent::__construct(dcCore::app(), 'zcfs_entries');
 
         $filters = new arrayObject([
             dcAdminFilters::getPageFilter(),
             $this->getPostUserFilter(),
             $this->getPostCategoriesFilter(),
             $this->getPostStatusFilter(),
-            $this->getPostMonthFilter()
+            $this->getPostMonthFilter(),
         ]);
 
         # --BEHAVIOR-- adminPostFilter
-        $core->callBehavior('adminZcfsPostFilter', $core, $filters);
+        dcCore::app()->callBehavior('adminZcfsPostFilter', $filters);
 
         $filters = $filters->getArrayCopy();
 
@@ -306,12 +309,12 @@ class adminZcfsPostFilter extends adminGenericFilter
         $users = null;
 
         try {
-            $users = $this->core->blog->getPostsUsers();
+            $users = dcCore::app()->blog->getPostsUsers();
             if ($users->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {
-            $this->core->error->add($e->getMessage());
+            dcCore::app()->error->add($e->getMessage());
 
             return null;
         }
@@ -337,19 +340,19 @@ class adminZcfsPostFilter extends adminGenericFilter
         $categories = null;
 
         try {
-            $categories = $this->core->blog->getCategories();
+            $categories = dcCore::app()->blog->getCategories();
             if ($categories->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {
-            $this->core->error->add($e->getMessage());
+            dcCore::app()->error->add($e->getMessage());
 
             return null;
         }
 
         $combo = [
             '-'            => '',
-            __('(No cat)') => 'NULL'
+            __('(No cat)') => 'NULL',
         ];
         while ($categories->fetch()) {
             $combo[
@@ -387,12 +390,12 @@ class adminZcfsPostFilter extends adminGenericFilter
         $dates = null;
 
         try {
-            $dates = $this->core->blog->getDates(['type' => 'month']);
+            $dates = dcCore::app()->blog->getDates(['type' => 'month']);
             if ($dates->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {
-            $this->core->error->add($e->getMessage());
+            dcCore::app()->error->add($e->getMessage());
 
             return null;
         }

@@ -14,11 +14,11 @@ if (!defined('DC_RC_PATH')) {
     return null;
 }
 
-$core->addBehavior(
+dcCore::app()->addBehavior(
     'initWidgets',
     ['zoneclearFeedServerWidget', 'adminSource']
 );
-$core->addBehavior(
+dcCore::app()->addBehavior(
     'initWidgets',
     ['zoneclearFeedServerWidget', 'adminNumber']
 );
@@ -33,7 +33,7 @@ class zoneclearFeedServerWidget
     /**
      * Widget configuration for sources list.
      *
-     * @param  dcWidget $w dcWidget instance
+     * @param  dcWidgets $w dcWidgets instance
      */
     public static function adminSource($w)
     {
@@ -56,7 +56,7 @@ class zoneclearFeedServerWidget
                [
                    __('Last update') => 'feed_upd_last',
                    __('Name')        => 'lowername',
-                   __('Create date') => 'feed_creadt'
+                   __('Create date') => 'feed_creadt',
                ]
            )
             ->setting(
@@ -66,7 +66,7 @@ class zoneclearFeedServerWidget
                 'combo',
                 [
                     __('Ascending')  => 'asc',
-                    __('Descending') => 'desc'
+                    __('Descending') => 'desc',
                 ]
             )
             ->setting(
@@ -90,7 +90,7 @@ class zoneclearFeedServerWidget
     /**
      * Widget configuration for feeds info.
      *
-     * @param  dcWidget $w dcWidget instance
+     * @param  dcWidgets $w dcWidgets instance
      */
     public static function adminNumber($w)
     {
@@ -148,15 +148,13 @@ class zoneclearFeedServerWidget
      */
     public static function publicSource($w)
     {
-        global $core;
-
         if ($w->offline) {
             return null;
         }
 
-        if (!$core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
-            || $w->homeonly == 1 && !$core->url->isHome($core->url->type)
-            || $w->homeonly == 2 && $core->url->isHome($core->url->type)
+        if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
+            || $w->homeonly == 1 && !dcCore::app()->url->isHome(dcCore::app()->url->type)
+            || $w->homeonly == 2 && dcCore::app()->url->isHome(dcCore::app()->url->type)
         ) {
             return null;
         }
@@ -168,7 +166,7 @@ class zoneclearFeedServerWidget
         $p['limit']       = abs((int) $w->limit);
         $p['feed_status'] = 1;
 
-        $zc = new zoneclearFeedServer($core);
+        $zc = new zoneclearFeedServer();
         $rs = $zc->getFeeds($p);
 
         if ($rs->isEmpty()) {
@@ -187,10 +185,10 @@ class zoneclearFeedServerWidget
             $i++;
         }
         $pub = '';
-        if ($w->pagelink && $core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
+        if ($w->pagelink && dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
             $pub = sprintf(
                 '<p><strong><a href="%s">%s</a></strong></p>',
-                $core->blog->url . $core->url->getBase('zoneclearFeedsPage'),
+                dcCore::app()->blog->url . dcCore::app()->url->getBase('zoneclearFeedsPage'),
                 html::escapeHTML($w->pagelink)
             );
         }
@@ -211,20 +209,18 @@ class zoneclearFeedServerWidget
      */
     public static function publicNumber($w)
     {
-        global $core;
-
         if ($w->offline) {
             return;
         }
 
-        if (!$core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
-            || $w->homeonly == 1 && !$core->url->isHome($core->url->type)
-            || $w->homeonly == 2 && $core->url->isHome($core->url->type)
+        if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
+            || $w->homeonly == 1 && !dcCore::app()->url->isHome(dcCore::app()->url->type)
+            || $w->homeonly == 2 && dcCore::app()->url->isHome(dcCore::app()->url->type)
         ) {
             return null;
         }
 
-        $zc      = new zoneclearFeedServer($core);
+        $zc      = new zoneclearFeedServer();
         $content = '';
 
         # Feed
@@ -238,10 +234,10 @@ class zoneclearFeedServerWidget
 
             $text = $count ? sprintf(__('one source', '%d sources', $count), $count) : __('no sources');
 
-            if ($core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
+            if (dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
                 $text = sprintf(
                     '<a href="%s">%s</a>',
-                    $core->blog->url . $core->url->getBase('zoneclearFeedsPage'),
+                    dcCore::app()->blog->url . dcCore::app()->url->getBase('zoneclearFeedsPage'),
                     $text
                 );
             }

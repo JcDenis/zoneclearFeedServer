@@ -14,39 +14,38 @@ if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
 
-$core->blog->settings->addNamespace('zoneclearFeedServer');
+dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
 
-require_once dirname(__FILE__) . '/_widgets.php';
+require_once __DIR__ . '/_widgets.php';
 
-$_menu['Plugins']->addItem(
+dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
     __('Feeds server'),
-    $core->adminurl->get('admin.plugin.zoneclearFeedServer'),
+    dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer'),
     dcPage::getPF('zoneclearFeedServer/icon.png'),
     preg_match(
-        '/' . preg_quote($core->adminurl->get('admin.plugin.zoneclearFeedServer')) . '(&.*)?$/',
+        '/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer')) . '(&.*)?$/',
         $_SERVER['REQUEST_URI']
     ),
-    $core->auth->check('admin', $core->blog->id)
+    dcCore::app()->auth->check('admin', dcCore::app()->blog->id)
 );
 
 # Delete related info about feed post in meta table
-$core->addBehavior('adminBeforePostDelete', ['zcfsAdminBehaviors', 'adminBeforePostDelete']);
+dcCore::app()->addBehavior('adminBeforePostDelete', ['zcfsAdminBehaviors', 'adminBeforePostDelete']);
 
-if ($core->auth->check('admin', $core->blog->id)) {
-
+if (dcCore::app()->auth->check('admin', dcCore::app()->blog->id)) {
     # Dashboard icon
-    $core->addBehavior('adminDashboardFavorites', ['zcfsAdminBehaviors', 'adminDashboardFavorites']);
+    dcCore::app()->addBehavior('adminDashboardFavoritesV2', ['zcfsAdminBehaviors', 'adminDashboardFavorites']);
     # User pref
-    $core->addBehavior('adminColumnsLists', ['zcfsAdminBehaviors', 'adminColumnsLists']);
-    $core->addBehavior('adminFiltersLists', ['zcfsAdminBehaviors', 'adminFiltersLists']);
+    dcCore::app()->addBehavior('adminColumnsListsV2', ['zcfsAdminBehaviors', 'adminColumnsLists']);
+    dcCore::app()->addBehavior('adminFiltersListsV2', ['zcfsAdminBehaviors', 'adminFiltersLists']);
     # Add info about feed on post page sidebar
-    $core->addBehavior('adminPostHeaders', ['zcfsAdminBehaviors', 'adminPostHeaders']);
-    $core->addBehavior('adminPostFormItems', ['zcfsAdminBehaviors', 'adminPostFormItems']);
+    dcCore::app()->addBehavior('adminPostHeaders', ['zcfsAdminBehaviors', 'adminPostHeaders']);
+    dcCore::app()->addBehavior('adminPostFormItems', ['zcfsAdminBehaviors', 'adminPostFormItems']);
 }
 
 # Take care about tweakurls (thanks Mathieu M.)
-if (version_compare($core->plugins->moduleInfo('tweakurls', 'version'), '0.8', '>=')) {
-    $core->addbehavior('zcfsAfterPostCreate', ['zoneclearFeedServer', 'tweakurlsAfterPostCreate']);
+if (version_compare(dcCore::app()->plugins->moduleInfo('tweakurls', 'version'), '0.8', '>=')) {
+    dcCore::app()->addbehavior('zcfsAfterPostCreate', ['zoneclearFeedServer', 'tweakurlsAfterPostCreate']);
 }
 
 /**
@@ -63,7 +62,7 @@ class zcfsAdminBehaviors
             __('Name')        => 'lowername',
             __('Frequency')   => 'feed_upd_int',
             __('Update date') => 'feed_upd_last',
-            __('Status')      => 'feed_status'
+            __('Status')      => 'feed_status',
         ];
     }
 
@@ -74,26 +73,25 @@ class zcfsAdminBehaviors
             __('Title')    => 'post_title',
             __('Category') => 'cat_title',
             __('Author')   => 'user_id',
-            __('Status')   => 'post_status'
+            __('Status')   => 'post_status',
         ];
     }
 
     /**
      * Favorites.
      *
-     * @param    dcCore      $core dcCore instance
-     * @param    arrayObject $favs Array of favorites
+     * @param    dcFavorites $favs Array of favorites
      */
-    public static function adminDashboardFavorites(dcCore $core, dcFavorites $favs)
+    public static function adminDashboardFavorites(dcFavorites $favs)
     {
         $favs->register('zcfs', [
             'title'        => __('Feeds server'),
-            'url'          => $core->adminurl->get('admin.plugin.zoneclearFeedServer'),
+            'url'          => dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer'),
             'small-icon'   => dcPage::getPF('zoneclearFeedServer/icon.png'),
             'large-icon'   => dcPage::getPF('zoneclearFeedServer/icon-big.png'),
             'permissions'  => 'usage,contentadmin',
             'active_cb'    => ['zcfsAdminBehaviors', 'adminDashboardFavoritesActive'],
-            'dashboard_cb' => ['zcfsAdminBehaviors', 'adminDashboardFavoritesCallback']
+            'dashboard_cb' => ['zcfsAdminBehaviors', 'adminDashboardFavoritesCallback'],
         ]);
     }
 
@@ -113,12 +111,11 @@ class zcfsAdminBehaviors
     /**
      * Favorites hack.
      *
-     * @param    dcCore      $core dcCore instance
      * @param    arrayObject $fav  Fav attributes
      */
-    public static function adminDashboardFavoritesCallback(dcCore $core, $fav)
+    public static function adminDashboardFavoritesCallback($fav)
     {
-        $zcfs = new zoneclearFeedServer($core);
+        $zcfs = new zoneclearFeedServer();
 
         $count = $zcfs->getFeeds(['feed_status' => '0'], true)->f(0);
         if (!$count) {
@@ -127,7 +124,7 @@ class zcfsAdminBehaviors
 
         $fav['title'] .= '<br />' . sprintf(__('%s feed disabled', '%s feeds disabled', $count), $count);
         $fav['large-icon'] = dcPage::getPF('zoneclearFeedServer/icon-big-update.png');
-        $fav['url']        = $core->adminurl->get(
+        $fav['url']        = dcCore::app()->adminurl->get(
             'admin.plugin.zoneclearFeedServer',
             ['part' => 'feeds', 'sortby' => 'feed_status', 'order' => 'asc']
         );
@@ -136,10 +133,9 @@ class zcfsAdminBehaviors
     /**
      * User pref columns lists.
      *
-     * @param    dcCore      $core dcCore instance
      * @param    arrayObject $cols Columns
      */
-    public static function adminColumnsLists(dcCore $core, $cols)
+    public static function adminColumnsLists($cols)
     {
         $cols['zcfs_feeds'] = [
             __('Feeds server: Feeds'),
@@ -147,40 +143,39 @@ class zcfsAdminBehaviors
                 'desc'    => [true, __('Feed')],
                 'period'  => [true, __('Frequency')],
                 'update'  => [true, __('Last update')],
-                'entries' => [true, __('Entries')]
-            ]
+                'entries' => [true, __('Entries')],
+            ],
         ];
         $cols['zcfs_entries'] = [
             __('Feeds server: Entries'),
             [
                 'date'     => [true, __('Date')],
                 'category' => [true, __('Category')],
-                'author'   => [true, __('Author')]
-            ]
+                'author'   => [true, __('Author')],
+            ],
         ];
     }
 
     /**
      * User pref filters options.
      *
-     * @param    dcCore      $core  dcCore instance
      * @param    arrayObject $sorts Sort options
      */
-    public static function adminFiltersLists(dcCore $core, $sorts)
+    public static function adminFiltersLists($sorts)
     {
         $sorts['zcfs_feeds'] = [
             __('Feeds server: Feeds'),
             self::feedsSortbyCombo(),
             'lowername',
             'asc',
-            [__('feeds per page'), 30]
+            [__('feeds per page'), 30],
         ];
         $sorts['zcfs_entries'] = [
             __('Feeds server: Entries'),
             self::entriesSortbyCombo(),
             'post_dt',
             'desc',
-            [__('entries per page'), 30]
+            [__('entries per page'), 30],
         ];
     }
 
@@ -207,50 +202,48 @@ class zcfsAdminBehaviors
             return null;
         }
 
-        global $core;
-
-        $url = $core->meta->getMetadata([
+        $url = dcCore::app()->meta->getMetadata([
             'post_id'   => $post->post_id,
             'meta_type' => 'zoneclearfeed_url',
-            'limit'     => 1
+            'limit'     => 1,
         ]);
         $url = $url->isEmpty() ? '' : $url->meta_id;
         if (!$url) {
             return null;
         }
 
-        $author = $core->meta->getMetadata([
+        $author = dcCore::app()->meta->getMetadata([
             'post_id'   => $post->post_id,
             'meta_type' => 'zoneclearfeed_author',
-            'limit'     => 1
+            'limit'     => 1,
         ]);
         $author = $author->isEmpty() ? '' : $author->meta_id;
 
-        $site = $core->meta->getMetadata([
+        $site = dcCore::app()->meta->getMetadata([
             'post_id'   => $post->post_id,
             'meta_type' => 'zoneclearfeed_site',
-            'limit'     => 1
+            'limit'     => 1,
         ]);
         $site = $site->isEmpty() ? '' : $site->meta_id;
 
-        $sitename = $core->meta->getMetadata([
+        $sitename = dcCore::app()->meta->getMetadata([
             'post_id'   => $post->post_id,
             'meta_type' => 'zoneclearfeed_sitename',
-            'limit'     => 1
+            'limit'     => 1,
         ]);
         $sitename = $sitename->isEmpty() ? '' : $sitename->meta_id;
 
         $edit = '';
-        if ($core->auth->check('admin', $core->blog->id)) {
-            $fid = $core->meta->getMetadata([
+        if (dcCore::app()->auth->check(dcAuth::PERMISSION_CONTENT_ADMIN, dcCore::app()->blog->id)) {
+            $fid = dcCore::app()->meta->getMetadata([
                 'post_id'   => $post->post_id,
                 'meta_type' => 'zoneclearfeed_id',
-                'limit'     => 1
+                'limit'     => 1,
             ]);
             if (!$fid->isEmpty()) {
                 $edit = sprintf(
                     '<p><a href="%s">%s</a></p>',
-                    $core->adminurl->get(
+                    dcCore::app()->adminurl->get(
                         'admin.plugin.zoneclearFeedServer',
                         ['part' => 'feed', 'feed_id' => $fid->meta_id]
                     ),
@@ -276,17 +269,15 @@ class zcfsAdminBehaviors
      */
     public static function adminBeforePostDelete($post_id)
     {
-        global $core;
-
-        $core->con->execute(
-            'DELETE FROM ' . $core->prefix . 'meta ' .
+        dcCore::app()->con->execute(
+            'DELETE FROM ' . dcCore::app()->prefix . dcMeta::META_TABLE_NAME . ' ' .
             'WHERE post_id = ' . ((int) $post_id) . ' ' .
-            'AND meta_type ' . $core->con->in([
+            'AND meta_type ' . dcCore::app()->con->in([
                 'zoneclearfeed_url',
                 'zoneclearfeed_author',
                 'zoneclearfeed_site',
                 'zoneclearfeed_sitename',
-                'zoneclearfeed_id'
+                'zoneclearfeed_id',
             ]) . ' '
         );
     }

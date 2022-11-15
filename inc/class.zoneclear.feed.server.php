@@ -25,23 +25,20 @@ class zoneclearFeedServer
     public static $nethttp_agent       = 'zoneclearFeedServer - http://zoneclear.org';
     public static $nethttp_maxredirect = 2;
 
-    public $core;
     public $con;
     private $blog;
     private $table;
     private $lock = null;
+    private $user = null;
 
     /**
      * Constructor.
-     *
-     * @param dcCore $core dcCore instance
      */
-    public function __construct(dcCore $core)
+    public function __construct()
     {
-        $this->core  = $core;
-        $this->con   = $core->con;
-        $this->blog  = $core->con->escape($core->blog->id);
-        $this->table = $core->prefix . 'zc_feed';
+        $this->con   = dcCore::app()->con;
+        $this->blog  = dcCore::app()->con->escape(dcCore::app()->blog->id);
+        $this->table = dcCore::app()->prefix . 'zc_feed';
     }
 
     /**
@@ -87,7 +84,7 @@ class zoneclearFeedServer
         }
 
         # --BEHAVIOR-- zoneclearFeedServerAfterUpdFeed
-        $this->core->callBehavior('zoneclearFeedServerAfterUpdFeed', $cur, $id);
+        dcCore::app()->callBehavior('zoneclearFeedServerAfterUpdFeed', $cur, $id);
     }
 
     /**
@@ -117,7 +114,7 @@ class zoneclearFeedServer
         }
 
         # --BEHAVIOR-- zoneclearFeedServerAfterAddFeed
-        $this->core->callBehavior('zoneclearFeedServerAfterAddFeed', $cur);
+        dcCore::app()->callBehavior('zoneclearFeedServerAfterAddFeed', $cur);
 
         return $cur->feed_id;
     }
@@ -161,7 +158,7 @@ class zoneclearFeedServer
         }
 
         # --BEHAVIOR-- zoneclearFeedServerAfterEnableFeed
-        $this->core->callBehavior('zoneclearFeedServerAfterEnableFeed', $id, $enable, $time);
+        dcCore::app()->callBehavior('zoneclearFeedServerAfterEnableFeed', $id, $enable, $time);
     }
 
     #
@@ -179,7 +176,7 @@ class zoneclearFeedServer
         }
 
         # --BEHAVIOR-- zoneclearFeedServerBeforeDelFeed
-        $this->core->callBehavior('zoneclearFeedServerBeforeDelFeed', $id);
+        dcCore::app()->callBehavior('zoneclearFeedServerBeforeDelFeed', $id);
 
         $this->con->execute(sprintf(
             "DELETE FROM %s WHERE feed_id = %s AND blog_id = '%s' ",
@@ -195,7 +192,7 @@ class zoneclearFeedServer
      *
      * @param  array   $params     Query params
      * @param  boolean $count_only Return only result count
-     * @return record              record instance
+     * @return null|dcRecord              record instance
      */
     public function getPostsByFeed($params = [], $count_only = false)
     {
@@ -203,10 +200,11 @@ class zoneclearFeedServer
             return null;
         }
 
-        $sql = new dcSelectStatement($this->core, 'zcfs');
-        $sql->join((new dcJoinStatement($this->core, 'zcfs'))
+        $sql = new dcSelectStatement();
+        $sql->join(
+            (new dcJoinStatement())
                    ->type('LEFT')
-                   ->from($this->core->prefix . 'meta F')
+                   ->from(dcCore::app()->prefix . dcMeta::META_TABLE_NAME . ' F')
                    ->on('P.post_id = F.post_id')
                    ->statement()
         );
@@ -217,7 +215,7 @@ class zoneclearFeedServer
 
         unset($params['feed_id']);
 
-        return $this->core->blog->getPosts($params, $count_only, $sql);
+        return dcCore::app()->blog->getPosts($params, $count_only, $sql);
     }
 
     /**
@@ -225,7 +223,7 @@ class zoneclearFeedServer
      *
      * @param  array   $params     Query params
      * @param  boolean $count_only Return only result count
-     * @return record              record instance
+     * @return dcRecord              record instance
      */
     public function getFeeds($params = [], $count_only = false)
     {
@@ -249,7 +247,7 @@ class zoneclearFeedServer
         }
 
         $strReq .= 'FROM ' . $this->table . ' Z ' .
-        'LEFT OUTER JOIN ' . $this->core->prefix . 'category C ON Z.cat_id = C.cat_id ';
+        'LEFT OUTER JOIN ' . dcCore::app()->prefix . 'category C ON Z.cat_id = C.cat_id ';
 
         if (!empty($params['from'])) {
             $strReq .= $params['from'] . ' ';
@@ -304,7 +302,6 @@ class zoneclearFeedServer
         }
 
         $rs     = $this->con->select($strReq);
-        $rs->zc = $this;
 
         return $rs;
     }
@@ -312,7 +309,7 @@ class zoneclearFeedServer
     /**
      * Get next table id.
      *
-     * @return record record instance
+     * @return integer  Next id
      */
     private function getNextId()
     {
@@ -409,9 +406,9 @@ class zoneclearFeedServer
             return false;
         }
 
-        dt::setTZ($this->core->blog->settings->system->blog_timezone);
+        dt::setTZ(dcCore::app()->blog->settings->system->blog_timezone);
         $time = time();
-        $s    = $this->core->blog->settings->zoneclearFeedServer;
+        $s    = dcCore::app()->blog->settings->zoneclearFeedServer;
 
         # All feeds or only one (from admin)
         $f = !$id ?
@@ -435,13 +432,13 @@ class zoneclearFeedServer
         }
         $i = 0;
 
-        $cur_post = $this->con->openCursor($this->core->prefix . 'post');
-        $cur_meta = $this->con->openCursor($this->core->prefix . 'meta');
+        $cur_post = $this->con->openCursor(dcCore::app()->prefix . dcBlog::POST_TABLE_NAME);
+        $cur_meta = $this->con->openCursor(dcCore::app()->prefix . dcMeta::META_TABLE_NAME);
 
         while ($f->fetch()) {
             # Check if feed need update
             if ($id || $i < $limit && $f->feed_status == 1
-                && $time > $f->feed_upd_last + $f->feed_upd_int
+                                   && $time > $f->feed_upd_last + $f->feed_upd_int
             ) {
                 $i++;
                 $feed = self::readFeed($f->feed_feed);
@@ -501,8 +498,8 @@ class zoneclearFeedServer
                         # Check if entry exists
                         $old_post = $this->con->select(
                             'SELECT P.post_id, P.post_status ' .
-                            'FROM ' . $this->core->prefix . 'post P ' .
-                            'INNER JOIN ' . $this->core->prefix . 'meta M ' .
+                            'FROM ' . dcCore::app()->prefix . dcBlog::POST_TABLE_NAME . ' P ' .
+                            'INNER JOIN ' . dcCore::app()->prefix . dcMeta::META_TABLE_NAME . ' M ' .
                             'ON P.post_id = M.post_id ' .
                             "WHERE blog_id='" . $this->blog . "' " .
                             "AND meta_type = 'zoneclearfeed_url' " .
@@ -516,6 +513,7 @@ class zoneclearFeedServer
                             $cur_post->cat_id = $f->cat_id;
                         }
                         $post_content           = $item->content ? $item->content : $item->description;
+                        $cur_post->post_format  = 'xhtml';
                         $cur_post->post_content = html::absoluteURLs($post_content, $feed->link);
                         $cur_post->post_title   = $item->title ? $item->title : text::cutString(html::clean($cur_post->post_content), 60);
                         $creator                = $item->creator ? $item->creator : $f->feed_owner;
@@ -524,25 +522,25 @@ class zoneclearFeedServer
                             # Create entry
                             if ($old_post->isEmpty()) {
                                 # Post
-                                $cur_post->user_id           = $this->core->auth->userID();
+                                $cur_post->user_id           = dcCore::app()->auth->userID();
                                 $cur_post->post_format       = 'xhtml';
                                 $cur_post->post_status       = (int) $s->zoneclearFeedServer_post_status_new;
                                 $cur_post->post_open_comment = 0;
                                 $cur_post->post_open_tb      = 0;
 
                                 # --BEHAVIOR-- zoneclearFeedServerBeforePostCreate
-                                $this->core->callBehavior(
+                                dcCore::app()->callBehavior(
                                     'zoneclearFeedServerBeforePostCreate',
                                     $cur_post
                                 );
 
-                                $post_id = $this->core->auth->sudo(
-                                    [$this->core->blog, 'addPost'],
+                                $post_id = dcCore::app()->auth->sudo(
+                                    [dcCore::app()->blog, 'addPost'],
                                     $cur_post
                                 );
 
                                 # --BEHAVIOR-- zoneclearFeedServerAfterPostCreate
-                                $this->core->callBehavior(
+                                dcCore::app()->callBehavior(
                                     'zoneclearFeedServerAfterPostCreate',
                                     $cur_post,
                                     $post_id
@@ -553,38 +551,39 @@ class zoneclearFeedServer
                                     $is_new_published_entry = true;
                                 }
 
-                                # Update entry
+                            # Update entry
                             } else {
                                 $post_id = $old_post->post_id;
 
                                 # --BEHAVIOR-- zoneclearFeedServerBeforePostUpdate
-                                $this->core->callBehavior(
+                                dcCore::app()->callBehavior(
                                     'zoneclearFeedServerBeforePostUpdate',
                                     $cur_post,
                                     $post_id
                                 );
 
-                                $this->core->auth->sudo(
-                                    [$this->core->blog, 'updPost'],
+                                dcCore::app()->auth->sudo(
+                                    [dcCore::app()->blog, 'updPost'],
                                     $post_id,
                                     $cur_post
                                 );
 
                                 # Quick delete old meta
                                 $this->con->execute(
-                                    'DELETE FROM ' . $this->core->prefix . 'meta ' .
+                                    'DELETE FROM ' . dcCore::app()->prefix . dcMeta::META_TABLE_NAME . ' ' .
                                     'WHERE post_id = ' . $post_id . ' ' .
                                     "AND meta_type LIKE 'zoneclearfeed_%' "
                                 );
+
                                 # Delete old tags
-                                $this->core->auth->sudo(
-                                    [$this->core->meta, 'delPostMeta'],
+                                dcCore::app()->auth->sudo(
+                                    [dcCore::app()->meta, 'delPostMeta'],
                                     $post_id,
                                     'tag'
                                 );
 
                                 # --BEHAVIOR-- zoneclearFeedServerAfterPostUpdate
-                                $this->core->callBehavior(
+                                dcCore::app()->callBehavior(
                                     'zoneclearFeedServerAfterPostUpdate',
                                     $cur_post,
                                     $post_id
@@ -598,64 +597,68 @@ class zoneclearFeedServer
                             $cur_meta->clean();
                             $cur_meta->post_id   = $post_id;
                             $cur_meta->meta_type = 'zoneclearfeed_url';
-                            $cur_meta->meta_id   = $meta->url   = $item_link;
+                            $cur_meta->meta_id   = $meta->url = $item_link;
                             $cur_meta->insert();
 
                             $cur_meta->clean();
                             $cur_meta->post_id   = $post_id;
                             $cur_meta->meta_type = 'zoneclearfeed_author';
-                            $cur_meta->meta_id   = $meta->author   = $creator;
+                            $cur_meta->meta_id   = $meta->author = $creator;
                             $cur_meta->insert();
 
                             $cur_meta->clean();
                             $cur_meta->post_id   = $post_id;
                             $cur_meta->meta_type = 'zoneclearfeed_site';
-                            $cur_meta->meta_id   = $meta->site   = $f->feed_url;
+                            $cur_meta->meta_id   = $meta->site = $f->feed_url;
                             $cur_meta->insert();
 
                             $cur_meta->clean();
                             $cur_meta->post_id   = $post_id;
                             $cur_meta->meta_type = 'zoneclearfeed_sitename';
-                            $cur_meta->meta_id   = $meta->sitename   = $f->feed_name;
+                            $cur_meta->meta_id   = $meta->sitename = $f->feed_name;
                             $cur_meta->insert();
 
                             $cur_meta->clean();
                             $cur_meta->post_id   = $post_id;
                             $cur_meta->meta_type = 'zoneclearfeed_id';
-                            $cur_meta->meta_id   = $meta->id   = $f->feed_id;
+                            $cur_meta->meta_id   = $meta->id = $f->feed_id;
                             $cur_meta->insert();
 
                             # Add new tags
-                            $tags = $this->core->meta->splitMetaValues($f->feed_tags);
+                            $tags = dcCore::app()->meta->splitMetaValues($f->feed_tags);
                             if ($f->feed_get_tags) {
-
                                 # Some feed subjects contains more than one tag
                                 foreach ($item->subject as $subjects) {
-                                    $tmp  = $this->core->meta->splitMetaValues($subjects);
+                                    $tmp  = dcCore::app()->meta->splitMetaValues($subjects);
                                     $tags = array_merge($tags, $tmp);
                                 }
                                 $tags = array_unique($tags);
                             }
                             $formated_tags = [];
                             foreach ($tags as $tag) {
-
                                 # Change tags case
                                 switch ((int) $s->zoneclearFeedServer_tag_case) {
                                     case 3: $tag = strtoupper($tag);
 
-break;
+                                        break;
                                     case 2: $tag = strtolower($tag);
 
-break;
+                                        break;
                                     case 1: $tag = ucfirst(strtolower($tag));
 
-break;
+                                        break;
                                     default: /* do nothing */                 break;
                                 }
                                 if (!in_array($tag, $formated_tags)) {
                                     $formated_tags[] = $tag;
-                                    $this->core->auth->sudo(
-                                        [$this->core->meta, 'setPostMeta'],
+                                    dcCore::app()->auth->sudo(
+                                        [dcCore::app()->meta, 'delPostMeta'],
+                                        $post_id,
+                                        'tag',
+                                        dcMeta::sanitizeMetaID($tag)
+                                    );
+                                    dcCore::app()->auth->sudo(
+                                        [dcCore::app()->meta, 'setPostMeta'],
                                         $post_id,
                                         'tag',
                                         dcMeta::sanitizeMetaID($tag)
@@ -665,9 +668,8 @@ break;
                             $meta->tags = $formated_tags;
 
                             # --BEHAVIOR-- zoneclearFeedServerAfterFeedUpdate
-                            $this->core->callBehavior(
+                            dcCore::app()->callBehavior(
                                 'zoneclearFeedServerAfterFeedUpdate',
-                                $this->core,
                                 $is_new_published_entry,
                                 $cur_post,
                                 $meta
@@ -700,13 +702,15 @@ break;
     {
         # Enable
         if ($enable) {
-            if (!$this->core->auth->checkUser($enable)) {
+            $this->user = dcCore::app()->auth->userID();
+            if (!dcCore::app()->auth->checkUser($enable)) {
                 throw new Exception('Unable to set user');
             }
-            # Disable
+        # Disable
         } else {
-            $this->core->auth = null;
-            $this->core->auth = new dcAuth($this->core);
+            dcCore::app()->auth = null;
+            dcCore::app()->auth = new dcAuth();
+            dcCore::app()->auth->checkUser($this->user);
         }
     }
 
@@ -736,7 +740,7 @@ break;
      */
     private function trigger()
     {
-        $this->core->blog->triggerBlog();
+        dcCore::app()->blog->triggerBlog();
     }
 
     /**
@@ -794,7 +798,7 @@ break;
     {
         return [
             __('Disabled') => '0',
-            __('Enabled')  => '1'
+            __('Enabled')  => '1',
         ];
     }
 
@@ -811,7 +815,7 @@ break;
             __('Two times per day') => 43200,
             __('Every day')         => 86400,
             __('Every two days')    => 172800,
-            __('Every week')        => 604800
+            __('Every week')        => 604800,
         ];
     }
 
@@ -827,7 +831,7 @@ break;
         # Get super admins
         $rs = $this->con->select(
             'SELECT user_id, user_super, user_name, user_firstname, user_displayname ' .
-            'FROM ' . $this->con->escapeSystem($this->core->prefix . 'user') . ' ' .
+            'FROM ' . $this->con->escapeSystem(dcCore::app()->prefix . 'user') . ' ' .
             'WHERE user_super = 1 AND user_status = 1 '
         );
 
@@ -846,8 +850,8 @@ break;
         # Get admins
         $rs = $this->con->select(
             'SELECT U.user_id, U.user_super, U.user_name, U.user_firstname, U.user_displayname ' .
-            'FROM ' . $this->con->escapeSystem($this->core->prefix . 'user') . ' U ' .
-            'LEFT JOIN ' . $this->con->escapeSystem($this->core->prefix . 'permissions') . ' P ' .
+            'FROM ' . $this->con->escapeSystem(dcCore::app()->prefix . 'user') . ' U ' .
+            'LEFT JOIN ' . $this->con->escapeSystem(dcCore::app()->prefix . 'permissions') . ' P ' .
             'ON U.user_id=P.user_id ' .
             'WHERE U.user_status = 1 ' .
             "AND P.blog_id = '" . $this->blog . "' " .
@@ -872,15 +876,14 @@ break;
     /**
      * Get list of urls where entries could be hacked.
      *
-     * @param  dcCore $core dcCore instance
      * @return array        List of names/types of URLs
      */
-    public static function getPublicUrlTypes(dcCore $core)
+    public static function getPublicUrlTypes()
     {
         $types = [];
 
         # --BEHAVIOR-- zoneclearFeedServerPublicUrlTypes
-        $core->callBehavior('zoneclearFeedServerPublicUrlTypes', $types);
+        dcCore::app()->callBehavior('zoneclearFeedServerPublicUrlTypes', $types);
 
         $types[__('Home page')]      = 'default';
         $types[__('Entries pages')]  = 'post';
@@ -900,8 +903,7 @@ break;
      */
     public static function tweakurlsAfterPostCreate(cursor $cur, $id)
     {
-        global $core;
         $cur->post_url = tweakUrls::tweakBlogURL($cur->post_url);
-        $core->auth->sudo([$core->blog, 'updPost'], $id, $cur);
+        dcCore::app()->auth->sudo([dcCore::app()->blog, 'updPost'], $id, $cur);
     }
 }

@@ -15,28 +15,28 @@ if (!defined('DC_RC_PATH')) {
 }
 
 # Namespace for settings
-$core->blog->settings->addNamespace('zoneclearFeedServer');
-$s = $core->blog->settings->zoneclearFeedServer;
+dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
+$s = dcCore::app()->blog->settings->zoneclearFeedServer;
 
 # Widgets
-require_once dirname(__FILE__) . '/_widgets.php';
+require_once __DIR__ . '/_widgets.php';
 
-$core->addBehavior('coreBlogGetPosts', ['zcfsPublicBehaviors', 'coreBlogGetPosts']);
+dcCore::app()->addBehavior('coreBlogGetPosts', ['zcfsPublicBehaviors', 'coreBlogGetPosts']);
 
 if (!$s->zoneclearFeedServer_active) {
     return null;
 }
 if (1 == $s->zoneclearFeedServer_bhv_pub_upd) {
-    $core->addBehavior('publicBeforeDocument', ['zcfsPublicBehaviors', 'publicDocument']);
+    dcCore::app()->addBehavior('publicBeforeDocument', ['zcfsPublicBehaviors', 'publicDocument']);
 } elseif (2 == $s->zoneclearFeedServer_bhv_pub_upd) {
-    $core->addBehavior('publicAfterDocument', ['zcfsPublicBehaviors', 'publicAfterDocument']);
+    dcCore::app()->addBehavior('publicAfterDocument', ['zcfsPublicBehaviors', 'publicAfterDocument']);
 } elseif (3 == $s->zoneclearFeedServer_bhv_pub_upd) {
-    $core->addBehavior('publicHeadContent', ['zcfsPublicBehaviors', 'publicHeadContent']);
+    dcCore::app()->addBehavior('publicHeadContent', ['zcfsPublicBehaviors', 'publicHeadContent']);
 }
 
 # Take care about tweakurls (thanks Mathieu M.)
-if (version_compare($core->plugins->moduleInfo('tweakurls', 'version'), '0.8', '>=')) {
-    $core->addbehavior('zoneclearFeedServerAfterPostCreate', ['zoneclearFeedServer', 'tweakurlsAfterPostCreate']);
+if (version_compare(dcCore::app()->plugins->moduleInfo('tweakurls', 'version'), '0.8', '>=')) {
+    dcCore::app()->addbehavior('zoneclearFeedServerAfterPostCreate', ['zoneclearFeedServer', 'tweakurlsAfterPostCreate']);
 }
 
 # Register tempalte blocks
@@ -44,10 +44,10 @@ $tpl_blocks = [
     'Feeds',
     'FeedsFooter',
     'FeedsHeader',
-    'FeedIf'
+    'FeedIf',
 ];
 foreach ($tpl_blocks as $v) {
-    $core->tpl->addBlock('zc' . $v, ['zcfsTemplate', $v]);
+    dcCore::app()->tpl->addBlock('zc' . $v, ['zcfsTemplate', $v]);
 }
 
 # Register tempalte values
@@ -67,10 +67,10 @@ $tpl_values = [
     'FeedOwner',
     'FeedDesc',
     'FeedSiteURL',
-    'FeedFeedURL'
+    'FeedFeedURL',
 ];
 foreach ($tpl_values as $v) {
-    $core->tpl->addValue('zc' . $v, ['zcfsTemplate', $v]);
+    dcCore::app()->tpl->addValue('zc' . $v, ['zcfsTemplate', $v]);
 }
 
 /**
@@ -83,9 +83,9 @@ class zcfsPublicBehaviors
     /**
      * Remember others post extension.
      *
-     * @param  record $rs record instance
+     * @param  dcRecord $rs record instance
      */
-    public static function coreBlogGetPosts(record $rs)
+    public static function coreBlogGetPosts(dcRecord $rs)
     {
         $GLOBALS['beforeZcFeedRsExt'] = $rs->extensions();
         $rs->extend('zcfsRsExtPosts');
@@ -94,29 +94,25 @@ class zcfsPublicBehaviors
     /**
      * Update feeds after contents.
      *
-     * @param  dcCore $core dcCore instance
-     * @return string       Document
      */
-    public static function publicAfterDocument(dcCore $core)
+    public static function publicAfterDocument()
     {
         # Limit feeds update to home page et feed page
         # Like publishScheduledEntries
-        if (!in_array($core->url->type, ['default', 'feed'])) {
+        if (!in_array(dcCore::app()->url->type, ['default', 'feed'])) {
             return null;
         }
 
-        self::publicDocument($core);
+        self::publicDocument();
     }
 
     /**
      * Generic behavior for before and after public content.
      *
-     * @param  dcCore $core dcCore instance
-     * @return null       NULL
      */
-    public static function publicDocument(dcCore $core)
+    public static function publicDocument()
     {
-        $zc = new zoneclearFeedServer($core);
+        $zc = new zoneclearFeedServer();
         $zc->checkFeedsUpdate();
 
         return null;
@@ -124,28 +120,24 @@ class zcfsPublicBehaviors
 
     /**
      * Update feeds by an Ajax request (background).
-     *
-     * @param  dcCore  $core dcCore instance
-     * @param  context $_ctx context instance
-     * @return string        HTML content
      */
-    public static function publicHeadContent(dcCore $core, context $_ctx)
+    public static function publicHeadContent()
     {
         # Limit update to home page
-        if ($core->url->type != 'default') {
+        if (dcCore::app()->url->type != 'default') {
             return null;
         }
 
         $blog_url = html::escapeJS(
-            $core->blog->url .
-            $core->url->getBase('zoneclearFeedsPage') .
+            dcCore::app()->blog->url .
+            dcCore::app()->url->getBase('zoneclearFeedsPage') .
             '/zcfsupd'
         );
-        $blog_id = html::escapeJS($core->blog->id);
+        $blog_id = html::escapeJS(dcCore::app()->blog->id);
 
         echo
         "\n<!-- JS for zoneclearFeedServer --> \n" .
-        dcutils::jsLoad($core->blog->url . $core->url->getBase('zoneclearFeedsPage') . '/zcfsupd.js') .
+        dcUtils::jsLoad(dcCore::app()->blog->url . dcCore::app()->url->getBase('zoneclearFeedsPage') . '/zcfsupd.js') .
         "<script type=\"text/javascript\"> \n//<![CDATA[\n" .
         ' $(function(){if(!document.getElementById){return;} ' .
         " $('body').zoneclearFeedServer({blog_url:'" .
@@ -162,19 +154,24 @@ class zcfsPublicBehaviors
  */
 class zcfsRsExtPosts extends rsExtPost
 {
+    public static function zc()
+    {
+        return new zonclearFeedServer();
+    }
+
     /**
      * Get feed meta.
      *
-     * @param  record $rs   record instance
+     * @param  dcRecord $rs   record instance
      * @param  string $info Feed info key
      * @return string       Feed info value
      */
     public static function zcFeed($rs, $info)
     {
-        $meta = $rs->core->meta->getMetadata([
+        $meta = dcCore::app()->meta->getMetadata([
             'post_id'   => $rs->post_id,
             'meta_type' => 'zoneclearfeed_' . $info,
-            'limit'     => 1
+            'limit'     => 1,
         ]);
 
         return $meta->isEmpty() ? null : $meta->meta_id;
@@ -203,10 +200,10 @@ class zcfsRsExtPosts extends rsExtPost
     /**
      * Get author link from post to feed.
      *
-     * @param  record $rs record instance
+     * @param  dcRecord $rs record instance
      * @return string     Author link
      */
-    public static function getAuthorLink($rs)
+    public static function getAuthorLink(dcRecord $rs): string
     {
         $author   = $rs->zcFeed('author');
         $site     = $rs->zcFeed('site');
@@ -220,10 +217,10 @@ class zcfsRsExtPosts extends rsExtPost
     /**
      * Get author CN from post to feed.
      *
-     * @param  record $rs record instance
+     * @param  dcRecord $rs record instance
      * @return string     Author CN
      */
-    public static function getAuthorCN($rs)
+    public static function getAuthorCN(dcRecord $rs): string
     {
         $author = $rs->zcFeed('author');
 
@@ -235,14 +232,14 @@ class zcfsRsExtPosts extends rsExtPost
     /**
      * Get post link from post to feed.
      *
-     * @param  record $rs record instance
+     * @param  dcRecord $rs record instance
      * @return string     Post link
      */
-    public static function getURL($rs)
+    public static function getURL(dcRecord $rs): string
     {
         $url   = $rs->zcFeed('url');
-        $types = @unserialize($rs->core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_post_title_redir);
-        $full  = is_array($types) && in_array($rs->core->url->type, $types);
+        $types = @unserialize(dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_post_title_redir);
+        $full  = is_array($types) && in_array(dcCore::app()->url->type, $types);
 
         return $url && $full ?
             zoneclearFeedServer::absoluteURL($rs->zcFeed('site'), $url) :
@@ -255,16 +252,16 @@ class zcfsRsExtPosts extends rsExtPost
      * @param  record $rs record instance
      * @return string     Post content
      */
-    public static function getContent($rs, $absolute_urls = false)
+    public static function getContent(dcRecord $rs, bool $absolute_urls = false): string
     {
         $url      = $rs->zcFeed('url');
         $sitename = $rs->zcFeed('sitename');
         $content  = self::zcFeedBrother('getContent', [&$rs, $absolute_urls]);
 
         if ($url && $sitename && $rs->post_type == 'post') {
-            $types = @unserialize($rs->core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_post_full_tpl);
+            $types = @unserialize(dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_post_full_tpl);
 
-            if (is_array($types) && in_array($rs->core->url->type, $types)) {
+            if (is_array($types) && in_array(dcCore::app()->url->type, $types)) {
                 return $content . sprintf(
                     '<p class="zoneclear-original"><em>%s</em></p>',
                     sprintf(__('Original post on <a href="%s">%s</a>'), $url, $sitename)
@@ -302,8 +299,7 @@ class zcfsUrlHandler extends dcUrlHandlers
      */
     public static function zcFeedsPage($args)
     {
-        global $core, $_ctx;
-        $s = $core->blog->settings->zoneclearFeedServer;
+        $s = dcCore::app()->blog->settings->zoneclearFeedServer;
 
         # Not active
         if (!$s->zoneclearFeedServer_active) {
@@ -315,9 +311,9 @@ class zcfsUrlHandler extends dcUrlHandlers
         # Update feeds (from ajax or other post resquest)
         if ($args == '/zcfsupd' && 3 == $s->zoneclearFeedServer_bhv_pub_upd) {
             $msg = '';
-            if (!empty($_POST['blogId']) && html::escapeJS($core->blog->id) == $_POST['blogId']) {
+            if (!empty($_POST['blogId']) && html::escapeJS(dcCore::app()->blog->id) == $_POST['blogId']) {
                 try {
-                    $zc = new zoneclearFeedServer($core);
+                    $zc = new zoneclearFeedServer();
                     if ($zc->checkFeedsUpdate()) {
                         $msg = sprintf(
                             '<status>%s</status><message>s%</message>',
@@ -347,7 +343,7 @@ class zcfsUrlHandler extends dcUrlHandlers
 
         # Server js
         } elseif ($args == '/zcfsupd.js' && 3 == $s->zoneclearFeedServer_bhv_pub_upd) {
-            $core->tpl->setPath($core->tpl->getPath(), dirname(__FILE__) . '/default-templates');
+            dcCore::app()->tpl->setPath(dcCore::app()->tpl->getPath(), __DIR__ . '/default-templates');
             self::serveDocument(
                 'zcfsupd.js',
                 'text/javascript',
@@ -357,12 +353,12 @@ class zcfsUrlHandler extends dcUrlHandlers
 
         # Server feeds description page
         } elseif (in_array($args, ['', '/']) && $s->zoneclearFeedServer_pub_active) {
-            $tplset = $core->themes->moduleInfo($core->blog->settings->system->theme, 'tplset');
-            $path   = dirname(__FILE__) . '/default-templates/';
+            $tplset = dcCore::app()->themes->moduleInfo(dcCore::app()->blog->settings->system->theme, 'tplset');
+            $path   = __DIR__ . '/default-templates/';
             if (!empty($tplset) && is_dir($path . $tplset)) {
-                $core->tpl->setPath($core->tpl->getPath(), $path . $tplset);
+                dcCore::app()->tpl->setPath(dcCore::app()->tpl->getPath(), $path . $tplset);
             } else {
-                $core->tpl->setPath($core->tpl->getPath(), $path . DC_DEFAULT_TPLSET);
+                dcCore::app()->tpl->setPath(dcCore::app()->tpl->getPath(), $path . DC_DEFAULT_TPLSET);
             }
             self::serveDocument('zcfeeds.html');
         }
@@ -417,19 +413,19 @@ class zcfsTemplate
             switch ($a['sortby']) {
                 case 'name':    $sortby = 'lowername';
 
-break;
+                    break;
                 case 'owner':  $sortby = 'feed_owner';
 
-break;
+                    break;
                 case 'date':   $sortby = 'feed_dt';
 
-break;
+                    break;
                 case 'update': $sortby = 'feed_upddt';
 
-break;
+                    break;
                 case 'id':     $sortby = 'feed_id';
 
-break;
+                    break;
             }
         }
         if (isset($a['order']) && preg_match('/^(desc|asc)$/i', $a['order'])) {
@@ -439,12 +435,12 @@ break;
 
         return
         '<?php ' . $p .
-        '$_ctx->feeds_params = $zcfs_params;' . "\n" .
-        '$zcfs = new zoneclearFeedServer($core);' . "\n" .
-        '$_ctx->feeds = $zcfs->getFeeds($zcfs_params); unset($zcfs_params,$zcfs);' . "\n" .
+        'dcCore::app()->ctx->feeds_params = $zcfs_params;' . "\n" .
+        '$zcfs = new zoneclearFeedServer();' . "\n" .
+        'dcCore::app()->ctx->feeds = $zcfs->getFeeds($zcfs_params); unset($zcfs_params,$zcfs);' . "\n" .
         "?>\n" .
-        '<?php while ($_ctx->feeds->fetch()) : ?>' . $c . '<?php endwhile; ' .
-        '$_ctx->feeds = null; $_ctx->feeds_params = null; ?>';
+        '<?php while (dcCore::app()->ctx->feeds->fetch()) : ?>' . $c . '<?php endwhile; ' .
+        'dcCore::app()->ctx->feeds = null; dcCore::app()->ctx->feeds_params = null; ?>';
     }
 
     public static function FeedIf($a, $c)
@@ -456,50 +452,50 @@ break;
         if (isset($a['type'])) {
             $type = trim($a['type']);
             $type = !empty($type) ? $type : 'feed';
-            $if[] = '$_ctx->feeds->feed_type == "' . addslashes($type) . '"';
+            $if[] = 'dcCore::app()->ctx->feeds->feed_type == "' . addslashes($type) . '"';
         }
         if (isset($a['site_url'])) {
             $url = trim($a['feed_url']);
             if (substr($url, 0, 1) == '!') {
                 $url  = substr($url, 1);
-                $if[] = '$_ctx->feeds->feed_url != "' . addslashes($url) . '"';
+                $if[] = 'dcCore::app()->ctx->feeds->feed_url != "' . addslashes($url) . '"';
             } else {
-                $if[] = '$_ctx->feeds->feed_url == "' . addslashes($url) . '"';
+                $if[] = 'dcCore::app()->ctx->feeds->feed_url == "' . addslashes($url) . '"';
             }
         }
         if (isset($a['feed_url'])) {
             $url = trim($a['feed_feed']);
             if (substr($url, 0, 1) == '!') {
                 $url  = substr($url, 1);
-                $if[] = '$_ctx->feeds->feed_feed != "' . addslashes($url) . '"';
+                $if[] = 'dcCore::app()->ctx->feeds->feed_feed != "' . addslashes($url) . '"';
             } else {
-                $if[] = '$_ctx->feeds->feed_feed == "' . addslashes($url) . '"';
+                $if[] = 'dcCore::app()->ctx->feeds->feed_feed == "' . addslashes($url) . '"';
             }
         }
         if (isset($a['category'])) {
             $category = addslashes(trim($a['category']));
             if (substr($category, 0, 1) == '!') {
                 $category = substr($category, 1);
-                $if[]     = '($_ctx->feeds->cat_url != "' . $category . '")';
+                $if[]     = '(dcCore::app()->ctx->feeds->cat_url != "' . $category . '")';
             } else {
-                $if[] = '($_ctx->feeds->cat_url == "' . $category . '")';
+                $if[] = '(dcCore::app()->ctx->feeds->cat_url == "' . $category . '")';
             }
         }
         if (isset($a['first'])) {
             $sign = (bool) $a['first'] ? '=' : '!';
-            $if[] = '$_ctx->feeds->index() ' . $sign . '= 0';
+            $if[] = 'dcCore::app()->ctx->feeds->index() ' . $sign . '= 0';
         }
         if (isset($a['odd'])) {
             $sign = (bool) $a['odd'] ? '=' : '!';
-            $if[] = '($_ctx->feeds->index()+1)%2 ' . $sign . ' = 1';
+            $if[] = '(dcCore::app()->ctx->feeds->index()+1)%2 ' . $sign . ' = 1';
         }
         if (isset($a['has_category'])) {
             $sign = (bool) $a['has_category'] ? '' : '!';
-            $if[] = $sign . '$_ctx->feeds->cat_id';
+            $if[] = $sign . 'dcCore::app()->ctx->feeds->cat_id';
         }
         if (isset($a['has_description'])) {
             $sign = (bool) $a['has_description'] ? '' : '!';
-            $if[] = $sign . '$_ctx->feeds->feed_desc';
+            $if[] = $sign . 'dcCore::app()->ctx->feeds->feed_desc';
         }
 
         return empty($if) ?
@@ -513,7 +509,7 @@ break;
         $ret = html::escapeHTML($ret);
 
         return
-        '<?php if ($_ctx->feeds->index() == 0) { ' .
+        '<?php if (dcCore::app()->ctx->feeds->index() == 0) { ' .
         "echo '" . addslashes($ret) . "'; } ?>";
     }
 
@@ -523,79 +519,79 @@ break;
         $ret = html::escapeHTML($ret);
 
         return
-        '<?php if (($_ctx->feeds->index()+1)%2 == 1) { ' .
+        '<?php if ((dcCore::app()->ctx->feeds->index()+1)%2 == 1) { ' .
         "echo '" . addslashes($ret) . "'; } ?>";
     }
 
     public static function FeedDesc($a)
     {
-        return self::getValue($a, '$_ctx->feeds->feed_desc');
+        return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_desc');
     }
 
     public static function FeedOwner($a)
     {
-        return self::getValue($a, '$_ctx->feeds->feed_owner');
+        return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_owner');
     }
 
     public static function FeedCategory($a)
     {
-        return self::getValue($a, '$_ctx->feeds->cat_title');
+        return self::getValue($a, 'dcCore::app()->ctx->feeds->cat_title');
     }
 
     public static function FeedCategoryID($a)
     {
-        return self::getValue($a, '$_ctx->feeds->cat_id');
+        return self::getValue($a, 'dcCore::app()->ctx->feeds->cat_id');
     }
 
     public static function FeedCategoryURL($a)
     {
-        return self::getValue($a, '$core->blog->url.$core->url->getBase(\'category\').\'/\'.html::sanitizeURL($_ctx->feeds->cat_url)');
+        return self::getValue($a, 'dcCore::app()->blog->url.dcCore::app()->url->getBase(\'category\').\'/\'.html::sanitizeURL(dcCore::app()->ctx->feeds->cat_url)');
     }
 
     public static function FeedCategoryShortURL($a)
     {
-        return self::getValue($a, '$_ctx->feeds->cat_url');
+        return self::getValue($a, 'dcCore::app()->ctx->feeds->cat_url');
     }
 
     public static function FeedID($a)
     {
-        return self::getValue($a, '$_ctx->feeds->feed_id');
+        return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_id');
     }
 
     public static function FeedLang($a)
     {
-        $f = $GLOBALS['core']->tpl->getFilters($a);
+        $f = dcCore::app()->tpl->getFilters($a);
 
         return empty($a['full']) ?
-            '<?php echo ' . sprintf($f, '$_ctx->feeds->feed_lang') . '; ?>' :
-            '<?php $langs = l10n::getISOcodes(); if (isset($langs[$_ctx->feeds->feed_lang])) { echo ' .
-                sprintf($f, '$langs[$_ctx->feeds->feed_lang]') . '; } else { echo ' .
-                sprintf($f, '$_ctx->feeds->feed_lang') . '; } unset($langs); ?>';
+            '<?php echo ' . sprintf($f, 'dcCore::app()->ctx->feeds->feed_lang') . '; ?>' :
+            '<?php $langs = l10n::getISOcodes(); if (isset($langs[dcCore::app()->ctx->feeds->feed_lang])) { echo ' .
+                sprintf($f, '$langs[dcCore::app()->ctx->feeds->feed_lang]') . '; } else { echo ' .
+                sprintf($f, 'dcCore::app()->ctx->feeds->feed_lang') . '; } unset($langs); ?>';
     }
 
     public static function FeedName($a)
     {
-        return self::getValue($a, '$_ctx->feeds->feed_name');
+        return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_name');
     }
 
     public static function FeedSiteURL($a)
     {
-        return self::getValue($a, '$_ctx->feeds->feed_url');
+        return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_url');
     }
 
     public static function FeedFeedURL($a)
     {
-        return self::getValue($a, '$_ctx->feeds->feed_feed');
+        return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_feed');
     }
 
     public static function FeedsHeader($a, $c)
     {
-        return '<?php if ($_ctx->feeds->isStart()) : ?>' . $c . '<?php endif; ?>';
+        return '<?php if (dcCore::app()->ctx->feeds->isStart()) : ?>' . $c . '<?php endif; ?>';
     }
 
     public static function FeedsFooter($a, $c)
     {
-        return '<?php if ($_ctx->feeds->isEnd()) : ?>' . $c . '<?php endif; ?>';
+        return '<?php if (dcCore::app()->ctx->feeds->isEnd()) : ?>' . $c . '<?php endif; ?>';
     }
 
     public static function FeedsCount($a)
@@ -615,7 +611,7 @@ break;
         }
 
         return
-        "<?php \$fcount = \$_ctx->feeds->count(); \n" .
+        "<?php \$fcount = dcCore::app()->ctx->feeds->count(); \n" .
         "if (\$fcount == 0) {\n" .
         "  printf(__('" . $none . "'),\$fcount);\n" .
         "} elseif (\$fcount == 1) {\n" .
@@ -642,10 +638,12 @@ break;
         }
 
         return
-        "<?php \$fcount = 0; \$allfeeds = \$_ctx->feeds->zc->getFeeds(); \n" .
+        "<?php \$fcount = 0; \n" .
+        '$zc = new zoneclearFeedServer();' . "\n" .
+        "\$allfeeds = \$zc->getFeeds(); \n" .
         "if (!\$allfeeds->isEmpty()) { \n" .
         ' while ($allfeeds->fetch()) { ' .
-        "  \$fcount += (integer) \$_ctx->feeds->zc->getPostsByFeed(array('feed_id'=>\$allfeeds->feed_id),true)->f(0); " .
+        "  \$fcount += (integer) \$zc->getPostsByFeed(array('feed_id'=>\$allfeeds->feed_id),true)->f(0); " .
         " } \n" .
         "} \n" .
         "if (\$fcount == 0) {\n" .
@@ -674,7 +672,8 @@ break;
         }
 
         return
-        "<?php \$fcount = \$_ctx->feeds->zc->getPostsByFeed(array('feed_id'=>\$_ctx->feeds->feed_id),true)->f(0); \n" .
+        "<?php \$zcfs = new zoneclearFeedServer(); \n" .
+        "\$fcount = \$zc->getPostsByFeed(array('feed_id'=>dcCore::app()->ctx->feeds->feed_id),true)->f(0); \n" .
         "if (\$fcount == 0) {\n" .
         "  printf(__('" . $none . "'),\$fcount);\n" .
         "} elseif (\$fcount == 1) {\n" .
@@ -686,7 +685,7 @@ break;
 
     protected static function getValue($a, $v)
     {
-        return '<?php echo ' . sprintf($GLOBALS['core']->tpl->getFilters($a), $v) . '; ?>';
+        return '<?php echo ' . sprintf(dcCore::app()->tpl->getFilters($a), $v) . '; ?>';
     }
 
     protected static function getOperator($op)
@@ -703,7 +702,7 @@ break;
     }
 }
 
-$core->addBehavior('publicBreadcrumb', ['extZcfeeds', 'publicBreadcrumb']);
+dcCore::app()->addBehavior('publicBreadcrumb', ['extZcfeeds', 'publicBreadcrumb']);
 
 class extZcfeeds
 {

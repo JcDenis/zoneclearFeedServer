@@ -14,11 +14,11 @@ if (!defined('DC_CONTEXT_MODULE')) {
     return null;
 }
 
-$redir = empty($_REQUEST['redir']) ? $list->getURL() . '#plugins' : $_REQUEST['redir'];
+$redir = empty($_REQUEST['redir']) ? dcCore::app()->admin->list->getURL() . '#plugins' : $_REQUEST['redir'];
 
 # -- Get settings --
-$core->blog->settings->addNamespace('zoneclearFeedServer');
-$s = $core->blog->settings->zoneclearFeedServer;
+dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
+$s = dcCore::app()->blog->settings->zoneclearFeedServer;
 
 $active           = (bool) $s->zoneclearFeedServer_active;
 $pub_active       = (bool) $s->zoneclearFeedServer_pub_active;
@@ -41,7 +41,7 @@ if (!is_array($post_title_redir)) {
     $post_title_redir = [];
 }
 
-$zc = new zoneclearFeedServer($core);
+$zc = new zoneclearFeedServer();
 
 # -- Set settings --
 if (!empty($_POST['save'])) {
@@ -72,17 +72,17 @@ if (!empty($_POST['save'])) {
         $s->put('zoneclearFeedServer_post_title_redir', serialize($post_title_redir));
         $s->put('zoneclearFeedServer_user', $feeduser);
 
-        $core->blog->triggerBlog();
+        dcCore::app()->blog->triggerBlog();
 
-        dcPage::addSuccessNotice(
+        dcAdminNotices::addSuccessNotice(
             __('Configuration successfully updated.')
         );
-        $core->adminurl->redirect(
+        dcCore::app()->adminurl->redirect(
             'admin.plugins',
-            ['module' => 'zoneclearFeedServer', 'conf' => 1, 'redir' => $list->getRedir()]
+            ['module' => 'zoneclearFeedServer', 'conf' => 1, 'redir' => dcCore::app()->admin->list->getRedir()]
         );
     } catch (Exception $e) {
-        $core->error->add($e->getMessage());
+        dcCore::app()->error->add($e->getMessage());
     }
 }
 
@@ -92,20 +92,20 @@ $combo_pubupd = [
     __('Disable')        => 0,
     __('Before display') => 1,
     __('After display')  => 2,
-    __('Through Ajax')   => 3
+    __('Through Ajax')   => 3,
 ];
 $combo_status = [
     __('Unpublished') => 0,
-    __('Published')   => 1
+    __('Published')   => 1,
 ];
 $combo_tagcase = [
     __('Keep source case') => 0,
     __('First upper case') => 1,
     __('All lower case')   => 2,
-    __('All upper case')   => 3
+    __('All upper case')   => 3,
 ];
 
-$pub_page_url = $core->blog->url . $core->url->getBase('zoneclearFeedsPage');
+$pub_page_url = dcCore::app()->blog->url . dcCore::app()->url->getBase('zoneclearFeedsPage');
 
 # -- Display form --
 
@@ -124,7 +124,7 @@ __('Enable plugin') . '</label></p>
 
 <div class="fieldset">';
 
-if ($core->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
+if (dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
     echo sprintf(
         '<p><a class="onblog_link outgoing" href="%s" title="%s">%s <img alt="" src="images/outgoing-link.svg"></a></p>',
         $pub_page_url,
@@ -168,7 +168,7 @@ form::checkbox('pub_active', 1, $pub_active) . __('Enable public page') . '</lab
 
 <p>' . __('Redirect to original post on:') . '</p><ul>';
 
-foreach ($zc->getPublicUrlTypes($core) as $k => $v) {
+foreach ($zc->getPublicUrlTypes() as $k => $v) {
     echo sprintf(
         '<li><label for="post_title_redir_%s">%s%s</label></li>',
         $v,
@@ -183,7 +183,7 @@ echo '
 
 <p>' . __('Show full content on:') . '</p><ul>';
 
-foreach ($zc->getPublicUrlTypes($core) as $k => $v) {
+foreach ($zc->getPublicUrlTypes() as $k => $v) {
     echo sprintf(
         '<li><label for="post_full_tpl_%s">%s%s</label></li>',
         $v,

@@ -104,7 +104,7 @@ $this->addDirectCallback(
     'delete feeds relations'
 );
 
-function zoneclearfeedServerUninstall($core, $id)
+function zoneclearfeedServerUninstall($id)
 {
     if ($id != 'zoneclearFeedServer') {
         return null;
