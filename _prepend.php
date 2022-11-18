@@ -30,6 +30,6 @@ dcCore::app()->url->register(
 );
 
 // Add to report on plugin activityReport
-if (defined('ACTIVITY_REPORT')) {
+if (defined('ACTIVITY_REPORT_V2')) {
     require_once __DIR__ . '/inc/lib.zcfs.activityreport.php';
 }
