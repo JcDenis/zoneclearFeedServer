@@ -301,7 +301,7 @@ class zoneclearFeedServer
             $strReq .= $this->con->limit($params['limit']);
         }
 
-        $rs     = $this->con->select($strReq);
+        $rs = $this->con->select($strReq);
 
         return $rs;
     }

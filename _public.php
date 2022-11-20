@@ -93,7 +93,6 @@ class zcfsPublicBehaviors
 
     /**
      * Update feeds after contents.
-     *
      */
     public static function publicAfterDocument()
     {
@@ -108,7 +107,6 @@ class zcfsPublicBehaviors
 
     /**
      * Generic behavior for before and after public content.
-     *
      */
     public static function publicDocument()
     {

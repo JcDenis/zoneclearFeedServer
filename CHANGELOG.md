@@ -3,6 +3,10 @@
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
 
+2022.11.20
+- fix compatibility with Dotclear 2.24 (required)
+- fix feed update
+
 2022.02.13
 - Fix sqlStatement errors (dc 2.21)
 
