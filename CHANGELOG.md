@@ -3,6 +3,12 @@
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
 
+2022.11.26
+- use SVG icon
+- fix missing dcCore (resources)
+- fix permissions check using contants
+- fix update crach on unconfigured blog
+
 2022.11.20
 - fix compatibility with Dotclear 2.24 (required)
 - fix feed update
