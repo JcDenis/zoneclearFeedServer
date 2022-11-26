@@ -18,35 +18,39 @@ dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
 
 require_once __DIR__ . '/_widgets.php';
 
-dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
-    __('Feeds server'),
-    dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer'),
-    dcPage::getPF('zoneclearFeedServer/icon.svg'),
-    preg_match(
-        '/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer')) . '(&.*)?$/',
-        $_SERVER['REQUEST_URI']
-    ),
-    dcCore::app()->auth->check(dcAuth::PERMISSION_CONTENT_ADMIN, dcCore::app()->blog->id)
-);
+if (dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
+    && '' != dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_user
+) {
+    dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
+        __('Feeds server'),
+        dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer'),
+        dcPage::getPF('zoneclearFeedServer/icon.svg'),
+        preg_match(
+            '/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer')) . '(&.*)?$/',
+            $_SERVER['REQUEST_URI']
+        ),
+        dcCore::app()->auth->check(dcAuth::PERMISSION_CONTENT_ADMIN, dcCore::app()->blog->id)
+    );
+
+    if (dcCore::app()->auth->check(dcAuth::PERMISSION_CONTENT_ADMIN, dcCore::app()->blog->id)) {
+        # Dashboard icon
+        dcCore::app()->addBehavior('adminDashboardFavoritesV2', ['zcfsAdminBehaviors', 'adminDashboardFavoritesV2']);
+        # User pref
+        dcCore::app()->addBehavior('adminColumnsListsV2', ['zcfsAdminBehaviors', 'adminColumnsListsV2']);
+        dcCore::app()->addBehavior('adminFiltersListsV2', ['zcfsAdminBehaviors', 'adminFiltersListsV2']);
+        # Add info about feed on post page sidebar
+        dcCore::app()->addBehavior('adminPostHeaders', ['zcfsAdminBehaviors', 'adminPostHeaders']);
+        dcCore::app()->addBehavior('adminPostFormItems', ['zcfsAdminBehaviors', 'adminPostFormItems']);
+    }
+
+    # Take care about tweakurls (thanks Mathieu M.)
+    if (version_compare(dcCore::app()->plugins->moduleInfo('tweakurls', 'version'), '0.8', '>=')) {
+        dcCore::app()->addbehavior('zcfsAfterPostCreate', ['zoneclearFeedServer', 'tweakurlsAfterPostCreate']);
+    }
+}
 
 # Delete related info about feed post in meta table
 dcCore::app()->addBehavior('adminBeforePostDelete', ['zcfsAdminBehaviors', 'adminBeforePostDelete']);
-
-if (dcCore::app()->auth->check(dcAuth::PERMISSION_CONTENT_ADMIN, dcCore::app()->blog->id)) {
-    # Dashboard icon
-    dcCore::app()->addBehavior('adminDashboardFavoritesV2', ['zcfsAdminBehaviors', 'adminDashboardFavoritesV2']);
-    # User pref
-    dcCore::app()->addBehavior('adminColumnsListsV2', ['zcfsAdminBehaviors', 'adminColumnsListsV2']);
-    dcCore::app()->addBehavior('adminFiltersListsV2', ['zcfsAdminBehaviors', 'adminFiltersListsV2']);
-    # Add info about feed on post page sidebar
-    dcCore::app()->addBehavior('adminPostHeaders', ['zcfsAdminBehaviors', 'adminPostHeaders']);
-    dcCore::app()->addBehavior('adminPostFormItems', ['zcfsAdminBehaviors', 'adminPostFormItems']);
-}
-
-# Take care about tweakurls (thanks Mathieu M.)
-if (version_compare(dcCore::app()->plugins->moduleInfo('tweakurls', 'version'), '0.8', '>=')) {
-    dcCore::app()->addbehavior('zcfsAfterPostCreate', ['zoneclearFeedServer', 'tweakurlsAfterPostCreate']);
-}
 
 /**
  * @ingroup DC_PLUGIN_ZONECLEARFEEDSERVER

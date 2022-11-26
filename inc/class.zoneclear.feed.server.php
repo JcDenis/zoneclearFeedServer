@@ -395,6 +395,13 @@ class zoneclearFeedServer
      */
     public function checkFeedsUpdate($id = null, $throw = false)
     {
+        $s = dcCore::app()->blog->settings->zoneclearFeedServer;
+
+        # Not configured
+        if (!$s->zoneclearFeedServer_active || !$s->zoneclearFeedServer_user) {
+            return false;
+        }
+
         # Limit to one update at a time
         try {
             $this->lockUpdate();
@@ -408,7 +415,6 @@ class zoneclearFeedServer
 
         dt::setTZ(dcCore::app()->blog->settings->system->blog_timezone);
         $time = time();
-        $s    = dcCore::app()->blog->settings->zoneclearFeedServer;
 
         # All feeds or only one (from admin)
         $f = !$id ?

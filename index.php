@@ -23,13 +23,24 @@ dcPage::check(dcAuth::PERMISSION_CONTENT_ADMIN);
 
 $zcfs = new zoneclearFeedServer();
 
+# Not configured
+if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
+    || !dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_user
+) {
+    echo
+    '<html><head><title>' . __('Feeds server') . '</title></head><body>' .
+    dcPage::breadcrumb([
+        __('Plugins')      => '',
+        __('Feeds server') => '',
+    ]) .
+    dcPage::notices();
+
 ############################################################
 #
 # One feed
 #
 ############################################################
-
-if (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
+} elseif (isset($_REQUEST['part']) && $_REQUEST['part'] == 'feed') {
     $feed_id       = '';
     $feed_name     = '';
     $feed_desc     = '';
