@@ -10,6 +10,5 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!isset($__resources['help']['zoneclearFeedServer'])) {
-    $__resources['help']['zoneclearFeedServer'] = dirname(__FILE__) . '/help/zoneclearFeedServer.html';
-}
+
+dcCore::app()->resources['help']['zoneclearFeedServer'] = __DIR__ . '/help/zoneclearFeedServer.html';
