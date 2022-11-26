@@ -26,18 +26,18 @@ dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
         '/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer')) . '(&.*)?$/',
         $_SERVER['REQUEST_URI']
     ),
-    dcCore::app()->auth->check('admin', dcCore::app()->blog->id)
+    dcCore::app()->auth->check(dcAuth::PERMISSION_CONTENT_ADMIN, dcCore::app()->blog->id)
 );
 
 # Delete related info about feed post in meta table
 dcCore::app()->addBehavior('adminBeforePostDelete', ['zcfsAdminBehaviors', 'adminBeforePostDelete']);
 
-if (dcCore::app()->auth->check('admin', dcCore::app()->blog->id)) {
+if (dcCore::app()->auth->check(dcAuth::PERMISSION_CONTENT_ADMIN, dcCore::app()->blog->id)) {
     # Dashboard icon
-    dcCore::app()->addBehavior('adminDashboardFavoritesV2', ['zcfsAdminBehaviors', 'adminDashboardFavorites']);
+    dcCore::app()->addBehavior('adminDashboardFavoritesV2', ['zcfsAdminBehaviors', 'adminDashboardFavoritesV2']);
     # User pref
-    dcCore::app()->addBehavior('adminColumnsListsV2', ['zcfsAdminBehaviors', 'adminColumnsLists']);
-    dcCore::app()->addBehavior('adminFiltersListsV2', ['zcfsAdminBehaviors', 'adminFiltersLists']);
+    dcCore::app()->addBehavior('adminColumnsListsV2', ['zcfsAdminBehaviors', 'adminColumnsListsV2']);
+    dcCore::app()->addBehavior('adminFiltersListsV2', ['zcfsAdminBehaviors', 'adminFiltersListsV2']);
     # Add info about feed on post page sidebar
     dcCore::app()->addBehavior('adminPostHeaders', ['zcfsAdminBehaviors', 'adminPostHeaders']);
     dcCore::app()->addBehavior('adminPostFormItems', ['zcfsAdminBehaviors', 'adminPostFormItems']);
@@ -82,7 +82,7 @@ class zcfsAdminBehaviors
      *
      * @param    dcFavorites $favs Array of favorites
      */
-    public static function adminDashboardFavorites(dcFavorites $favs)
+    public static function adminDashboardFavoritesV2(dcFavorites $favs)
     {
         $favs->register('zcfs', [
             'title'        => __('Feeds server'),
@@ -90,22 +90,8 @@ class zcfsAdminBehaviors
             'small-icon'   => dcPage::getPF('zoneclearFeedServer/icon.svg'),
             'large-icon'   => dcPage::getPF('zoneclearFeedServer/icon.svg'),
             'permissions'  => 'usage,contentadmin',
-            'active_cb'    => ['zcfsAdminBehaviors', 'adminDashboardFavoritesActive'],
             'dashboard_cb' => ['zcfsAdminBehaviors', 'adminDashboardFavoritesCallback'],
         ]);
-    }
-
-    /**
-     * Favorites selection.
-     *
-     * @param    string $request Requested page
-     * @param    array  $params  Requested parameters
-     */
-    public static function adminDashboardFavoritesActive($request, $params)
-    {
-        return $request == 'plugin.php'
-            && isset($params['p'])
-            && $params['p'] == 'zoneclearFeedServer';
     }
 
     /**
@@ -135,7 +121,7 @@ class zcfsAdminBehaviors
      *
      * @param    arrayObject $cols Columns
      */
-    public static function adminColumnsLists($cols)
+    public static function adminColumnsListsV2($cols)
     {
         $cols['zcfs_feeds'] = [
             __('Feeds server: Feeds'),
@@ -161,7 +147,7 @@ class zcfsAdminBehaviors
      *
      * @param    arrayObject $sorts Sort options
      */
-    public static function adminFiltersLists($sorts)
+    public static function adminFiltersListsV2($sorts)
     {
         $sorts['zcfs_feeds'] = [
             __('Feeds server: Feeds'),

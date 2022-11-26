@@ -19,7 +19,7 @@ if (dcCore::app()->getVersion('zoneclearFeedServer') != dcCore::app()->plugins->
     return null;
 }
 
-dcPage::check('admin');
+dcPage::check(dcAuth::PERMISSION_CONTENT_ADMIN);
 
 $zcfs = new zoneclearFeedServer();
 
