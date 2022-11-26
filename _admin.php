@@ -21,7 +21,7 @@ require_once __DIR__ . '/_widgets.php';
 dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
     __('Feeds server'),
     dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer'),
-    dcPage::getPF('zoneclearFeedServer/icon.png'),
+    dcPage::getPF('zoneclearFeedServer/icon.svg'),
     preg_match(
         '/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer')) . '(&.*)?$/',
         $_SERVER['REQUEST_URI']
@@ -87,8 +87,8 @@ class zcfsAdminBehaviors
         $favs->register('zcfs', [
             'title'        => __('Feeds server'),
             'url'          => dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer'),
-            'small-icon'   => dcPage::getPF('zoneclearFeedServer/icon.png'),
-            'large-icon'   => dcPage::getPF('zoneclearFeedServer/icon-big.png'),
+            'small-icon'   => dcPage::getPF('zoneclearFeedServer/icon.svg'),
+            'large-icon'   => dcPage::getPF('zoneclearFeedServer/icon.svg'),
             'permissions'  => 'usage,contentadmin',
             'active_cb'    => ['zcfsAdminBehaviors', 'adminDashboardFavoritesActive'],
             'dashboard_cb' => ['zcfsAdminBehaviors', 'adminDashboardFavoritesCallback'],
@@ -123,7 +123,7 @@ class zcfsAdminBehaviors
         }
 
         $fav['title'] .= '<br />' . sprintf(__('%s feed disabled', '%s feeds disabled', $count), $count);
-        $fav['large-icon'] = dcPage::getPF('zoneclearFeedServer/icon-big-update.png');
+        $fav['large-icon'] = dcPage::getPF('zoneclearFeedServer/icon-pdate.svg');
         $fav['url']        = dcCore::app()->adminurl->get(
             'admin.plugin.zoneclearFeedServer',
             ['part' => 'feeds', 'sortby' => 'feed_status', 'order' => 'asc']
