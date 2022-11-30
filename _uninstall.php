@@ -32,7 +32,7 @@ $this->addUserAction(
     /* action */
     'delete',
     /* ns */
-    'zc_feed',
+    initZoneclearFeedServer::FEED_TABLE_NAME,
     /* desc */
     __('delete table')
 );
@@ -73,7 +73,7 @@ $this->addDirectAction(
     /* action */
     'delete',
     /* ns */
-    'zc_feed',
+    initZoneclearFeedServer::FEED_TABLE_NAME,
     /* desc */
     sprintf(__('delete %s table'), $mod_id)
 );
