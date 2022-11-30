@@ -716,7 +716,7 @@ class zoneclearFeedServer
         } else {
             dcCore::app()->auth = null;
             dcCore::app()->auth = new dcAuth();
-            dcCore::app()->auth->checkUser($this->user);
+            dcCore::app()->auth->checkUser($this->user ?? '');
         }
     }
 
