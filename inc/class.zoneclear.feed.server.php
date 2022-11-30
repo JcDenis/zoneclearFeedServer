@@ -38,7 +38,7 @@ class zoneclearFeedServer
     {
         $this->con   = dcCore::app()->con;
         $this->blog  = dcCore::app()->con->escape(dcCore::app()->blog->id);
-        $this->table = dcCore::app()->prefix . 'zc_feed';
+        $this->table = dcCore::app()->prefix . initZoneclearFeedServer::FEED_TABLE_NAME;
     }
 
     /**
@@ -247,7 +247,7 @@ class zoneclearFeedServer
         }
 
         $strReq .= 'FROM ' . $this->table . ' Z ' .
-        'LEFT OUTER JOIN ' . dcCore::app()->prefix . 'category C ON Z.cat_id = C.cat_id ';
+        'LEFT OUTER JOIN ' . dcCore::app()->prefix . dcCategories::CATEGORY_TABLE_NAME . ' C ON Z.cat_id = C.cat_id ';
 
         if (!empty($params['from'])) {
             $strReq .= $params['from'] . ' ';
@@ -837,7 +837,7 @@ class zoneclearFeedServer
         # Get super admins
         $rs = $this->con->select(
             'SELECT user_id, user_super, user_name, user_firstname, user_displayname ' .
-            'FROM ' . $this->con->escapeSystem(dcCore::app()->prefix . 'user') . ' ' .
+            'FROM ' . $this->con->escapeSystem(dcCore::app()->prefix . dcCategories::CATEGORY_TABLE_NAME) . ' ' .
             'WHERE user_super = 1 AND user_status = 1 '
         );
 
@@ -856,8 +856,8 @@ class zoneclearFeedServer
         # Get admins
         $rs = $this->con->select(
             'SELECT U.user_id, U.user_super, U.user_name, U.user_firstname, U.user_displayname ' .
-            'FROM ' . $this->con->escapeSystem(dcCore::app()->prefix . 'user') . ' U ' .
-            'LEFT JOIN ' . $this->con->escapeSystem(dcCore::app()->prefix . 'permissions') . ' P ' .
+            'FROM ' . $this->con->escapeSystem(dcCore::app()->prefix . dcCategories::CATEGORY_TABLE_NAME) . ' U ' .
+            'LEFT JOIN ' . $this->con->escapeSystem(dcCore::app()->prefix . dcAuth::PERMISSIONS_TABLE_NAME) . ' P ' .
             'ON U.user_id=P.user_id ' .
             'WHERE U.user_status = 1 ' .
             "AND P.blog_id = '" . $this->blog . "' " .

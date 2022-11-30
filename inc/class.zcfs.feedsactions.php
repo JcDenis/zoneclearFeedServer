@@ -75,7 +75,7 @@ class zcfsFeedsActionsPage extends dcActions
             $this->rs = $feeds;
         } else {
             $this->rs = dcCore::app()->con->select(
-                'SELECT blog_id FROM ' . dcCore::app()->prefix . 'blog WHERE false'
+                'SELECT blog_id FROM ' . dcCore::app()->prefix . dcBlog::BLOG_TABLE_NAME . ' WHERE false'
             );
         }
     }
