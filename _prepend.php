@@ -14,12 +14,14 @@ if (!defined('DC_RC_PATH')) {
     return null;
 }
 
-Clearbricks::lib()->autoload(['zoneclearFeedServer' => __DIR__ . '/inc/class.zoneclear.feed.server.php']);
-Clearbricks::lib()->autoload(['zcfsFeedsList' => __DIR__ . '/inc/lib.zcfs.list.php']);
-Clearbricks::lib()->autoload(['zcfsEntriesList' => __DIR__ . '/inc/lib.zcfs.list.php']);
-Clearbricks::lib()->autoload(['adminZcfsPostFilter' => __DIR__ . '/inc/lib.zcfs.list.php']);
-Clearbricks::lib()->autoload(['zcfsFeedsActionsPage' => __DIR__ . '/inc/class.zcfs.feedsactions.php']);
-Clearbricks::lib()->autoload(['zcfsDefaultFeedsActions' => __DIR__ . '/inc/class.zcfs.feedsactions.php']);
+Clearbricks::lib()->autoload([
+    'zoneclearFeedServer'     => __DIR__ . '/inc/class.zoneclear.feed.server.php',
+    'zcfsFeedsList'           => __DIR__ . '/inc/lib.zcfs.list.php',
+    'zcfsEntriesList'         => __DIR__ . '/inc/lib.zcfs.list.php',
+    'adminZcfsPostFilter'     => __DIR__ . '/inc/lib.zcfs.list.php',
+    'zcfsFeedsActionsPage'    => __DIR__ . '/inc/class.zcfs.feedsactions.php',
+    'zcfsDefaultFeedsActions' => __DIR__ . '/inc/class.zcfs.feedsactions.php',
+]);
 
 // public url for page of description of the flux
 dcCore::app()->url->register(
