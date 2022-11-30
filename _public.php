@@ -154,7 +154,7 @@ class zcfsRsExtPosts extends rsExtPost
 {
     public static function zc()
     {
-        return new zonclearFeedServer();
+        return new zoneclearFeedServer();
     }
 
     /**
