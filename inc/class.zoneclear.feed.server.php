@@ -837,7 +837,7 @@ class zoneclearFeedServer
         # Get super admins
         $rs = $this->con->select(
             'SELECT user_id, user_super, user_name, user_firstname, user_displayname ' .
-            'FROM ' . $this->con->escapeSystem(dcCore::app()->prefix . dcCategories::CATEGORY_TABLE_NAME) . ' ' .
+            'FROM ' . $this->con->escapeSystem(dcCore::app()->prefix . dcAuth::USER_TABLE_NAME) . ' ' .
             'WHERE user_super = 1 AND user_status = 1 '
         );
 
@@ -856,7 +856,7 @@ class zoneclearFeedServer
         # Get admins
         $rs = $this->con->select(
             'SELECT U.user_id, U.user_super, U.user_name, U.user_firstname, U.user_displayname ' .
-            'FROM ' . $this->con->escapeSystem(dcCore::app()->prefix . dcCategories::CATEGORY_TABLE_NAME) . ' U ' .
+            'FROM ' . $this->con->escapeSystem(dcCore::app()->prefix . dcAuth::USER_TABLE_NAME) . ' U ' .
             'LEFT JOIN ' . $this->con->escapeSystem(dcCore::app()->prefix . dcAuth::PERMISSIONS_TABLE_NAME) . ' P ' .
             'ON U.user_id=P.user_id ' .
             'WHERE U.user_status = 1 ' .
