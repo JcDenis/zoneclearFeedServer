@@ -21,10 +21,12 @@ $this->registerModule(
     '2022.11.26',
     [
         'requires'    => [['core', '2.24']],
-        'permissions' => dcAuth::PERMISSION_CONTENT_ADMIN,
-        'type'        => 'plugin',
-        'support'     => 'https://github.com/JcDenis/zoneclearFeedServer',
-        'details'     => 'https://plugins.dotaddict.org/dc2/details/pacKman',
-        'repository'  => 'https://raw.githubusercontent.com/JcDenis/zoneclearFeedServer/master/dcstore.xml',
+        'permissions' => dcCore::app()->auth->makePermissions([
+            dcAuth::PERMISSION_CONTENT_ADMIN,
+        ]),
+        'type'       => 'plugin',
+        'support'    => 'https://github.com/JcDenis/zoneclearFeedServer',
+        'details'    => 'https://plugins.dotaddict.org/dc2/details/pacKman',
+        'repository' => 'https://raw.githubusercontent.com/JcDenis/zoneclearFeedServer/master/dcstore.xml',
     ]
 );

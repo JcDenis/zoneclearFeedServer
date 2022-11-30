@@ -211,7 +211,7 @@ class zcfsEntriesList extends adminGenericList
 
     private function postLine()
     {
-        $cat_link = dcCore::app()->auth->check(dcAuth::PERMISSION_CATEGORIES, dcCore::app()->blog->id) ?
+        $cat_link = dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([dcAuth::PERMISSION_CATEGORIES]), dcCore::app()->blog->id) ?
             '<a href="category.php?id=%s" title="' . __('Edit category') . '">%s</a>'
             : '%2$s';
 

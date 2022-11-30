@@ -18,6 +18,10 @@ dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
 
 require_once __DIR__ . '/_widgets.php';
 
+$perm = dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
+    dcAuth::PERMISSION_CONTENT_ADMIN,
+]), dcCore::app()->blog->id);
+
 if (dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
     && '' != dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_user
 ) {
@@ -29,10 +33,10 @@ if (dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_acti
             '/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer')) . '(&.*)?$/',
             $_SERVER['REQUEST_URI']
         ),
-        dcCore::app()->auth->check(dcAuth::PERMISSION_CONTENT_ADMIN, dcCore::app()->blog->id)
+        $perm
     );
 
-    if (dcCore::app()->auth->check(dcAuth::PERMISSION_CONTENT_ADMIN, dcCore::app()->blog->id)) {
+    if ($perm) {
         # Dashboard icon
         dcCore::app()->addBehavior('adminDashboardFavoritesV2', ['zcfsAdminBehaviors', 'adminDashboardFavoritesV2']);
         # User pref
@@ -89,11 +93,14 @@ class zcfsAdminBehaviors
     public static function adminDashboardFavoritesV2(dcFavorites $favs)
     {
         $favs->register('zcfs', [
-            'title'        => __('Feeds server'),
-            'url'          => dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer'),
-            'small-icon'   => dcPage::getPF('zoneclearFeedServer/icon.svg'),
-            'large-icon'   => dcPage::getPF('zoneclearFeedServer/icon.svg'),
-            'permissions'  => 'usage,contentadmin',
+            'title'       => __('Feeds server'),
+            'url'         => dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer'),
+            'small-icon'  => dcPage::getPF('zoneclearFeedServer/icon.svg'),
+            'large-icon'  => dcPage::getPF('zoneclearFeedServer/icon.svg'),
+            'permissions' => dcCore::app()->auth->makePermissions([
+                dcAuth::PERMISSION_USAGE,
+                dcAuth::PERMISSION_CONTENT_ADMIN,
+            ]),
             'dashboard_cb' => ['zcfsAdminBehaviors', 'adminDashboardFavoritesCallback'],
         ]);
     }
@@ -224,7 +231,7 @@ class zcfsAdminBehaviors
         $sitename = $sitename->isEmpty() ? '' : $sitename->meta_id;
 
         $edit = '';
-        if (dcCore::app()->auth->check(dcAuth::PERMISSION_CONTENT_ADMIN, dcCore::app()->blog->id)) {
+        if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([dcAuth::PERMISSION_CONTENT_ADMIN]), dcCore::app()->blog->id)) {
             $fid = dcCore::app()->meta->getMetadata([
                 'post_id'   => $post->post_id,
                 'meta_type' => 'zoneclearfeed_id',
