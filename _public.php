@@ -27,9 +27,9 @@ if (!$s->zoneclearFeedServer_active) {
     return null;
 }
 if (1 == $s->zoneclearFeedServer_bhv_pub_upd) {
-    dcCore::app()->addBehavior('publicBeforeDocument', ['zcfsPublicBehaviors', 'publicDocument']);
+    dcCore::app()->addBehavior('publicBeforeDocumentV2', ['zcfsPublicBehaviors', 'publicDocumentV2']);
 } elseif (2 == $s->zoneclearFeedServer_bhv_pub_upd) {
-    dcCore::app()->addBehavior('publicAfterDocument', ['zcfsPublicBehaviors', 'publicAfterDocument']);
+    dcCore::app()->addBehavior('publicAfterDocumentV2', ['zcfsPublicBehaviors', 'publicAfterDocumentV2']);
 } elseif (3 == $s->zoneclearFeedServer_bhv_pub_upd) {
     dcCore::app()->addBehavior('publicHeadContent', ['zcfsPublicBehaviors', 'publicHeadContent']);
 }
@@ -94,7 +94,7 @@ class zcfsPublicBehaviors
     /**
      * Update feeds after contents.
      */
-    public static function publicAfterDocument()
+    public static function publicAfterDocumentV2()
     {
         # Limit feeds update to home page et feed page
         # Like publishScheduledEntries
@@ -108,7 +108,7 @@ class zcfsPublicBehaviors
     /**
      * Generic behavior for before and after public content.
      */
-    public static function publicDocument()
+    public static function publicDocumentV2()
     {
         $zc = new zoneclearFeedServer();
         $zc->checkFeedsUpdate();
