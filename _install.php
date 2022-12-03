@@ -14,10 +14,12 @@ if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
 
-$mod_id = 'zoneclearFeedServer';
-$dc_min = $this->modules[$mod_id]['requires'][0][1];
 
 try {
+    # Grab module info
+    $mod_id = basename(__DIR__);
+    $dc_min = $this->modules[$mod_id]['requires'][0][1];
+
     # Check module version
     if (version_compare(
         dcCore::app()->getVersion($mod_id),
