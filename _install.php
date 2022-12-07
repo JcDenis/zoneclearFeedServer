@@ -85,12 +85,6 @@ try {
     $s->put('zoneclearFeedServer_post_full_tpl', serialize(['post', 'category', 'tag', 'archive']), 'string', 'List of templates types for full feed', false, true);
     $s->put('zoneclearFeedServer_post_title_redir', serialize(['feed']), 'string', 'List of templates types for redirection to original post', false, true);
 
-    # Set module version
-    dcCore::app()->setVersion(
-        $mod_id,
-        $this->moduleInfo($mod_id, 'version')
-    );
-
     return true;
 } catch (Exception $e) {
     dcCore::app()->error->add($e->getMessage());
