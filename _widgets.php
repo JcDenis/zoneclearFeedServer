@@ -153,8 +153,7 @@ class zoneclearFeedServerWidget
         }
 
         if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
-            || $w->homeonly == 1 && !dcCore::app()->url->isHome(dcCore::app()->url->type)
-            || $w->homeonly == 2 && dcCore::app()->url->isHome(dcCore::app()->url->type)
+            || !$w->checkHomeOnly(dcCore::app()->url->type)
         ) {
             return null;
         }
@@ -214,8 +213,7 @@ class zoneclearFeedServerWidget
         }
 
         if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
-            || $w->homeonly == 1 && !dcCore::app()->url->isHome(dcCore::app()->url->type)
-            || $w->homeonly == 2 && dcCore::app()->url->isHome(dcCore::app()->url->type)
+            || !$w->checkHomeOnly(dcCore::app()->url->type)
         ) {
             return null;
         }
