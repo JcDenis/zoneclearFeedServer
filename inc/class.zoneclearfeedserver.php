@@ -426,9 +426,7 @@ class zoneclearFeedServer
             return false;
         }
 
-        # Set feeds user
-        $this->enableUser(true);
-
+        $enabled = false;
         $updates  = false;
         $loop_mem = [];
 
@@ -443,9 +441,14 @@ class zoneclearFeedServer
 
         while ($f->fetch()) {
             # Check if feed need update
-            if ($id || $i < $limit && $f->feed_status == 1
-                                   && $time > $f->feed_upd_last + $f->feed_upd_int
+            if ($id 
+             || $i < $limit && $f->feed_status == 1 && ($time > $f->feed_upd_last + $f->feed_upd_int)
             ) {
+                if (!$enabled) {
+                    # Set feeds user
+                    $this->enableUser(true);
+                    $enabled = true;
+                }
                 $i++;
                 $feed = self::readFeed($f->feed_feed);
 
@@ -693,7 +696,9 @@ class zoneclearFeedServer
                 }
             }
         }
-        $this->enableUser(false);
+        if ($enabled) {
+            $this->enableUser(false);
+        }
         $this->unlockUpdate();
 
         return true;
