@@ -98,7 +98,7 @@ class zcfsFeedsList extends adminGenericList
             $shunk_feed = substr($shunk_feed, 0, 50) . '...' . substr($shunk_feed, -20);
         }
 
-        $url = 'plugin.php?p=zoneclearFeedServer&amp;part=feed&amp;feed_id=' . $this->rs->feed_id;
+        $url = dcCore::app()->adminurl->get('admin.plugin.' . basename(dirname('../' . __DIR__)), ['part' => 'feed', 'feed_id' => $this->rs->feed_id]);
 
         $cols = [
             'check' => '<td class="nowrap minimal">' .

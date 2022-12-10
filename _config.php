@@ -17,8 +17,8 @@ if (!defined('DC_CONTEXT_MODULE')) {
 $redir = empty($_REQUEST['redir']) ? dcCore::app()->admin->list->getURL() . '#plugins' : $_REQUEST['redir'];
 
 # -- Get settings --
-dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
-$s = dcCore::app()->blog->settings->zoneclearFeedServer;
+dcCore::app()->blog->settings->addNamespace(basename(__DIR__));
+$s = dcCore::app()->blog->settings->__get(basename(__DIR__));
 
 $active           = (bool) $s->zoneclearFeedServer_active;
 $pub_active       = (bool) $s->zoneclearFeedServer_pub_active;
@@ -79,7 +79,7 @@ if (!empty($_POST['save'])) {
         );
         dcCore::app()->adminurl->redirect(
             'admin.plugins',
-            ['module' => 'zoneclearFeedServer', 'conf' => 1, 'redir' => dcCore::app()->admin->list->getRedir()]
+            ['module' => basename(__DIR__), 'conf' => 1, 'redir' => dcCore::app()->admin->list->getRedir()]
         );
     } catch (Exception $e) {
         dcCore::app()->error->add($e->getMessage());
@@ -124,7 +124,7 @@ __('Enable plugin') . '</label></p>
 
 <div class="fieldset">';
 
-if (dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_pub_active) {
+if ($s->zoneclearFeedServer_pub_active) {
     echo sprintf(
         '<p><a class="onblog_link outgoing" href="%s" title="%s">%s <img alt="" src="images/outgoing-link.svg"></a></p>',
         $pub_page_url,

@@ -16,5 +16,5 @@ if (!defined('DC_RC_PATH')) {
 
 class initZoneclearFeedServer
 {
-    public const FEED_TABLE_NAME = 'zc_feed';
+    public const TABLE_NAME  = 'zc_feed';
 }

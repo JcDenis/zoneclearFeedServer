@@ -28,8 +28,8 @@ dcPage::check(dcCore::app()->auth->makePermissions([
 $zcfs = new zoneclearFeedServer();
 
 # Not configured
-if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
-    || !dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_user
+if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_active
+    || !dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_user
 ) {
     echo
     '<html><head><title>' . __('Feeds server') . '</title></head><body>' .
@@ -224,7 +224,7 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
                     __('Feed successfully updated.')
                 );
                 dcCore::app()->adminurl->redirect(
-                    'admin.plugin.zoneclearFeedServer',
+                    'admin.plugin.' . basename(__DIR__),
                     ['part' => 'feed', 'feed_id' => $feed_id]
                 );
             } catch (Exception $e) {
@@ -244,7 +244,7 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
                     __('Feed successfully created.')
                 );
                 dcCore::app()->adminurl->redirect(
-                    'admin.plugin.zoneclearFeedServer',
+                    'admin.plugin.' . basename(__DIR__),
                     ['part' => 'feed', 'feed_id' => $return_id]
                 );
             } catch (Exception $e) {
@@ -259,7 +259,7 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
         $posts_actions_page = new dcPostsActions(
             'plugin.php',
             [
-                'p'       => 'zoneclearFeedServer',
+                'p'       => basename(__DIR__),
                 'part'    => 'feed',
                 'feed_id' => $feed_id,
                 '_ANCHOR' => 'entries',
@@ -309,8 +309,8 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
     echo
     '<html><head><title>' . __('Feeds server') . '</title>' .
     ($feed_id && !dcCore::app()->error->flag() ?
-        $post_filter->js(dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed', 'feed_id' => $feed_id], '&') . '#entries') .
-        dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/list.js'))
+        $post_filter->js(dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), ['part' => 'feed', 'feed_id' => $feed_id], '&') . '#entries') .
+        dcPage::jsLoad(dcPage::getPF(basename(__DIR__) . '/js/list.js'))
     : '') .
     dcPage::jsPageTabs() .
     $next_headlink . "\n" . $prev_headlink .
@@ -426,7 +426,7 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
 
         '<p class="clear">
         <input type="submit" name="save" value="' . __('Save') . ' (s)" accesskey="s"/>' .
-        dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', [
+        dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . basename(__DIR__), [
             'part'    => 'feed',
             'feed_id' => $feed_id,
             'action'  => 'savefeed',
@@ -443,8 +443,8 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
 
         # show filters
         $post_filter->display(
-            ['admin.plugin.zoneclearFeedServer','#entries'],
-            dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', [
+            ['admin.plugin.' . basename(__DIR__),'#entries'],
+            dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . basename(__DIR__), [
                 'part'    => 'feed',
                 'feed_id' => $feed_id,
             ])
@@ -459,8 +459,8 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
         $post_list->display(
             $post_filter->page,
             $post_filter->nb,
-            dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer', $args, '&') . '#entries',
-            '<form action="' . dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed']) . '#entries" method="post" id="form-entries">' .
+            dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), $args, '&') . '#entries',
+            '<form action="' . dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), ['part' => 'feed']) . '#entries" method="post" id="form-entries">' .
             '%s' .
 
             '<div class="two-cols">' .
@@ -469,8 +469,8 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
             '<p class="col right">' . __('Selected entries action:') . ' ' .
             form::combo('action', $posts_actions_page->getCombo()) .
             '<input type="submit" name="save" value="' . __('ok') . '" /></p>' .
-            dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', $post_filter->values()) .
-            form::hidden('redir', dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer', $post_filter->values())) .
+            dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . basename(__DIR__), $post_filter->values()) .
+            form::hidden('redir', dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), $post_filter->values())) .
             dcCore::app()->formNonce() .
             '</div>' .
             '</form>',
@@ -489,7 +489,7 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
     # actions
     $feeds_actions_page = new zcfsFeedsActionsPage(
         'plugin.php',
-        ['p' => 'zoneclearFeedServer', 'part' => 'feeds']
+        ['p' => basename(__DIR__), 'part' => 'feeds']
     );
     if ($feeds_actions_page->process()) {
         return null;
@@ -518,8 +518,8 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
     # display
     echo
     '<html><head><title>' . __('Feeds server') . '</title>' .
-    $feeds_filter->js(dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feeds'], '&')) .
-    dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/list.js')) .
+    $feeds_filter->js(dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), ['part' => 'feeds'], '&')) .
+    dcPage::jsLoad(dcPage::getPF(basename(__DIR__) . '/js/list.js')) .
     dcPage::jsPageTabs() .
 
     # --BEHAVIOR-- adminZoneclearFeedServerHeader
@@ -534,25 +534,25 @@ if (!dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_act
     dcPage::notices() .
 
     '<p class="top-add">' .
-    '<a class="button add" href="' . dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feed']) . '">' .
+    '<a class="button add" href="' . dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), ['part' => 'feed']) . '">' .
     __('New feed') . '</a></p>';
 
     $feeds_filter->display(
-        'admin.plugin.zoneclearFeedServer',
-        dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', ['part' => 'feeds'])
+        'admin.plugin.' . basename(__DIR__),
+        dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . basename(__DIR__), ['part' => 'feeds'])
     );
 
     $feeds_list->feedsDisplay(
         $feeds_filter->page,
         $feeds_filter->nb,
-        '<form action="' . dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer', ['part' => 'feeds']) . '" method="post" id="form-actions">' .
+        '<form action="' . dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), ['part' => 'feeds']) . '" method="post" id="form-actions">' .
         '%s' .
         '<div class="two-cols">' .
         '<p class="col checkboxes-helpers"></p>' .
         '<p class="col right">' . __('Selected feeds action:') . ' ' .
         form::combo(['action'], $feeds_actions_page->getCombo()) .
         '<input type="submit" value="' . __('ok') . '" />' .
-        dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.zoneclearFeedServer', $feeds_filter->values(true)) .
+        dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . basename(__DIR__), $feeds_filter->values(true)) .
         dcCore::app()->formNonce() .
         '</p>' .
         '</div>' .

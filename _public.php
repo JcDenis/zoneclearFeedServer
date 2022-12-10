@@ -15,8 +15,8 @@ if (!defined('DC_RC_PATH')) {
 }
 
 # Namespace for settings
-dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
-$s = dcCore::app()->blog->settings->zoneclearFeedServer;
+dcCore::app()->blog->settings->addNamespace(basename(__DIR__));
+$s = dcCore::app()->blog->settings->__get(basename(__DIR__));
 
 # Widgets
 require_once __DIR__ . '/_widgets.php';
@@ -236,7 +236,7 @@ class zcfsRsExtPosts extends rsExtPost
     public static function getURL(dcRecord $rs): string
     {
         $url   = $rs->zcFeed('url');
-        $types = @unserialize(dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_post_title_redir);
+        $types = @unserialize(dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_post_title_redir);
         $full  = is_array($types) && in_array(dcCore::app()->url->type, $types);
 
         return $url && $full ?
@@ -257,7 +257,7 @@ class zcfsRsExtPosts extends rsExtPost
         $content  = self::zcFeedBrother('getContent', [&$rs, $absolute_urls]);
 
         if ($url && $sitename && $rs->post_type == 'post') {
-            $types = @unserialize(dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_post_full_tpl);
+            $types = @unserialize(dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_post_full_tpl);
 
             if (is_array($types) && in_array(dcCore::app()->url->type, $types)) {
                 return $content . sprintf(
@@ -297,7 +297,7 @@ class zcfsUrlHandler extends dcUrlHandlers
      */
     public static function zcFeedsPage($args)
     {
-        $s = dcCore::app()->blog->settings->zoneclearFeedServer;
+        $s = dcCore::app()->blog->settings->__get(basename(__DIR__));
 
         # Not active
         if (!$s->zoneclearFeedServer_active) {

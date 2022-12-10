@@ -25,7 +25,7 @@ try {
 
     # Tables
     $t = new dbStruct(dcCore::app()->con, dcCore::app()->prefix);
-    $t->{initZoneclearFeedServer::FEED_TABLE_NAME}
+    $t->{initZoneclearFeedServer::TABLE_NAME}
         ->feed_id('bigint', 0, false)
         ->feed_creadt('timestamp', 0, false, 'now()')
         ->feed_upddt('timestamp', 0, false, 'now()')

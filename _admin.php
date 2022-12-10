@@ -14,7 +14,7 @@ if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
 
-dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
+dcCore::app()->blog->settings->addNamespace(basename(__DIR__));
 
 require_once __DIR__ . '/_widgets.php';
 
@@ -22,15 +22,15 @@ $perm = dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
     dcAuth::PERMISSION_CONTENT_ADMIN,
 ]), dcCore::app()->blog->id);
 
-if (dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_active
-    && '' != dcCore::app()->blog->settings->zoneclearFeedServer->zoneclearFeedServer_user
+if (dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_active
+    && '' != dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_user
 ) {
     dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
         __('Feeds server'),
-        dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer'),
-        dcPage::getPF('zoneclearFeedServer/icon.svg'),
+        dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__)),
+        dcPage::getPF(basename(__DIR__) . '/icon.svg'),
         preg_match(
-            '/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer')) . '(&.*)?$/',
+            '/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__))) . '(&.*)?$/',
             $_SERVER['REQUEST_URI']
         ),
         $perm
@@ -94,9 +94,9 @@ class zcfsAdminBehaviors
     {
         $favs->register('zcfs', [
             'title'       => __('Feeds server'),
-            'url'         => dcCore::app()->adminurl->get('admin.plugin.zoneclearFeedServer'),
-            'small-icon'  => dcPage::getPF('zoneclearFeedServer/icon.svg'),
-            'large-icon'  => dcPage::getPF('zoneclearFeedServer/icon.svg'),
+            'url'         => dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__)),
+            'small-icon'  => dcPage::getPF(basename(__DIR__) . '/icon.svg'),
+            'large-icon'  => dcPage::getPF(basename(__DIR__) . '/icon.svg'),
             'permissions' => dcCore::app()->auth->makePermissions([
                 dcAuth::PERMISSION_USAGE,
                 dcAuth::PERMISSION_CONTENT_ADMIN,
@@ -120,9 +120,9 @@ class zcfsAdminBehaviors
         }
 
         $fav['title'] .= '<br />' . sprintf(__('%s feed disabled', '%s feeds disabled', $count), $count);
-        $fav['large-icon'] = dcPage::getPF('zoneclearFeedServer/icon-pdate.svg');
+        $fav['large-icon'] = dcPage::getPF(basename(__DIR__) . '/icon-update.svg');
         $fav['url']        = dcCore::app()->adminurl->get(
-            'admin.plugin.zoneclearFeedServer',
+            'admin.plugin.' . basename(__DIR__),
             ['part' => 'feeds', 'sortby' => 'feed_status', 'order' => 'asc']
         );
     }
@@ -183,7 +183,7 @@ class zcfsAdminBehaviors
      */
     public static function adminPostHeaders()
     {
-        return dcPage::jsLoad(dcPage::getPF('zoneclearFeedServer/js/post.js'));
+        return dcPage::jsLoad(dcPage::getPF(basename(__DIR__) . '/js/post.js'));
     }
 
     /**
@@ -241,7 +241,7 @@ class zcfsAdminBehaviors
                 $edit = sprintf(
                     '<p><a href="%s">%s</a></p>',
                     dcCore::app()->adminurl->get(
-                        'admin.plugin.zoneclearFeedServer',
+                        'admin.plugin.' . basename(__DIR__),
                         ['part' => 'feed', 'feed_id' => $fid->meta_id]
                     ),
                     __('Edit this feed')

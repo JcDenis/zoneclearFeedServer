@@ -38,7 +38,7 @@ class zoneclearFeedServer
     {
         $this->con   = dcCore::app()->con;
         $this->blog  = dcCore::app()->con->escape(dcCore::app()->blog->id);
-        $this->table = dcCore::app()->prefix . initZoneclearFeedServer::FEED_TABLE_NAME;
+        $this->table = dcCore::app()->prefix . initZoneclearFeedServer::TABLE_NAME;
     }
 
     /**
@@ -395,7 +395,7 @@ class zoneclearFeedServer
      */
     public function checkFeedsUpdate($id = null, $throw = false)
     {
-        $s = dcCore::app()->blog->settings->zoneclearFeedServer;
+        $s = dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)));
 
         # Not configured
         if (!$s->zoneclearFeedServer_active || !$s->zoneclearFeedServer_user) {
