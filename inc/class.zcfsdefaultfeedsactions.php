@@ -162,11 +162,7 @@ class zcfsDefaultFeedsActions
         }
 
         dcAdminNotices::addSuccessNotice(sprintf(
-            __(
-                '%d feed has been successfully updated.',
-                '%d feeds have been successfully updated.',
-                count($ids)
-            ),
+            __('%d feed has been successfully updated.', '%d feeds have been successfully updated.', count($ids)),
             count($ids)
         ));
         $ap->redirect(true);
@@ -188,11 +184,7 @@ class zcfsDefaultFeedsActions
         }
 
         dcAdminNotices::addSuccessNotice(sprintf(
-            __(
-                'Last update of %s feed successfully reseted.',
-                'Last update of %s feeds successfully reseted.',
-                count($ids)
-            ),
+            __('Last update of %s feed successfully reseted.', 'Last update of %s feeds successfully reseted.', count($ids)),
             count($ids)
         ));
         $ap->redirect(true);
@@ -216,11 +208,7 @@ class zcfsDefaultFeedsActions
             }
 
             dcAdminNotices::addSuccessNotice(sprintf(
-                __(
-                    'Category of %s feed successfully changed.',
-                    'Category of %s feeds successfully changed.',
-                    count($ids)
-                ),
+                __('Category of %s feed successfully changed.', 'Category of %s feeds successfully changed.', count($ids)),
                 count($ids)
             ));
             $ap->redirect(true);
@@ -271,11 +259,7 @@ class zcfsDefaultFeedsActions
             }
 
             dcAdminNotices::addSuccessNotice(sprintf(
-                __(
-                    'Update frequency of %s feed successfully changed.',
-                    'Update frequency of %s feeds successfully changed.',
-                    count($ids)
-                ),
+                __('Update frequency of %s feed successfully changed.', 'Update frequency of %s feeds successfully changed.', count($ids)),
                 count($ids)
             ));
             $ap->redirect(true);

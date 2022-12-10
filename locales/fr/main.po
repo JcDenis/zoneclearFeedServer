@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: zoneclearFeedServer 2021.09.16\n"
+"Project-Id-Version: zoneclearFeedServer 2022.11.26\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2021-10-28T20:52:17+00:00\n"
+"PO-Revision-Date: 2022-12-10T22:19:59+00:00\n"
 "Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -12,41 +12,6 @@ msgstr ""
 
 msgid "Feeds server"
 msgstr "Serveur de flux"
-
-msgid "Update date"
-msgstr "Date de mise à jour"
-
-msgid "%s feed disabled"
-msgid_plural "%s feeds disabled"
-msgstr[0] "%s flux désactivé"
-msgstr[1] "%s flux désactivés"
-
-msgid "Feeds server: Feeds"
-msgstr "Serveur de flux : Flux"
-
-msgid "Feed"
-msgstr "Flux"
-
-msgid "Feeds server: Entries"
-msgstr "Serveur de flux : Billets"
-
-msgid "feeds per page"
-msgstr "flux par page"
-
-msgid "entries per page"
-msgstr "billets par page"
-
-msgid "Edit this feed"
-msgstr "Modifier ce flux"
-
-msgid "Feed source"
-msgstr "Source du flux"
-
-msgid "feed URL"
-msgstr "URL du fil"
-
-msgid "site URL"
-msgstr "URL du site"
 
 msgid "Disable"
 msgstr "Désactiver"
@@ -111,18 +76,6 @@ msgstr "Rediriger vers le billet original sur :"
 msgid "Show full content on:"
 msgstr "Afficher le contenu complet sur :"
 
-msgid "Original post on <a href=\"%s\">%s</a>"
-msgstr "Billet original sur <a href=\"%s\">%s</a>"
-
-msgid "Read more details about this feed"
-msgstr "Lire plus de détails à propos de ce flux"
-
-msgid "no entries"
-msgstr "aucune publication"
-
-msgid "one entry"
-msgstr "une publication"
-
 msgid "List of feeds"
 msgstr "Liste des sources"
 
@@ -180,14 +133,76 @@ msgstr "une source"
 msgid "no sources"
 msgstr "aucune source"
 
-msgid "Feeds"
-msgstr "Flux de syndication"
+msgid "one entry"
+msgstr "une publication"
 
-msgid "Back to feeds list"
-msgstr "Retour à la liste des flux"
+msgid "no entries"
+msgstr "aucune publication"
 
-msgid "Feeds actions"
-msgstr "Actions sur les flux"
+msgid "feed creation"
+msgstr "création d'un flux"
+
+msgid "A new feed named \"%s\" point to \"%s\" was added by \"%s\""
+msgstr "Un nouveau flux nommé \"%s\" pointant vers \"%s\" a été ajouté par \"%s\""
+
+msgid "updating feed info"
+msgstr "mise à jour des informations du flux (administration)"
+
+msgid "Feed named \"%s\" point to \"%s\" has been updated by \"%s\""
+msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été mis à jour par \"%s\""
+
+msgid "updating feed records"
+msgstr "mise à jour des enregistrements du flux (automatique)"
+
+msgid "Records of the feed named \"%s\" have been updated automatically"
+msgstr "Les enregistrements du flux nommé \"%s\" ont été automatiquement mis à jour"
+
+msgid "feed deletion"
+msgstr "suppression d'un flux"
+
+msgid "Feed named \"%s\" point to \"%s\" has been deleted by \"%s\""
+msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été supprimé par \"%s\""
+
+msgid "feed status"
+msgstr "status d'un flux"
+
+msgid "Feed named \"%s\" point to \"%s\" has been set to \"%s\""
+msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été marqué comme \"%s\""
+
+msgid "Update date"
+msgstr "Date de mise à jour"
+
+msgid "%s feed disabled"
+msgid_plural "%s feeds disabled"
+msgstr[0] "%s flux désactivé"
+msgstr[1] "%s flux désactivés"
+
+msgid "Feeds server: Feeds"
+msgstr "Serveur de flux : Flux"
+
+msgid "Feed"
+msgstr "Flux"
+
+msgid "Feeds server: Entries"
+msgstr "Serveur de flux : Billets"
+
+msgid "feeds per page"
+msgstr "flux par page"
+
+msgid "entries per page"
+msgstr "billets par page"
+
+msgid "Edit this feed"
+msgstr "Modifier ce flux"
+
+msgid "Feed source"
+msgstr "Source du flux"
+
+msgid "feed URL"
+msgstr "URL du fil"
+
+msgid "site URL"
+msgstr "URL du site"
 
 msgid "Change update interval"
 msgstr "Changer l'interval de mise à jour"
@@ -216,11 +231,70 @@ msgstr "Aucun flux selectionné"
 msgid "Entries have been successfully deleted."
 msgstr "Les billets ont été effacé avec succès."
 
+msgid "%d feed has been successfully updated."
+msgid_plural "%d feeds have been successfully updated."
+msgstr[0] "%s flux a été mis à jour."
+msgstr[1] "%s flux ont été mis à jour."
+
+msgid "Last update of %s feed successfully reseted."
+msgid_plural "Last update of %s feeds successfully reseted."
+msgstr[0] "La date de dernière mise à jour de %s flux a été remis à zéro."
+msgstr[1] "Les date de dernière mise à jour de %s flux ont été remis à zéro."
+
+msgid "Category of %s feed successfully changed."
+msgid_plural "Category of %s feeds successfully changed."
+msgstr[0] "La catégorie de %s flux a été changé."
+msgstr[1] "Les catégories de %s flux ont été changé."
+
+msgid "Update frequency of %s feed successfully changed."
+msgid_plural "Update frequency of %s feeds successfully changed."
+msgstr[0] "La fréquence de mise à jour de %s flux a été changé."
+msgstr[1] "Les fréquences de mise à jour de %s flux ont été changé."
+
 msgid "Change update frequency for this selection"
 msgstr "Changer la fréquence de mise à jour pour la selection"
 
 msgid "Frequency:"
 msgstr "Fréquence :"
+
+msgid "No entries matches the filter"
+msgstr "Aucun billet correspondant au filtre."
+
+msgid "No entries"
+msgstr "Aucun billet"
+
+msgid "Feeds"
+msgstr "Flux de syndication"
+
+msgid "Back to feeds list"
+msgstr "Retour à la liste des flux"
+
+msgid "Feeds actions"
+msgstr "Actions sur les flux"
+
+msgid "No feeds matches the filter"
+msgstr "Aucun flux correspondant au filtre."
+
+msgid "No feeds"
+msgstr "Aucun flux"
+
+msgid "List of %s feeds matching the filter."
+msgstr "Liste des %s flux correspondant au filtre."
+
+msgid "List of feeds (%s)"
+msgstr "Liste des flux (%s)"
+
+msgid "never"
+msgstr "jamais"
+
+msgid "View entries"
+msgstr "Voir les billets"
+
+msgid "Original post on <a href=\"%s\">%s</a>"
+msgstr "Billet original sur <a href=\"%s\">%s</a>"
+
+msgid "Read more details about this feed"
+msgstr "Lire plus de détails à propos de ce flux"
 
 msgid "Disabled"
 msgstr "Désactivé"
@@ -254,60 +328,6 @@ msgstr "Pages des archives"
 
 msgid "Category pages"
 msgstr "Pages de catégories"
-
-msgid "feed creation"
-msgstr "création d'un flux"
-
-msgid "A new feed named \"%s\" point to \"%s\" was added by \"%s\""
-msgstr "Un nouveau flux nommé \"%s\" pointant vers \"%s\" a été ajouté par \"%s\""
-
-msgid "updating feed info"
-msgstr "mise à jour des informations du flux (administration)"
-
-msgid "Feed named \"%s\" point to \"%s\" has been updated by \"%s\""
-msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été mis à jour par \"%s\""
-
-msgid "updating feed records"
-msgstr "mise à jour des enregistrements du flux (automatique)"
-
-msgid "Records of the feed named \"%s\" have been updated automatically"
-msgstr "Les enregistrements du flux nommé \"%s\" ont été automatiquement mis à jour"
-
-msgid "feed deletion"
-msgstr "suppression d'un flux"
-
-msgid "Feed named \"%s\" point to \"%s\" has been deleted by \"%s\""
-msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été supprimé par \"%s\""
-
-msgid "feed status"
-msgstr "status d'un flux"
-
-msgid "Feed named \"%s\" point to \"%s\" has been set to \"%s\""
-msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été marqué comme \"%s\""
-
-msgid "No feeds matches the filter"
-msgstr "Aucun flux correspondant au filtre."
-
-msgid "No feeds"
-msgstr "Aucun flux"
-
-msgid "List of %s feeds matching the filter."
-msgstr "Liste des %s flux correspondant au filtre."
-
-msgid "List of feeds (%s)"
-msgstr "Liste des flux (%s)"
-
-msgid "never"
-msgstr "jamais"
-
-msgid "View entries"
-msgstr "Voir les billets"
-
-msgid "No entries matches the filter"
-msgstr "Aucun billet correspondant au filtre."
-
-msgid "No entries"
-msgstr "Aucun billet"
 
 msgid "This feed does not exist."
 msgstr "Ce flux n'existe pas."
