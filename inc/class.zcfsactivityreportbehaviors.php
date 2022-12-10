@@ -31,7 +31,19 @@ class zcfsActivityReportBehaviors
             __('feed creation'),
             __('A new feed named "%s" point to "%s" was added by "%s"'),
             'zoneclearFeedServerAfterAddFeed',
-            ['zoneclearFeedServerActivityReportBehaviors', 'addFeed']
+            function ($cur) {
+                $logs = [
+                    $cur->feed_name,
+                    $cur->feed_feed,
+                    dcCore::app()->auth->getInfo('user_cn'),
+                ];
+
+                dcCore::app()->activityReport->addLog(
+                    'zoneclearFeedServer',
+                    'create',
+                    $logs
+                );
+            }
         );
         # from BEHAVIOR zoneclearFeedServerAfterUpdFeed in in zoneclearFeedServer/inc/class.zoneclear.feed.server.php
         dcCore::app()->activityReport->addAction(
@@ -40,7 +52,24 @@ class zcfsActivityReportBehaviors
             __('updating feed info'),
             __('Feed named "%s" point to "%s" has been updated by "%s"'),
             'zoneclearFeedServerAfterUpdFeed',
-            ['zoneclearFeedServerActivityReportBehaviors', 'updFeedInfo']
+            function ($cur, $id) {
+                if (defined('DC_CONTEXT_ADMIN')) {
+                    $zc = new zoneclearFeedServer();
+                    $rs = $zc->getFeeds(['feed_id' => $id]);
+
+                    $logs = [
+                        $rs->feed_name,
+                        $rs->feed_feed,
+                        dcCore::app()->auth->getInfo('user_cn'),
+                    ];
+
+                    dcCore::app()->activityReport->addLog(
+                        'zoneclearFeedServer',
+                        'updatefeedinfo',
+                        $logs
+                    );
+                }
+            }
         );
         # from BEHAVIOR zoneclearFeedServerAfterUpdFeed in in zoneclearFeedServer/inc/class.zoneclear.feed.server.php
         dcCore::app()->activityReport->addAction(
@@ -49,7 +78,22 @@ class zcfsActivityReportBehaviors
             __('updating feed records'),
             __('Records of the feed named "%s" have been updated automatically'),
             'zoneclearFeedServerAfterUpdFeed',
-            ['zoneclearFeedServerActivityReportBehaviors', 'updFeedRecord']
+            function ($cur, $id) {
+                if (!defined('DC_CONTEXT_ADMIN')) {
+                    $zc = new zoneclearFeedServer();
+                    $rs = $zc->getFeeds(['feed_id' => $id]);
+
+                    $logs = [
+                        $rs->feed_name,
+                    ];
+
+                    dcCore::app()->activityReport->addLog(
+                        'zoneclearFeedServer',
+                        'updatefeedrecords',
+                        $logs
+                    );
+                }
+            }
         );
         # from BEHAVIOR zoneclearFeedServerAfterDelFeed in in zoneclearFeedServer/inc/class.zoneclear.feed.server.php
         dcCore::app()->activityReport->addAction(
@@ -58,7 +102,22 @@ class zcfsActivityReportBehaviors
             __('feed deletion'),
             __('Feed named "%s" point to "%s" has been deleted by "%s"'),
             'zoneclearFeedServerAfterDelFeed',
-            ['zoneclearFeedServerActivityReportBehaviors', 'delFeed']
+            function ($id) {
+                $zc = new zoneclearFeedServer();
+                $rs = $zc->getFeeds(['feed_id' => $id]);
+
+                $logs = [
+                    $rs->feed_name,
+                    $rs->feed_feed,
+                    dcCore::app()->auth->getInfo('user_cn'),
+                ];
+
+                dcCore::app()->activityReport->addLog(
+                    'zoneclearFeedServer',
+                    'delete',
+                    $logs
+                );
+            }
         );
         # from BEHAVIOR zoneclearFeedServerAfterEnableFeed in in zoneclearFeedServer/inc/class.zoneclear.feed.server.php
         dcCore::app()->activityReport->addAction(
@@ -67,96 +126,22 @@ class zcfsActivityReportBehaviors
             __('feed status'),
             __('Feed named "%s" point to "%s" has been set to "%s"'),
             'zoneclearFeedServerAfterEnableFeed',
-            ['zoneclearFeedServerActivityReportBehaviors', 'enableFeed']
-        );
-    }
+            function ($id, $enable, $time) {
+                $zc = new zoneclearFeedServer();
+                $rs = $zc->getFeeds(['feed_id' => $id]);
 
-    public static function addFeed($cur)
-    {
-        $logs = [
-            $cur->feed_name,
-            $cur->feed_feed,
-            dcCore::app()->auth->getInfo('user_cn'),
-        ];
+                $logs = [
+                    $rs->feed_name,
+                    $rs->feed_feed,
+                    $enable ? 'enable' : 'disable',
+                ];
 
-        dcCore::app()->activityReport->addLog(
-            'zoneclearFeedServer',
-            'create',
-            $logs
-        );
-    }
-
-    public static function updFeedInfo($cur, $id)
-    {
-        if (defined('DC_CONTEXT_ADMIN')) {
-            $zc = new zoneclearFeedServer();
-            $rs = $zc->getFeeds(['feed_id' => $id]);
-
-            $logs = [
-                $rs->feed_name,
-                $rs->feed_feed,
-                dcCore::app()->auth->getInfo('user_cn'),
-            ];
-
-            dcCore::app()->activityReport->addLog(
-                'zoneclearFeedServer',
-                'updatefeedinfo',
-                $logs
-            );
-        }
-    }
-
-    public static function updFeedRecord($cur, $id)
-    {
-        if (!defined('DC_CONTEXT_ADMIN')) {
-            $zc = new zoneclearFeedServer();
-            $rs = $zc->getFeeds(['feed_id' => $id]);
-
-            $logs = [
-                $rs->feed_name,
-            ];
-
-            dcCore::app()->activityReport->addLog(
-                'zoneclearFeedServer',
-                'updatefeedrecords',
-                $logs
-            );
-        }
-    }
-
-    public static function delFeed($id)
-    {
-        $zc = new zoneclearFeedServer();
-        $rs = $zc->getFeeds(['feed_id' => $id]);
-
-        $logs = [
-            $rs->feed_name,
-            $rs->feed_feed,
-            dcCore::app()->auth->getInfo('user_cn'),
-        ];
-
-        dcCore::app()->activityReport->addLog(
-            'zoneclearFeedServer',
-            'delete',
-            $logs
-        );
-    }
-
-    public static function enableFeed($id, $enable, $time)
-    {
-        $zc = new zoneclearFeedServer();
-        $rs = $zc->getFeeds(['feed_id' => $id]);
-
-        $logs = [
-            $rs->feed_name,
-            $rs->feed_feed,
-            $enable ? 'enable' : 'disable',
-        ];
-
-        dcCore::app()->activityReport->addLog(
-            'zoneclearFeedServer',
-            'status',
-            $logs
+                dcCore::app()->activityReport->addLog(
+                    'zoneclearFeedServer',
+                    'status',
+                    $logs
+                );
+            }
         );
     }
 }
