@@ -427,7 +427,7 @@ class zoneclearFeedServer
         }
 
         # Set feeds user
-        $this->enableUser($s->zoneclearFeedServer_user);
+        $this->enableUser(true);
 
         $updates  = false;
         $loop_mem = [];
@@ -708,14 +708,17 @@ class zoneclearFeedServer
     {
         # Enable
         if ($enable) {
+            // backup current user
             $this->user = dcCore::app()->auth->userID();
-            if (!dcCore::app()->auth->checkUser($this->user ?? '')) {
+            // set zcfs posts user
+            if (!dcCore::app()->auth->checkUser((string) dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)))->zoneclearFeedServer_user)) {
                 throw new Exception('Unable to set user');
             }
         # Disable
         } else {
             dcCore::app()->auth = null;
             dcCore::app()->auth = new dcAuth();
+            // restore current user
             dcCore::app()->auth->checkUser($this->user ?? '');
         }
     }
