@@ -53,8 +53,9 @@ class zcfsRsExtPosts extends rsExtPost
      */
     public static function zcFeedBrother($type, $args)
     {
-        if (!empty($GLOBALS['beforeZcFeedRsExt'][$type])) {
-            $func = $GLOBALS['beforeZcFeedRsExt'][$type];
+        $ext = dcCore::app()->__get('beforeZcFeedRsExt');
+        if (null !== $ext && !empty($ext[$type])) {
+            $func = $ext[$type];
         } elseif (is_callable('rsExtPostPublic', $type)) {
             $func = ['rsExtPostPublic', $type];
         } else {

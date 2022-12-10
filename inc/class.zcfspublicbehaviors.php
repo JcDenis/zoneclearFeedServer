@@ -28,7 +28,7 @@ class zcfsPublicBehaviors
      */
     public static function coreBlogGetPosts(dcRecord $rs)
     {
-        $GLOBALS['beforeZcFeedRsExt'] = $rs->extensions();
+        dcCore::app()->__set('beforeZcFeedRsExt', $rs->extensions());
         $rs->extend('zcfsRsExtPosts');
     }
 
