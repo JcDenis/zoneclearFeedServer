@@ -17,7 +17,7 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 try {
     # Check module version
     if (!dcCore::app()->newVersion(
-        basename(__DIR__), 
+        basename(__DIR__),
         dcCore::app()->plugins->moduleInfo(basename(__DIR__), 'version')
     )) {
         return null;

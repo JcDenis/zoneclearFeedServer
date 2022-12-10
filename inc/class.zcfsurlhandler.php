@@ -46,7 +46,7 @@ class zcfsUrlHandler extends dcUrlHandlers
                     $zc = new zoneclearFeedServer();
                     if ($zc->checkFeedsUpdate()) {
                         $msg = sprintf(
-                            '<status>%s</status><message>s%</message>',
+                            '<status>%s</status><message>%s</message>',
                             'ok',
                             'Feeds updated successfully'
                         );
@@ -56,7 +56,7 @@ class zcfsUrlHandler extends dcUrlHandlers
             }
             if (empty($msg)) {
                 $msg = sprintf(
-                    '<status>%s</status><message>s%</message>',
+                    '<status>%s</status><message>%s</message>',
                     'failed',
                     'Failed to update feeds'
                 );

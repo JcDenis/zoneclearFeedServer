@@ -308,7 +308,7 @@ if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServe
     # display
     echo
     '<html><head><title>' . __('Feeds server') . '</title>' .
-    ($feed_id && !dcCore::app()->error->flag() ?
+    ($feed_id && isset($post_filter) && !dcCore::app()->error->flag() ?
         $post_filter->js(dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), ['part' => 'feed', 'feed_id' => $feed_id], '&') . '#entries') .
         dcPage::jsLoad(dcPage::getPF(basename(__DIR__) . '/js/list.js'))
     : '') .
@@ -438,7 +438,7 @@ if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServe
     }
 
     # entries
-    if ($feed_id && $can_view_page && !dcCore::app()->error->flag()) {
+    if ($feed_id && $can_view_page && isset($post_filter) && isset($post_list) && isset($posts_actions_page) && !dcCore::app()->error->flag()) {
         echo '<div class="multi-part" title="' . __('Entries') . '" id="entries">';
 
         # show filters
@@ -531,34 +531,37 @@ if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServe
         __('Plugins')      => '',
         __('Feeds server') => '',
     ]) .
-    dcPage::notices() .
+    dcPage::notices();
 
-    '<p class="top-add">' .
-    '<a class="button add" href="' . dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), ['part' => 'feed']) . '">' .
-    __('New feed') . '</a></p>';
+    if (isset($feeds_list)) {
+        echo
+        '<p class="top-add">' .
+        '<a class="button add" href="' . dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), ['part' => 'feed']) . '">' .
+        __('New feed') . '</a></p>';
 
-    $feeds_filter->display(
-        'admin.plugin.' . basename(__DIR__),
-        dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . basename(__DIR__), ['part' => 'feeds'])
-    );
+        $feeds_filter->display(
+            'admin.plugin.' . basename(__DIR__),
+            dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . basename(__DIR__), ['part' => 'feeds'])
+        );
 
-    $feeds_list->feedsDisplay(
-        $feeds_filter->page,
-        $feeds_filter->nb,
-        '<form action="' . dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), ['part' => 'feeds']) . '" method="post" id="form-actions">' .
-        '%s' .
-        '<div class="two-cols">' .
-        '<p class="col checkboxes-helpers"></p>' .
-        '<p class="col right">' . __('Selected feeds action:') . ' ' .
-        form::combo(['action'], $feeds_actions_page->getCombo()) .
-        '<input type="submit" value="' . __('ok') . '" />' .
-        dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . basename(__DIR__), $feeds_filter->values(true)) .
-        dcCore::app()->formNonce() .
-        '</p>' .
-        '</div>' .
-        '</form>',
-        $feeds_filter->show()
-    );
+        $feeds_list->feedsDisplay(
+            $feeds_filter->page,
+            $feeds_filter->nb,
+            '<form action="' . dcCore::app()->adminurl->get('admin.plugin.' . basename(__DIR__), ['part' => 'feeds']) . '" method="post" id="form-actions">' .
+            '%s' .
+            '<div class="two-cols">' .
+            '<p class="col checkboxes-helpers"></p>' .
+            '<p class="col right">' . __('Selected feeds action:') . ' ' .
+            form::combo(['action'], $feeds_actions_page->getCombo()) .
+            '<input type="submit" value="' . __('ok') . '" />' .
+            dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . basename(__DIR__), $feeds_filter->values(true)) .
+            dcCore::app()->formNonce() .
+            '</p>' .
+            '</div>' .
+            '</form>',
+            $feeds_filter->show()
+        );
+    }
 }
 
 echo '</body></html>';

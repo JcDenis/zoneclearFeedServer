@@ -709,7 +709,7 @@ class zoneclearFeedServer
         # Enable
         if ($enable) {
             $this->user = dcCore::app()->auth->userID();
-            if (!dcCore::app()->auth->checkUser($enable)) {
+            if (!dcCore::app()->auth->checkUser($this->user ?? '')) {
                 throw new Exception('Unable to set user');
             }
         # Disable
@@ -724,7 +724,7 @@ class zoneclearFeedServer
      * Read and parse external feeds.
      *
      * @param  string      $f Feed URL
-     * @return arrayObject    Parsed feed
+     * @return feedParser|false    Parsed feed
      */
     public static function readFeed($f)
     {
@@ -737,7 +737,7 @@ class zoneclearFeedServer
 
             return $feed_reader->parse($f);
         } catch (Exception $e) {
-            return null;
+            return false;
         }
     }
 
@@ -909,7 +909,9 @@ class zoneclearFeedServer
      */
     public static function tweakurlsAfterPostCreate(cursor $cur, $id)
     {
-        $cur->post_url = tweakUrls::tweakBlogURL($cur->post_url);
-        dcCore::app()->auth->sudo([dcCore::app()->blog, 'updPost'], $id, $cur);
+        if (version_compare(dcCore::app()->plugins->moduleInfo('tweakurls', 'version'), '0.8', '>=')) {
+            $cur->post_url = tweakUrls::tweakBlogURL($cur->post_url);
+            dcCore::app()->auth->sudo([dcCore::app()->blog, 'updPost'], $id, $cur);
+        }
     }
 }

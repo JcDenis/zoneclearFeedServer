@@ -43,7 +43,7 @@ class zcfsPublicBehaviors
             return null;
         }
 
-        self::publicDocument();
+        self::publicDocumentV2();
     }
 
     /**

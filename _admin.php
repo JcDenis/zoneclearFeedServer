@@ -48,9 +48,7 @@ if (dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer
     }
 
     # Take care about tweakurls (thanks Mathieu M.)
-    if (version_compare(dcCore::app()->plugins->moduleInfo('tweakurls', 'version'), '0.8', '>=')) {
-        dcCore::app()->addbehavior('zcfsAfterPostCreate', ['zoneclearFeedServer', 'tweakurlsAfterPostCreate']);
-    }
+    dcCore::app()->addbehavior('zcfsAfterPostCreate', ['zoneclearFeedServer', 'tweakurlsAfterPostCreate']);
 }
 
 # Delete related info about feed post in meta table

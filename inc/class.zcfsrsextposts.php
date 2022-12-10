@@ -56,7 +56,7 @@ class zcfsRsExtPosts extends rsExtPost
         $ext = dcCore::app()->__get('beforeZcFeedRsExt');
         if (null !== $ext && !empty($ext[$type])) {
             $func = $ext[$type];
-        } elseif (is_callable('rsExtPostPublic', $type)) {
+        } elseif (is_callable(['rsExtPostPublic', $type])) {
             $func = ['rsExtPostPublic', $type];
         } else {
             $func = ['rsExtPost', $type];
@@ -117,7 +117,7 @@ class zcfsRsExtPosts extends rsExtPost
     /**
      * Get post content from post to feed.
      *
-     * @param  record $rs record instance
+     * @param  dcRecord $rs record instance
      * @return string     Post content
      */
     public static function getContent(dcRecord $rs, bool $absolute_urls = false): string
