@@ -160,7 +160,7 @@ if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServe
             $feed_lang     = $_POST['feed_lang'];
             $feed_tags     = $_POST['feed_tags'];
             $feed_get_tags = empty($_POST['feed_get_tags']) ? 0 : 1;
-            $feed_cat_id   = $_POST['feed_cat_id'];
+            $feed_cat_id   = $_POST['feed_cat_id'] !== '' ? $_POST['feed_cat_id'] : null;
             $feed_upd_int  = $_POST['feed_upd_int'];
             if (isset($_POST['feed_status'])) {
                 $feed_status = (int) $_POST['feed_status'];
@@ -185,8 +185,7 @@ if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServe
             if (!zoneclearFeedServer::validateURL($feed_feed)) {
                 throw new Exception(__('You must provide valid feed URL.'));
             }
-            $get_feed_cat_id = dcCore::app()->blog->getCategory($feed_cat_id);
-            if ($feed_cat_id != '' && !$get_feed_cat_id) {
+            if (null === $feed_cat_id && !dcCore::app()->blog->getCategory((int) $feed_cat_id)) {
                 throw new Exception(__('You must provide valid category.'));
             }
         } catch (Exception $e) {
@@ -205,7 +204,7 @@ if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServe
         $cur->feed_lang     = $feed_lang;
         $cur->feed_tags     = $feed_tags;
         $cur->feed_get_tags = (int) $feed_get_tags;
-        $cur->cat_id        = $feed_cat_id != '' ? (int) $feed_cat_id : null;
+        $cur->cat_id        = null === $feed_cat_id ? null : (int) $feed_cat_id;
         $cur->feed_status   = (int) $feed_status;
         $cur->feed_upd_int  = (int) $feed_upd_int;
 
