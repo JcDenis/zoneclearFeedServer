@@ -14,8 +14,10 @@ if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
 
-if (dcCore::app()->getVersion('zoneclearFeedServer') != dcCore::app()->plugins->moduleInfo('zoneclearFeedServer', 'version')
-) {
+if (0 !== dcCore::app()->testVersion(
+    basename(__DIR__), 
+    dcCore::app()->plugins->moduleInfo(basename(__DIR__), 'version')
+)) {
     return null;
 }
 
