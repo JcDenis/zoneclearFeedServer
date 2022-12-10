@@ -15,7 +15,7 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 }
 
 if (0 !== dcCore::app()->testVersion(
-    basename(__DIR__), 
+    basename(__DIR__),
     dcCore::app()->plugins->moduleInfo(basename(__DIR__), 'version')
 )) {
     return null;
@@ -270,7 +270,7 @@ if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServe
         }
 
         # filters
-        $post_filter = new adminZcfsPostFilter();
+        $post_filter = new zcfsPostFilter();
         $post_filter->add('part', 'feed');
         $post_filter->add('feed_id', $feed_id);
         $params = $post_filter->params();
@@ -487,7 +487,7 @@ if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServe
 ############################################################
 } else {
     # actions
-    $feeds_actions_page = new zcfsFeedsActionsPage(
+    $feeds_actions_page = new zcfsFeedsActions(
         'plugin.php',
         ['p' => basename(__DIR__), 'part' => 'feeds']
     );

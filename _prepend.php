@@ -15,12 +15,18 @@ if (!defined('DC_RC_PATH')) {
 }
 
 Clearbricks::lib()->autoload([
-    'zoneclearFeedServer'     => __DIR__ . '/inc/class.zoneclear.feed.server.php',
-    'zcfsFeedsList'           => __DIR__ . '/inc/lib.zcfs.list.php',
-    'zcfsEntriesList'         => __DIR__ . '/inc/lib.zcfs.list.php',
-    'adminZcfsPostFilter'     => __DIR__ . '/inc/lib.zcfs.list.php',
-    'zcfsFeedsActionsPage'    => __DIR__ . '/inc/class.zcfs.feedsactions.php',
-    'zcfsDefaultFeedsActions' => __DIR__ . '/inc/class.zcfs.feedsactions.php',
+    'zoneclearFeedServer'         => __DIR__ . '/inc/class.zoneclearfeedserver.php',
+    'zcfsAdminBehaviors'          => __DIR__ . '/inc/class.zcfsadminbehaviors.php',
+    'zcfsPostFilter'              => __DIR__ . '/inc/class.zcfspostfilter.php',
+    'zcfsEntriesList'             => __DIR__ . '/inc/class.zcfsentrieslist.php',
+    'zcfsFeedsList'               => __DIR__ . '/inc/class.zcfsfeedslist.php',
+    'zcfsFeedsActions'            => __DIR__ . '/inc/class.zcfsfeedsactions.php',
+    'zcfsDefaultFeedsActions'     => __DIR__ . '/inc/class.zcfsdefaultfeedsactions.php',
+    'zcfsTemplate'                => __DIR__ . '/inc/class.zcfstemplate.php',
+    'zcfsPublicBehaviors'         => __DIR__ . '/inc/class.zcfspublicbehaviors.php',
+    'zcfsRsExtPosts'              => __DIR__ . '/inc/class.zcfsrsextposts.php',
+    'zcfsUrlHandler'              => __DIR__ . '/inc/class.zcfsurlhandler.php',
+    'zcfsActivityReportBehaviors' => __DIR__ . '/inc/class.zcfsactivityreportbehaviors.php',
 ]);
 
 // public url for page of description of the flux
@@ -33,5 +39,5 @@ dcCore::app()->url->register(
 
 // Add to report on plugin activityReport
 if (defined('ACTIVITY_REPORT_V2')) {
-    require_once __DIR__ . '/inc/lib.zcfs.activityreport.php';
+    zcfsActivityReportBehaviors::init();
 }
