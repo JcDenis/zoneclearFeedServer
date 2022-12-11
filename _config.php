@@ -27,8 +27,8 @@ $bhv_pub_upd      = (int) $s->bhv_pub_upd;
 $update_limit     = (int) $s->update_limit;
 $keep_empty_feed  = (bool) $s->keep_empty_feed;
 $tag_case         = (int) $s->tag_case;
-$post_full_tpl    = @unserialize($s->post_full_tpl);
-$post_title_redir = @unserialize($s->post_title_redir);
+$post_full_tpl    = json_decode($s->post_full_tpl);
+$post_title_redir = json_decode($s->post_title_redir);
 $feeduser         = (string) $s->user;
 
 if ($update_limit < 1) {
@@ -68,8 +68,8 @@ if (!empty($_POST['save'])) {
         $s->put('update_limit', $limit);
         $s->put('keep_empty_feed', $keep_empty_feed);
         $s->put('tag_case', $tag_case);
-        $s->put('post_full_tpl', serialize($post_full_tpl));
-        $s->put('post_title_redir', serialize($post_title_redir));
+        $s->put('post_full_tpl', json_encode($post_full_tpl));
+        $s->put('post_title_redir', json_encode($post_title_redir));
         $s->put('user', $feeduser);
 
         dcCore::app()->blog->triggerBlog();
