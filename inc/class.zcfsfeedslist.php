@@ -50,12 +50,12 @@ class zcfsFeedsList extends adminGenericList
                 ) . '</caption>';
 
             $cols = [
-                'title'   => '<th colspan="2" class="first">' . __('Name') . '</th>',
-                'desc'    => '<th scope="col">' . __('Feed') . '</th>',
-                'period'  => '<th scope="col">' . __('Frequency') . '</th>',
-                'update'  => '<th scope="col">' . __('Last update') . '</th>',
-                'entries' => '<th scope="col">' . __('Entries') . '</th>',
-                'status'  => '<th scope="col">' . __('Status') . '</th>',
+                'title'   => '<th colspan="2" class="first nowrap">' . __('Name') . '</th>',
+                'desc'    => '<th class="nowrap" scope="col">' . __('Feed') . '</th>',
+                'period'  => '<th class="nowrap" scope="col">' . __('Frequency') . '</th>',
+                'update'  => '<th class="nowrap" scope="col">' . __('Last update') . '</th>',
+                'entries' => '<th class="nowrap" scope="col">' . __('Entries') . '</th>',
+                'status'  => '<th class="nowrap" scope="col">' . __('Status') . '</th>',
             ];
             $cols = new ArrayObject($cols);
 
