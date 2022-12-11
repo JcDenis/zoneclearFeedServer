@@ -3,6 +3,18 @@
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
 
+- fix posts owner on feeds update
+- fix permissions 
+- enhance feed update
+- use constant for table name
+- use new behaviors names
+- use dc methods in widget
+- use abstract plugin name
+- split file by class
+- clean prepend file
+- clean install file
+- update translation
+
 2022.11.26
 - use SVG icon
 - fix missing dcCore (resources)

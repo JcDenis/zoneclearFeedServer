@@ -82,7 +82,7 @@ if (!isset($opts['u']) || !dcCore::app()->auth->checkUser($opts['u'])) {
 
 dcCore::app()->plugins->loadModules(DC_PLUGINS_ROOT);
 
-dcCore::app()->blog->settings->addNamespace('zoneclearFeedServer');
+dcCore::app()->blog->settings->addNamespace(basename(__DIR__));
 
 try {
     $zc = new zoneclearFeedServer();

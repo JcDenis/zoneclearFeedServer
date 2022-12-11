@@ -22,8 +22,8 @@ $perm = dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
     dcAuth::PERMISSION_CONTENT_ADMIN,
 ]), dcCore::app()->blog->id);
 
-if (dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_active
-    && '' != dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_user
+if (dcCore::app()->blog->settings->__get(basename(__DIR__))->active
+    && '' != dcCore::app()->blog->settings->__get(basename(__DIR__))->user
 ) {
     dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
         __('Feeds server'),

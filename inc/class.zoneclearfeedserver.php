@@ -398,7 +398,7 @@ class zoneclearFeedServer
         $s = dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)));
 
         # Not configured
-        if (!$s->zoneclearFeedServer_active || !$s->zoneclearFeedServer_user) {
+        if (!$s->active || !$s->user) {
             return false;
         }
 
@@ -426,11 +426,11 @@ class zoneclearFeedServer
             return false;
         }
 
-        $enabled = false;
+        $enabled  = false;
         $updates  = false;
         $loop_mem = [];
 
-        $limit = abs((int) $s->zoneclearFeedServer_update_limit);
+        $limit = abs((int) $s->update_limit);
         if ($limit < 1) {
             $limit = 10;
         }
@@ -441,7 +441,7 @@ class zoneclearFeedServer
 
         while ($f->fetch()) {
             # Check if feed need update
-            if ($id 
+            if ($id
              || $i < $limit && $f->feed_status == 1 && ($time > $f->feed_upd_last + $f->feed_upd_int)
             ) {
                 if (!$enabled) {
@@ -455,7 +455,7 @@ class zoneclearFeedServer
                 # Nothing to parse
                 if (!$feed) {
                     # Keep active empty feed or disable it ?
-                    if (!$s->zoneclearFeedServer_keep_empty_feed) {
+                    if (!$s->keep_empty_feed) {
                         $this->enableFeed($f->feed_id, false);
                     } else {
                         # Set update time of this feed
@@ -533,7 +533,7 @@ class zoneclearFeedServer
                                 # Post
                                 $cur_post->user_id           = dcCore::app()->auth->userID();
                                 $cur_post->post_format       = 'xhtml';
-                                $cur_post->post_status       = (int) $s->zoneclearFeedServer_post_status_new;
+                                $cur_post->post_status       = (int) $s->post_status_new;
                                 $cur_post->post_open_comment = 0;
                                 $cur_post->post_open_tb      = 0;
 
@@ -646,7 +646,7 @@ class zoneclearFeedServer
                             $formated_tags = [];
                             foreach ($tags as $tag) {
                                 # Change tags case
-                                switch ((int) $s->zoneclearFeedServer_tag_case) {
+                                switch ((int) $s->tag_case) {
                                     case 3: $tag = strtoupper($tag);
 
                                         break;
@@ -716,7 +716,7 @@ class zoneclearFeedServer
             // backup current user
             $this->user = dcCore::app()->auth->userID();
             // set zcfs posts user
-            if (!dcCore::app()->auth->checkUser((string) dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)))->zoneclearFeedServer_user)) {
+            if (!dcCore::app()->auth->checkUser((string) dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)))->user)) {
                 throw new Exception('Unable to set user');
             }
         # Disable

@@ -32,14 +32,14 @@ class zcfsUrlHandler extends dcUrlHandlers
         $s = dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)));
 
         # Not active
-        if (!$s->zoneclearFeedServer_active) {
+        if (!$s->active) {
             self::p404();
 
             return null;
         }
 
         # Update feeds (from ajax or other post resquest)
-        if ($args == '/zcfsupd' && 3 == $s->zoneclearFeedServer_bhv_pub_upd) {
+        if ($args == '/zcfsupd' && 3 == $s->bhv_pub_upd) {
             $msg = '';
             if (!empty($_POST['blogId']) && html::escapeJS(dcCore::app()->blog->id) == $_POST['blogId']) {
                 try {
@@ -72,7 +72,7 @@ class zcfsUrlHandler extends dcUrlHandlers
             exit(1);
 
         # Server js
-        } elseif ($args == '/zcfsupd.js' && 3 == $s->zoneclearFeedServer_bhv_pub_upd) {
+        } elseif ($args == '/zcfsupd.js' && 3 == $s->bhv_pub_upd) {
             dcCore::app()->tpl->setPath(dcCore::app()->tpl->getPath(), __DIR__ . '/default-templates');
             self::serveDocument(
                 'zcfsupd.js',
@@ -82,7 +82,7 @@ class zcfsUrlHandler extends dcUrlHandlers
             );
 
         # Server feeds description page
-        } elseif (in_array($args, ['', '/']) && $s->zoneclearFeedServer_pub_active) {
+        } elseif (in_array($args, ['', '/']) && $s->pub_active) {
             $tplset = dcCore::app()->themes->moduleInfo(dcCore::app()->blog->settings->system->theme, 'tplset');
             $path   = __DIR__ . '/default-templates/';
             if (!empty($tplset) && is_dir($path . $tplset)) {

@@ -42,7 +42,7 @@ Once it's done you can manage your feeds from menu
 
 ## CONTRIBUTORS
 
- * Jean-Christian Denis
+ * Jean-Christian Denis (author)
  * BG
  * Pierre Van Glabeke
 

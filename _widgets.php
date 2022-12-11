@@ -152,7 +152,7 @@ class zoneclearFeedServerWidget
             return null;
         }
 
-        if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_active
+        if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->active
             || !$w->checkHomeOnly(dcCore::app()->url->type)
         ) {
             return null;
@@ -184,7 +184,7 @@ class zoneclearFeedServerWidget
             $i++;
         }
         $pub = '';
-        if ($w->pagelink && dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_pub_active) {
+        if ($w->pagelink && dcCore::app()->blog->settings->__get(basename(__DIR__))->pub_active) {
             $pub = sprintf(
                 '<p><strong><a href="%s">%s</a></strong></p>',
                 dcCore::app()->blog->url . dcCore::app()->url->getBase('zoneclearFeedsPage'),
@@ -212,7 +212,7 @@ class zoneclearFeedServerWidget
             return;
         }
 
-        if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_active
+        if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->active
             || !$w->checkHomeOnly(dcCore::app()->url->type)
         ) {
             return null;
@@ -232,7 +232,7 @@ class zoneclearFeedServerWidget
 
             $text = $count ? sprintf(__('one source', '%d sources', $count), $count) : __('no sources');
 
-            if (dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_pub_active) {
+            if (dcCore::app()->blog->settings->__get(basename(__DIR__))->pub_active) {
                 $text = sprintf(
                     '<a href="%s">%s</a>',
                     dcCore::app()->blog->url . dcCore::app()->url->getBase('zoneclearFeedsPage'),

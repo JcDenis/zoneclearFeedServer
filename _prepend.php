@@ -27,6 +27,7 @@ Clearbricks::lib()->autoload([
     'zcfsRsExtPosts'              => __DIR__ . '/inc/class.zcfsrsextposts.php',
     'zcfsUrlHandler'              => __DIR__ . '/inc/class.zcfsurlhandler.php',
     'zcfsActivityReportBehaviors' => __DIR__ . '/inc/class.zcfsactivityreportbehaviors.php',
+    'zcfsUpgrade'                 => __DIR__ . '/inc/class.zcfsupgrade.php',
 ]);
 
 // public url for page of description of the flux

@@ -15,7 +15,7 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 }
 
 try {
-    # Check module version
+    // Check module version
     if (!dcCore::app()->newVersion(
         basename(__DIR__),
         dcCore::app()->plugins->moduleInfo(basename(__DIR__), 'version')
@@ -23,7 +23,10 @@ try {
         return null;
     }
 
-    # Tables
+    // Upgrade existing install
+    zcfsUpgrade::preUpgrade();
+
+    // Tables
     $t = new dbStruct(dcCore::app()->con, dcCore::app()->prefix);
     $t->{initZoneclearFeedServer::TABLE_NAME}
         ->feed_id('bigint', 0, false)
@@ -54,19 +57,19 @@ try {
     $ti      = new dbStruct(dcCore::app()->con, dcCore::app()->prefix);
     $changes = $ti->synchronize($t);
 
-    # Settings
+    // Settings
     dcCore::app()->blog->settings->addNamespace(basename(__DIR__));
     $s = dcCore::app()->blog->settings->__get(basename(__DIR__));
-    $s->put('zoneclearFeedServer_active', false, 'boolean', 'Enable zoneclearBlogServer', false, true);
-    $s->put('zoneclearFeedServer_pub_active', false, 'boolean', 'Enable public page of list of feeds', false, true);
-    $s->put('zoneclearFeedServer_post_status_new', true, 'boolean', 'Enable auto publish new posts', false, true);
-    $s->put('zoneclearFeedServer_bhv_pub_upd', 2, 'string', 'Auto update on public side (disable/before/after)', false, true);
-    $s->put('zoneclearFeedServer_update_limit', 1, 'integer', 'Number of feeds to update at one time', false, true);
-    $s->put('zoneclearFeedServer_keep_empty_feed', false, 'boolean', 'Keep active empty feeds', false, true);
-    $s->put('zoneclearFeedServer_tag_case', 0, 'integer', 'How to transform imported tags', false, true);
-    $s->put('zoneclearFeedServer_user', '', 'string', 'User id that has right on post', false, true);
-    $s->put('zoneclearFeedServer_post_full_tpl', serialize(['post', 'category', 'tag', 'archive']), 'string', 'List of templates types for full feed', false, true);
-    $s->put('zoneclearFeedServer_post_title_redir', serialize(['feed']), 'string', 'List of templates types for redirection to original post', false, true);
+    $s->put('active', false, 'boolean', 'Enable zoneclearBlogServer', false, true);
+    $s->put('pub_active', false, 'boolean', 'Enable public page of list of feeds', false, true);
+    $s->put('post_status_new', true, 'boolean', 'Enable auto publish new posts', false, true);
+    $s->put('bhv_pub_upd', 2, 'string', 'Auto update on public side (disable/before/after)', false, true);
+    $s->put('update_limit', 1, 'integer', 'Number of feeds to update at one time', false, true);
+    $s->put('keep_empty_feed', false, 'boolean', 'Keep active empty feeds', false, true);
+    $s->put('tag_case', 0, 'integer', 'How to transform imported tags', false, true);
+    $s->put('user', '', 'string', 'User id that has right on post', false, true);
+    $s->put('post_full_tpl', serialize(['post', 'category', 'tag', 'archive']), 'string', 'List of templates types for full feed', false, true);
+    $s->put('post_title_redir', serialize(['feed']), 'string', 'List of templates types for redirection to original post', false, true);
 
     return true;
 } catch (Exception $e) {

@@ -28,8 +28,8 @@ dcPage::check(dcCore::app()->auth->makePermissions([
 $zcfs = new zoneclearFeedServer();
 
 # Not configured
-if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_active
-    || !dcCore::app()->blog->settings->__get(basename(__DIR__))->zoneclearFeedServer_user
+if (!dcCore::app()->blog->settings->__get(basename(__DIR__))->active
+    || !dcCore::app()->blog->settings->__get(basename(__DIR__))->user
 ) {
     echo
     '<html><head><title>' . __('Feeds server') . '</title></head><body>' .

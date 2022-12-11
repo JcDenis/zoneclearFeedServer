@@ -23,14 +23,14 @@ require_once __DIR__ . '/_widgets.php';
 
 dcCore::app()->addBehavior('coreBlogGetPosts', ['zcfsPublicBehaviors', 'coreBlogGetPosts']);
 
-if (!$s->zoneclearFeedServer_active) {
+if (!$s->active) {
     return null;
 }
-if (1 == $s->zoneclearFeedServer_bhv_pub_upd) {
+if (1 == $s->bhv_pub_upd) {
     dcCore::app()->addBehavior('publicBeforeDocumentV2', ['zcfsPublicBehaviors', 'publicDocumentV2']);
-} elseif (2 == $s->zoneclearFeedServer_bhv_pub_upd) {
+} elseif (2 == $s->bhv_pub_upd) {
     dcCore::app()->addBehavior('publicAfterDocumentV2', ['zcfsPublicBehaviors', 'publicAfterDocumentV2']);
-} elseif (3 == $s->zoneclearFeedServer_bhv_pub_upd) {
+} elseif (3 == $s->bhv_pub_upd) {
     dcCore::app()->addBehavior('publicHeadContent', ['zcfsPublicBehaviors', 'publicHeadContent']);
 }
 

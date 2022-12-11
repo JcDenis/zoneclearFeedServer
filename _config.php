@@ -20,16 +20,16 @@ $redir = empty($_REQUEST['redir']) ? dcCore::app()->admin->list->getURL() . '#pl
 dcCore::app()->blog->settings->addNamespace(basename(__DIR__));
 $s = dcCore::app()->blog->settings->__get(basename(__DIR__));
 
-$active           = (bool) $s->zoneclearFeedServer_active;
-$pub_active       = (bool) $s->zoneclearFeedServer_pub_active;
-$post_status_new  = (bool) $s->zoneclearFeedServer_post_status_new;
-$bhv_pub_upd      = (int) $s->zoneclearFeedServer_bhv_pub_upd;
-$update_limit     = (int) $s->zoneclearFeedServer_update_limit;
-$keep_empty_feed  = (bool) $s->zoneclearFeedServer_keep_empty_feed;
-$tag_case         = (int) $s->zoneclearFeedServer_tag_case;
-$post_full_tpl    = @unserialize($s->zoneclearFeedServer_post_full_tpl);
-$post_title_redir = @unserialize($s->zoneclearFeedServer_post_title_redir);
-$feeduser         = (string) $s->zoneclearFeedServer_user;
+$active           = (bool) $s->active;
+$pub_active       = (bool) $s->pub_active;
+$post_status_new  = (bool) $s->post_status_new;
+$bhv_pub_upd      = (int) $s->bhv_pub_upd;
+$update_limit     = (int) $s->update_limit;
+$keep_empty_feed  = (bool) $s->keep_empty_feed;
+$tag_case         = (int) $s->tag_case;
+$post_full_tpl    = @unserialize($s->post_full_tpl);
+$post_title_redir = @unserialize($s->post_title_redir);
+$feeduser         = (string) $s->user;
 
 if ($update_limit < 1) {
     $update_limit = 10;
@@ -61,16 +61,16 @@ if (!empty($_POST['save'])) {
             $limit = 10;
         }
 
-        $s->put('zoneclearFeedServer_active', $active);
-        $s->put('zoneclearFeedServer_pub_active', $pub_active);
-        $s->put('zoneclearFeedServer_post_status_new', $post_status_new);
-        $s->put('zoneclearFeedServer_bhv_pub_upd', $bhv_pub_upd);
-        $s->put('zoneclearFeedServer_update_limit', $limit);
-        $s->put('zoneclearFeedServer_keep_empty_feed', $keep_empty_feed);
-        $s->put('zoneclearFeedServer_tag_case', $tag_case);
-        $s->put('zoneclearFeedServer_post_full_tpl', serialize($post_full_tpl));
-        $s->put('zoneclearFeedServer_post_title_redir', serialize($post_title_redir));
-        $s->put('zoneclearFeedServer_user', $feeduser);
+        $s->put('active', $active);
+        $s->put('pub_active', $pub_active);
+        $s->put('post_status_new', $post_status_new);
+        $s->put('bhv_pub_upd', $bhv_pub_upd);
+        $s->put('update_limit', $limit);
+        $s->put('keep_empty_feed', $keep_empty_feed);
+        $s->put('tag_case', $tag_case);
+        $s->put('post_full_tpl', serialize($post_full_tpl));
+        $s->put('post_title_redir', serialize($post_title_redir));
+        $s->put('user', $feeduser);
 
         dcCore::app()->blog->triggerBlog();
 
@@ -124,7 +124,7 @@ __('Enable plugin') . '</label></p>
 
 <div class="fieldset">';
 
-if ($s->zoneclearFeedServer_pub_active) {
+if ($s->pub_active) {
     echo sprintf(
         '<p><a class="onblog_link outgoing" href="%s" title="%s">%s <img alt="" src="images/outgoing-link.svg"></a></p>',
         $pub_page_url,
