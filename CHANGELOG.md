@@ -3,7 +3,9 @@
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
 
+2022.12.11
 - fix posts owner on feeds update
+- fix category type
 - fix permissions 
 - enhance feed update
 - use constant for table name
@@ -13,6 +15,8 @@
 - split file by class
 - clean prepend file
 - clean install file
+- update settings ids to shorter ones
+- update settings to json rather than serialise
 - update translation
 
 2022.11.26
