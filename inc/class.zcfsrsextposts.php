@@ -106,7 +106,7 @@ class zcfsRsExtPosts extends rsExtPost
     public static function getURL(dcRecord $rs): string
     {
         $url   = $rs->zcFeed('url');
-        $types = @unserialize(dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)))->post_title_redir);
+        $types = json_decode(dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)))->post_title_redir);
         $full  = is_array($types) && in_array(dcCore::app()->url->type, $types);
 
         return $url && $full ?
@@ -127,7 +127,7 @@ class zcfsRsExtPosts extends rsExtPost
         $content  = self::zcFeedBrother('getContent', [&$rs, $absolute_urls]);
 
         if ($url && $sitename && $rs->post_type == 'post') {
-            $types = @unserialize(dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)))->post_full_tpl);
+            $types = json_decode(dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)))->post_full_tpl);
 
             if (is_array($types) && in_array(dcCore::app()->url->type, $types)) {
                 return $content . sprintf(

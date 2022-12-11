@@ -68,8 +68,8 @@ try {
     $s->put('keep_empty_feed', false, 'boolean', 'Keep active empty feeds', false, true);
     $s->put('tag_case', 0, 'integer', 'How to transform imported tags', false, true);
     $s->put('user', '', 'string', 'User id that has right on post', false, true);
-    $s->put('post_full_tpl', serialize(['post', 'category', 'tag', 'archive']), 'string', 'List of templates types for full feed', false, true);
-    $s->put('post_title_redir', serialize(['feed']), 'string', 'List of templates types for redirection to original post', false, true);
+    $s->put('post_full_tpl', json_encode(['post', 'category', 'tag', 'archive']), 'string', 'List of templates types for full feed', false, true);
+    $s->put('post_title_redir', json_encode(['feed']), 'string', 'List of templates types for redirection to original post', false, true);
 
     return true;
 } catch (Exception $e) {
