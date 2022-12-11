@@ -18,15 +18,10 @@ class zcfsUpgrade
 {
     public static function preUpgrade()
     {
-        //$current = dcCore::app()->plugins->moduleInfo(basename(dirname('../' . __DIR__)), 'version');
         $current = dcCore::app()->getVersion(basename(dirname('../' . __DIR__)));
         if ($current && version_compare($current, '2022.12.10', '<')) {
             self::preUpgrade20221210();
         }
-    }
-
-    public static function postUpgrade()
-    {
     }
 
     protected static function preUpgrade20221210()
@@ -51,10 +46,10 @@ class zcfsUpgrade
             $cur->update("WHERE setting_id = '" . $old . "' and setting_ns = 'zoneclearFeedServer' ");
         }
 
-        // use json rather than serialise
+        // use json rather than serialise for settings array
         $setting_values = [
             'post_full_tpl'    => ['post', 'category', 'tag', 'archive'],
-            'post_title_redir' => ['feed']
+            'post_title_redir' => ['feed'],
         ];
 
         $record = dcCore::app()->con->select(
@@ -62,8 +57,8 @@ class zcfsUpgrade
             "WHERE setting_ns = '" . dcCore::app()->con->escape(basename(dirname('../' . __DIR__))) . "' "
         );
 
-        while($record->fetch()) {
-            foreach($setting_values as $key => $default) {
+        while ($record->fetch()) {
+            foreach ($setting_values as $key => $default) {
                 try {
                     $value = @unserialize($record->__get($key));
                 } catch(Exception) {
@@ -73,7 +68,7 @@ class zcfsUpgrade
                 $cur                = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
                 $cur->setting_value = json_encode(!is_array($value) ? $default : $value);
                 $cur->update(
-                    "WHERE setting_id = '" . $key . "' and setting_ns = '" . $record->setting_ns . "' " .
+                    "WHERE setting_id = '" . $key . "' and setting_ns = '" . dcCore::app()->con->escape($record->setting_ns) . "' " .
                     'AND blog_id ' . (null === $record->blog_id ? 'IS NULL ' : ("= '" . dcCore::app()->con->escape($record->blog_id) . "' "))
                 );
             }
