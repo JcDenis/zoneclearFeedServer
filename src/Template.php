@@ -10,44 +10,47 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return null;
-}
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\zoneclearFeedServer;
+
+use ArrayObject;
+use dcCore;
+use dcTemplate;
+use Dotclear\Helper\Html\Html;
 
 /**
- * @ingroup DC_PLUGIN_ZONECLEARFEEDSERVER
- * @brief Mix your blog with a feeds planet - template methods.
- * @since 2.6
+ * Frontend template blocks and values.
  */
-class zcfsTemplate
+class Template
 {
-    public static function Feeds($a, $c)
+    public static function Feeds(ArrayObject $a, string $c): string
     {
         $lastn = -1;
         $p     = '';
-        if (isset($a['lastn'])) {
+        if (isset($a['lastn']) && is_numeric($a['lastn'])) {
             $lastn = abs((int) $a['lastn']) + 0;
             $p .= "\$zcfs_params['limit'] = " . $lastn . ";\n";
         }
-        if (isset($a['cat_id'])) {
+        if (isset($a['cat_id']) && is_string($a['cat_id'])) {
             $p .= "@\$zcfs_params['sql'] .= 'AND Z.cat_id = " . addslashes($a['cat_id']) . " ';\n";
         }
         if (isset($a['no_category'])) {
             $p .= "@\$zcfs_params['sql'] .= 'AND Z.cat_id IS NULL ';\n";
         }
-        if (!empty($a['site_url'])) {
+        if (!empty($a['site_url']) && is_string($a['site_url'])) {
             $p .= "\$zcfs_params['feed_url'] = '" . addslashes($a['site_url']) . "';\n";
         }
-        if (isset($a['feed_status'])) {
+        if (isset($a['feed_status']) && is_numeric($a['feed_status'])) {
             $p .= "\$zcfs_params['feed_status'] = " . ((int) $a['feed_status']) . ";\n";
         } else {
             $p .= "\$zcfs_params['feed_status'] = 1;\n";
         }
-        if (!empty($a['feed_url'])) {
+        if (!empty($a['feed_url']) && is_string($a['feed_url'])) {
             $p .= "\$zcfs_params['feed_feed'] = '" . addslashes($a['feed_url']) . "';\n";
         }
-        if (isset($a['feed_owner'])) {
-            $p .= "@\$zcfs_params['sql'] .= \"AND Z.feed_owner = '" . addslashes($a['author']) . "' \";\n";
+        if (isset($a['feed_owner']) && is_string($a['feed_owner'])) {
+            $p .= "@\$zcfs_params['sql'] .= \"AND Z.feed_owner = '" . addslashes($a['feed_owner']) . "' \";\n";
         }
 
         $sortby = 'feed_creadt';
@@ -71,7 +74,7 @@ class zcfsTemplate
                     break;
             }
         }
-        if (isset($a['order']) && preg_match('/^(desc|asc)$/i', $a['order'])) {
+        if (isset($a['order']) && is_string($a['order']) && preg_match('/^(desc|asc)$/i', $a['order'])) {
             $order = $a['order'];
         }
         $p .= "\$zcfs_params['order'] = '" . $sortby . ' ' . $order . "';\n";
@@ -79,26 +82,26 @@ class zcfsTemplate
         return
         '<?php ' . $p .
         'dcCore::app()->ctx->feeds_params = $zcfs_params;' . "\n" .
-        '$zcfs = new zoneclearFeedServer();' . "\n" .
+        '$zcfs = ' . ZoneclearFeedServer::class . '::instance();' . "\n" .
         'dcCore::app()->ctx->feeds = $zcfs->getFeeds($zcfs_params); unset($zcfs_params,$zcfs);' . "\n" .
         "?>\n" .
         '<?php while (dcCore::app()->ctx->feeds->fetch()) : ?>' . $c . '<?php endwhile; ' .
         'dcCore::app()->ctx->feeds = null; dcCore::app()->ctx->feeds_params = null; ?>';
     }
 
-    public static function FeedIf($a, $c)
+    public static function FeedIf(ArrayObject $a, string $c): string
     {
         $if = [];
 
-        $operator = isset($a['operator']) ? self::getOperator($a['operator']) : '&&';
+        $operator = isset($a['operator']) && is_string($a['operator']) ? dcTemplate::getOperator($a['operator']) : '&&';
 
-        if (isset($a['type'])) {
+        if (isset($a['type']) && is_string($a['type'])) {
             $type = trim($a['type']);
             $type = !empty($type) ? $type : 'feed';
             $if[] = 'dcCore::app()->ctx->feeds->feed_type == "' . addslashes($type) . '"';
         }
-        if (isset($a['site_url'])) {
-            $url = trim($a['feed_url']);
+        if (isset($a['site_url']) && is_string($a['site_url'])) {
+            $url = trim($a['site_url']);
             if (substr($url, 0, 1) == '!') {
                 $url  = substr($url, 1);
                 $if[] = 'dcCore::app()->ctx->feeds->feed_url != "' . addslashes($url) . '"';
@@ -106,8 +109,8 @@ class zcfsTemplate
                 $if[] = 'dcCore::app()->ctx->feeds->feed_url == "' . addslashes($url) . '"';
             }
         }
-        if (isset($a['feed_url'])) {
-            $url = trim($a['feed_feed']);
+        if (isset($a['feed_url']) && is_string($a['feed_url'])) {
+            $url = trim($a['feed_url']);
             if (substr($url, 0, 1) == '!') {
                 $url  = substr($url, 1);
                 $if[] = 'dcCore::app()->ctx->feeds->feed_feed != "' . addslashes($url) . '"';
@@ -115,7 +118,7 @@ class zcfsTemplate
                 $if[] = 'dcCore::app()->ctx->feeds->feed_feed == "' . addslashes($url) . '"';
             }
         }
-        if (isset($a['category'])) {
+        if (isset($a['category']) && is_string($a['category'])) {
             $category = addslashes(trim($a['category']));
             if (substr($category, 0, 1) == '!') {
                 $category = substr($category, 1);
@@ -146,112 +149,100 @@ class zcfsTemplate
             '<?php if(' . implode(' ' . $operator . ' ', $if) . ') : ?>' . $c . '<?php endif; ?>';
     }
 
-    public static function FeedIfFirst($a)
+    public static function FeedIfFirst(ArrayObject $a): string
     {
-        $ret = $a['return'] ?? 'first';
-        $ret = html::escapeHTML($ret);
+        $ret = Html::escapeHTML(isset($a['return']) && is_string($a['return']) ? $a['return'] : 'first');
 
         return
         '<?php if (dcCore::app()->ctx->feeds->index() == 0) { ' .
         "echo '" . addslashes($ret) . "'; } ?>";
     }
 
-    public static function FeedIfOdd($a)
+    public static function FeedIfOdd(ArrayObject $a): string
     {
-        $ret = $a['return'] ?? 'odd';
-        $ret = html::escapeHTML($ret);
+        $ret = Html::escapeHTML(isset($a['return']) && is_string($a['return']) ? $a['return'] : 'odd');
 
         return
         '<?php if ((dcCore::app()->ctx->feeds->index()+1)%2 == 1) { ' .
         "echo '" . addslashes($ret) . "'; } ?>";
     }
 
-    public static function FeedDesc($a)
+    public static function FeedDesc(ArrayObject $a): string
     {
         return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_desc');
     }
 
-    public static function FeedOwner($a)
+    public static function FeedOwner(ArrayObject $a): string
     {
         return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_owner');
     }
 
-    public static function FeedCategory($a)
+    public static function FeedCategory(ArrayObject $a): string
     {
         return self::getValue($a, 'dcCore::app()->ctx->feeds->cat_title');
     }
 
-    public static function FeedCategoryID($a)
+    public static function FeedCategoryID(ArrayObject $a): string
     {
         return self::getValue($a, 'dcCore::app()->ctx->feeds->cat_id');
     }
 
-    public static function FeedCategoryURL($a)
+    public static function FeedCategoryURL(ArrayObject $a): string
     {
-        return self::getValue($a, 'dcCore::app()->blog->url.dcCore::app()->url->getBase(\'category\').\'/\'.html::sanitizeURL(dcCore::app()->ctx->feeds->cat_url)');
+        return self::getValue($a, 'dcCore::app()->blog->url.dcCore::app()->url->getBase(\'category\').\'/\'.Html::sanitizeURL(dcCore::app()->ctx->feeds->cat_url)');
     }
 
-    public static function FeedCategoryShortURL($a)
+    public static function FeedCategoryShortURL(ArrayObject $a): string
     {
         return self::getValue($a, 'dcCore::app()->ctx->feeds->cat_url');
     }
 
-    public static function FeedID($a)
+    public static function FeedID(ArrayObject $a): string
     {
         return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_id');
     }
 
-    public static function FeedLang($a)
+    public static function FeedLang(ArrayObject $a): string
     {
-        $f = dcCore::app()->tpl->getFilters($a);
-
         return empty($a['full']) ?
-            '<?php echo ' . sprintf($f, 'dcCore::app()->ctx->feeds->feed_lang') . '; ?>' :
-            '<?php $langs = l10n::getISOcodes(); if (isset($langs[dcCore::app()->ctx->feeds->feed_lang])) { echo ' .
-                sprintf($f, '$langs[dcCore::app()->ctx->feeds->feed_lang]') . '; } else { echo ' .
-                sprintf($f, 'dcCore::app()->ctx->feeds->feed_lang') . '; } unset($langs); ?>';
+            self::getValue($a, 'dcCore::app()->ctx->feeds->feed_lang') :
+            '<?php $langs = l10n::getISOcodes(); if (isset($langs[dcCore::app()->ctx->feeds->feed_lang])) { ?>' .
+            self::getValue($a, '$langs[dcCore::app()->ctx->feeds->feed_lang]') .
+            '<?php } else { ?>' .
+            self::getValue($a, 'dcCore::app()->ctx->feeds->feed_lang') .
+            '<?php ; } unset($langs); ?>';
     }
 
-    public static function FeedName($a)
+    public static function FeedName(ArrayObject $a): string
     {
         return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_name');
     }
 
-    public static function FeedSiteURL($a)
+    public static function FeedSiteURL(ArrayObject $a): string
     {
         return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_url');
     }
 
-    public static function FeedFeedURL($a)
+    public static function FeedFeedURL(ArrayObject $a): string
     {
         return self::getValue($a, 'dcCore::app()->ctx->feeds->feed_feed');
     }
 
-    public static function FeedsHeader($a, $c)
+    public static function FeedsHeader(ArrayObject $a, string $c): string
     {
         return '<?php if (dcCore::app()->ctx->feeds->isStart()) : ?>' . $c . '<?php endif; ?>';
     }
 
-    public static function FeedsFooter($a, $c)
+    public static function FeedsFooter(ArrayObject $a, string $c): string
     {
         return '<?php if (dcCore::app()->ctx->feeds->isEnd()) : ?>' . $c . '<?php endif; ?>';
     }
 
-    public static function FeedsCount($a)
+    public static function FeedsCount(ArrayObject $a): string
     {
-        $none = 'no sources';
-        $one  = 'one source';
-        $more = '%d sources';
-
-        if (isset($a['none'])) {
-            $none = addslashes($a['none']);
-        }
-        if (isset($a['one'])) {
-            $one = addslashes($a['one']);
-        }
-        if (isset($a['more'])) {
-            $more = addslashes($a['more']);
-        }
+        $none = isset($a['none']) && is_string($a['none']) ? addslashes($a['none']) : 'no sources';
+        $one  = isset($a['one'])  && is_string($a['one']) ? addslashes($a['one']) : 'one source';
+        $more = isset($a['more']) && is_string($a['more']) ? addslashes($a['more']) : '%d sources';
 
         return
         "<?php \$fcount = dcCore::app()->ctx->feeds->count(); \n" .
@@ -264,25 +255,15 @@ class zcfsTemplate
         '} unset($fcount); ?>';
     }
 
-    public static function FeedsEntriesCount($a)
+    public static function FeedsEntriesCount(ArrayObject $a): string
     {
-        $none = __('no entries');
-        $one  = __('one entry');
-        $more = __('%d entries');
-
-        if (isset($a['none'])) {
-            $none = addslashes($a['none']);
-        }
-        if (isset($a['one'])) {
-            $one = addslashes($a['one']);
-        }
-        if (isset($a['more'])) {
-            $more = addslashes($a['more']);
-        }
+        $none = isset($a['none']) && is_string($a['none']) ? addslashes($a['none']) : 'no entries';
+        $one  = isset($a['one'])  && is_string($a['one']) ? addslashes($a['one']) : 'one entry';
+        $more = isset($a['more']) && is_string($a['more']) ? addslashes($a['more']) : '%d entries';
 
         return
         "<?php \$fcount = 0; \n" .
-        '$zc = new zoneclearFeedServer();' . "\n" .
+        '$zc = ' . ZoneclearFeedServer::class . '::instance();' . "\n" .
         "\$allfeeds = \$zc->getFeeds(); \n" .
         "if (!\$allfeeds->isEmpty()) { \n" .
         ' while ($allfeeds->fetch()) { ' .
@@ -298,24 +279,14 @@ class zcfsTemplate
         '} unset($allfeeds,$fcount); ?>';
     }
 
-    public static function FeedEntriesCount($a)
+    public static function FeedEntriesCount(ArrayObject $a): string
     {
-        $none = 'no entries';
-        $one  = 'one entry';
-        $more = '%d entries';
-
-        if (isset($a['none'])) {
-            $none = addslashes($a['none']);
-        }
-        if (isset($a['one'])) {
-            $one = addslashes($a['one']);
-        }
-        if (isset($a['more'])) {
-            $more = addslashes($a['more']);
-        }
+        $none = isset($a['none']) && is_string($a['none']) ? addslashes($a['none']) : 'no entries';
+        $one  = isset($a['one'])  && is_string($a['one']) ? addslashes($a['one']) : 'one entry';
+        $more = isset($a['more']) && is_string($a['more']) ? addslashes($a['more']) : '%d entries';
 
         return
-        "<?php \$zcfs = new zoneclearFeedServer(); \n" .
+        '<?php $zcfs = ' . ZoneclearFeedServer::class . "::instance(); \n" .
         "\$fcount = \$zc->getPostsByFeed(array('feed_id'=>dcCore::app()->ctx->feeds->feed_id),true)->f(0); \n" .
         "if (\$fcount == 0) {\n" .
         "  printf(__('" . $none . "'),\$fcount);\n" .
@@ -326,21 +297,8 @@ class zcfsTemplate
         '} unset($fcount); ?>';
     }
 
-    protected static function getValue($a, $v)
+    protected static function getValue(ArrayObject $a, string $v): string
     {
         return '<?php echo ' . sprintf(dcCore::app()->tpl->getFilters($a), $v) . '; ?>';
-    }
-
-    protected static function getOperator($op)
-    {
-        switch (strtolower($op)) {
-            case 'or':
-            case '||':
-                return '||';
-            case 'and':
-            case '&&':
-            default:
-                return '&&';
-        }
     }
 }

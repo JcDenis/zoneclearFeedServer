@@ -10,41 +10,44 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return null;
-}
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\zoneclearFeedServer;
+
+use dcCore;
+use dcUrlHandlers;
+use Dotclear\Helper\Html\Html;
+use Exception;
 
 /**
- * @ingroup DC_PLUGIN_ZONECLEARFEEDSERVER
- * @brief Mix your blog with a feeds planet - url handler methods.
- * @since 2.6
+ * Frontend URL handler.
+ *
+ * This adds public page that list feeds.
+ * And serve an endpoint to update feeds through js.
  */
-class zcfsUrlHandler extends dcUrlHandlers
+class UrlHandler extends dcUrlHandlers
 {
     /**
      * Feeds source page and update methods.
      *
-     * @param  array $args Page arguments
-     * @return mixed
+     * @param   string  $args   The page arguments
      */
-    public static function zcFeedsPage($args)
+    public static function zoneclearFeedsPage(string $args): void
     {
-        $s = dcCore::app()->blog->settings->__get(basename(dirname('../' . __DIR__)));
+        $z = ZoneclearFeedServer::instance();
+        $s = $z->settings;
 
         # Not active
-        if (!$s->active) {
+        if (is_null(dcCore::app()->blog) || !$s->active) {
             self::p404();
-
-            return null;
         }
 
         # Update feeds (from ajax or other post resquest)
         if ($args == '/zcfsupd' && 3 == $s->bhv_pub_upd) {
             $msg = '';
-            if (!empty($_POST['blogId']) && html::escapeJS(dcCore::app()->blog->id) == $_POST['blogId']) {
+            if (!empty($_POST['blogId']) && Html::escapeJS(dcCore::app()->blog->id) == $_POST['blogId']) {
                 try {
-                    $zc = new zoneclearFeedServer();
-                    if ($zc->checkFeedsUpdate()) {
+                    if ($z->checkFeedsUpdate()) {
                         $msg = sprintf(
                             '<status>%s</status><message>%s</message>',
                             'ok',
@@ -73,7 +76,7 @@ class zcfsUrlHandler extends dcUrlHandlers
 
         # Server js
         } elseif ($args == '/zcfsupd.js' && 3 == $s->bhv_pub_upd) {
-            dcCore::app()->tpl->setPath(dcCore::app()->tpl->getPath(), __DIR__ . '/default-templates');
+            dcCore::app()->tpl->setPath(dcCore::app()->tpl->getPath(), My::path() . '/default-templates');
             self::serveDocument(
                 'zcfsupd.js',
                 'text/javascript',
@@ -83,8 +86,12 @@ class zcfsUrlHandler extends dcUrlHandlers
 
         # Server feeds description page
         } elseif (in_array($args, ['', '/']) && $s->pub_active) {
-            $tplset = dcCore::app()->themes->moduleInfo(dcCore::app()->blog->settings->system->theme, 'tplset');
-            $path   = __DIR__ . '/default-templates/';
+            $theme = dcCore::app()->blog->settings->get('system')->get('theme');
+            if (!is_string($theme)) {
+                self::p404();
+            }
+            $tplset = dcCore::app()->themes->moduleInfo($theme, 'tplset');
+            $path   = My::path() . '/default-templates/';
             if (!empty($tplset) && is_dir($path . $tplset)) {
                 dcCore::app()->tpl->setPath(dcCore::app()->tpl->getPath(), $path . $tplset);
             } else {
@@ -96,7 +103,5 @@ class zcfsUrlHandler extends dcUrlHandlers
         else {
             self::p404();
         }
-
-        return null;
     }
 }

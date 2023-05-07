@@ -10,132 +10,179 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_CONTEXT_ADMIN')) {
-    return null;
-}
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\zoneclearFeedServer;
+
+use ArrayObject;
+use adminGenericFilterV2;
+use adminGenericListV2;
+use dcCore;
+use dcPager;
+use Dotclear\Helper\Date;
+use Dotclear\Helper\Html\Form\{
+    Checkbox,
+    Div,
+    Link,
+    Para,
+    Text
+};
+use Dotclear\Helper\Html\Html;
 
 /**
- * @ingroup DC_PLUGIN_ZONECLEARFEEDSERVER
- * @brief Feeds server - feeds list methods
- * @since 2.6
- * @see  adminGenericList for more info
+ * Backend feeds list.
  */
-class zcfsFeedsList extends adminGenericList
+class FeedsList extends adminGenericListV2
 {
-    private $zc = null;
-
-    public function feedsDisplay($page, $nb_per_page, $enclose_block = '', $filter = false)
+    public function display(adminGenericFilterV2 $filter, string $enclose_block = ''): void
     {
         if ($this->rs->isEmpty()) {
-            if ($filter) {
-                echo '<p><strong>' . __('No feeds matches the filter') . '</strong></p>';
-            } else {
-                echo '<p><strong>' . __('No feeds') . '</strong></p>';
-            }
-        } else {
-            $this->zc = new zoneclearFeedServer();
-            $pager    = new dcPager($page, $this->rs_count, $nb_per_page, 10);
-            $entries  = [];
-            if (isset($_REQUEST['feeds'])) {
-                foreach ($_REQUEST['feeds'] as $v) {
-                    $entries[(int) $v] = true;
-                }
-            }
-            $html_block = '<div class="table-outer">' .
-                '<table>' .
-                '<caption>' . (
-                    $filter ?
-                    sprintf(__('List of %s feeds matching the filter.'), $this->rs_count) :
-                    sprintf(__('List of feeds (%s)'), $this->rs_count)
-                ) . '</caption>';
+            echo
+            (new Text(
+                'p',
+                $filter->show() ?
+                    __('No feeds matches the filter') :
+                    __('No feeds')
+            ))
+                ->class('info')
+                ->render();
 
-            $cols = [
-                'title'   => '<th colspan="2" class="first nowrap">' . __('Name') . '</th>',
-                'desc'    => '<th class="nowrap" scope="col">' . __('Feed') . '</th>',
-                'period'  => '<th class="nowrap" scope="col">' . __('Frequency') . '</th>',
-                'update'  => '<th class="nowrap" scope="col">' . __('Last update') . '</th>',
-                'entries' => '<th class="nowrap" scope="col">' . __('Entries') . '</th>',
-                'status'  => '<th class="nowrap" scope="col">' . __('Status') . '</th>',
-            ];
-            $cols = new ArrayObject($cols);
-
-            dcCore::app()->callBehavior('adminZcfsFeedsListHeader', $this->rs, $cols);
-
-            $this->userColumns('zcfs_feeds', $cols);
-
-            $html_block .= '<tr>' . implode(iterator_to_array($cols)) . '</tr>%s</table>%s</div>';
-            if ($enclose_block) {
-                $html_block = sprintf($enclose_block, $html_block);
-            }
-
-            echo $pager->getLinks();
-
-            $blocks = explode('%s', $html_block);
-
-            echo $blocks[0];
-
-            while ($this->rs->fetch()) {
-                echo $this->feedsLine(isset($entries[$this->rs->feed_id]));
-            }
-
-            echo $blocks[1];
-            echo $blocks[2];
-            echo $pager->getLinks();
+            return;
         }
+
+        $page  = is_numeric($filter->value('page')) ? (int) $filter->value('page') : 1;
+        $nbpp  = is_numeric($filter->value('nb')) ? (int) $filter->value('nb') : 10;
+        $count = (int) $this->rs_count;
+        $pager = new dcPager($page, $count, $nbpp, 10);
+
+        $cols = new ArrayObject([
+            'title' => (new Text('th', __('Name')))
+                ->class('first')
+                ->extra('colspan="2"'),
+            'desc' => (new Text('th', __('Feed')))
+                ->extra('scope="col"'),
+            'period' => (new Text('th', __('Frequency')))
+                ->extra('scope="col"'),
+            'update' => (new Text('th', __('Last update')))
+                ->extra('scope="col"')->class('nowrap'),
+            'entries' => (new Text('th', __('Entries')))
+                ->extra('scope="col"'),
+            'status' => (new Text('th', __('Status')))
+                ->extra('scope="col"'),
+        ]);
+
+        $this->userColumns(My::id() . 'feeds', $cols);
+
+        $lines = [];
+        while ($this->rs->fetch()) {
+            $lines[] = $this->line(isset($_POST['feeds']) && in_array($this->rs->post_id, $_POST['feeds']));
+        }
+
+        echo
+        $pager->getLinks() .
+        sprintf(
+            $enclose_block,
+            (new Div())
+                ->class('table-outer')
+                ->items([
+                    (new Para(null, 'table'))
+                        ->items([
+                            (new Text(
+                                'caption',
+                                $filter->show() ?
+                                sprintf(__('List of %s feeds matching the filter.'), $this->rs_count) :
+                                sprintf(__('List of feeds. (%s)'), $this->rs_count)
+                            )),
+                            (new Para(null, 'tr'))
+                                ->items(iterator_to_array($cols)),
+                            (new Para(null, 'tbody'))
+                                ->items($lines),
+                        ]),
+                ])
+                ->render()
+        ) .
+        $pager->getLinks();
     }
 
-    private function feedsLine($checked)
+    private function line(bool $checked): Para
     {
-        $combo_status  = zoneclearFeedServer::getAllStatus();
-        $combo_upd_int = zoneclearFeedServer::getAllUpdateInterval();
-        $status        = $this->rs->feed_status ?
-            '<img src="images/check-on.png" alt="enable" />' :
-            '<img src="images/check-off.png" alt="disable" />';
+        $row       = new FeedRow($this->rs);
+        $img_title = $row->status ? __('enabled') : __('disabled');
+        $img_src   = $row->status ? 'check-on.png' : 'check-off.png';
 
-        $entries_count = $this->zc->getPostsByFeed(['feed_id' => $this->rs->feed_id], true)->f(0);
-        $shunk_feed    = $this->rs->feed_feed;
+        $entries_count = ZoneclearFeedServer::instance()->getPostsByFeed(['feed_id' => $row->id], true)->f(0);
+        if (!is_numeric($entries_count)) {
+            $entries_count = 0;
+        }
+
+        $shunk_feed = $row->feed;
         if (strlen($shunk_feed) > 83) {
             $shunk_feed = substr($shunk_feed, 0, 50) . '...' . substr($shunk_feed, -20);
         }
 
-        $url = dcCore::app()->adminurl->get('admin.plugin.' . basename(dirname('../' . __DIR__)), ['part' => 'feed', 'feed_id' => $this->rs->feed_id]);
+        $url = dcCore::app()->adminurl?->get('admin.plugin.' . My::id(), ['part' => 'feed', 'feed_id' => $row->id]);
+        if (!is_string($url)) {
+            $url = '';
+        }
+        $tz = dcCore::app()->auth?->getInfo('user_tz');
+        if (!is_string($tz)) {
+            $tz = 'UTC';
+        }
 
-        $cols = [
-            'check' => '<td class="nowrap minimal">' .
-                form::checkbox(['feeds[]'], $this->rs->feed_id, ['checked' => $checked]) .
-                '</td>',
-            'title' => '<td class="nowrap" scope="row">' .
-                '<a href="' . $url . '#feed" title="' . __('Edit') . '">' . html::escapeHTML($this->rs->feed_name) . '</a>' .
-                '</td>',
-            'desc' => '<td class="nowrap maximal">' .
-                '<a href="' . $this->rs->feed_feed . '" title="' . html::escapeHTML($this->rs->feed_desc) . '">' . html::escapeHTML($shunk_feed) . '</a>' .
-                '</td>',
-            'period' => '<td class="nowrap minimal count">' .
-                array_search($this->rs->feed_upd_int, $combo_upd_int) .
-                '</td>',
-            'update' => '<td class="nowrap minimal count">' .
-                (
-                    $this->rs->feed_upd_last < 1 ?
+        $cols = new ArrayObject([
+            'check' => (new Para(null, 'td'))
+                ->class('nowrap minimal')
+                ->items([
+                    (new Checkbox(['feeds[]'], $checked))
+                        ->value($row->id),
+                ]),
+            'title' => (new Para(null, 'td'))
+                ->class('nowrap')
+                ->items([
+                    (new Link())
+                        ->title(__('Edit'))
+                        ->text(Html::escapeHTML($row->name))
+                        ->href($url . '#feed'),
+                ]),
+            'desc' => (new Para(null, 'td'))
+                ->class('nowrap maximal')
+                ->items([
+                    (new Link())
+                        ->title(Html::escapeHTML($row->desc))
+                        ->text(Html::escapeHTML($shunk_feed))
+                        ->href($row->feed),
+                ])
+                ->class('nowrap minimal'),
+            'period' => (new Text('td', (string) array_search($row->upd_int, Combo::updateInterval())))
+                ->class('nowrap minimal'),
+            'update' => (new Text(
+                'td',
+                $row->upd_last < 1 ?
                     __('never') :
-                    dt::str(__('%Y-%m-%d %H:%M'), (int) $this->rs->feed_upd_last, dcCore::app()->auth->getInfo('user_tz'))
-                ) . '</td>',
-            'entries' => '<td class="nowrap minimal count">' .
-                (
-                    $entries_count ?
-                    '<a href="' . $url . '#entries" title="' . __('View entries') . '">' . $entries_count . '</a>' :
-                    $entries_count
-                ) . '</td>',
-            'status' => '<td class="nowrap minimal status">' . $status . '</td>',
-        ];
+                    Date::str(__('%Y-%m-%d %H:%M'), $row->upd_last, $tz)
+            ))
+                ->class('nowrap minimal'),
+            'entries' => (new Para(null, 'td'))
+                ->class('nowrap minimal count')
+                ->items([
+                    (new Link())
+                        ->title(Html::escapeHTML(__('View entries')))
+                        ->text(Html::escapeHTML((string) $entries_count))
+                        ->href($url . '#entries'),
+                ]),
+            'status' => (new Para(null, 'td'))
+                ->class('nowrap minimal status')
+                ->items([
+                    (new Text('img', ''))
+                        ->title($img_title)
+                        ->extra('src="images/' . $img_src . '"'),
+                ]),
+        ]);
 
-        $cols = new ArrayObject($cols);
-        dcCore::app()->callBehavior('adminZcfsFeedsListValue', $this->rs, $cols);
+        $this->userColumns(My::id() . 'feeds', $cols);
 
-        $this->userColumns('zcfs_feeds', $cols);
-
-        return
-            '<tr class="line ' . ($this->rs->feed_status ? '' : 'offline ') . '" id="p' . $this->rs->feed_id . '">' .
-            implode(iterator_to_array($cols)) .
-            '</tr>';
+        return (new Para('p' . $row->id, 'tr'))
+            ->class('line' . ($row->status != 1 ? ' offline ' : ''))
+            ->items(iterator_to_array($cols));
     }
 }

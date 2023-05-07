@@ -10,35 +10,44 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return null;
-}
+declare(strict_types=1);
 
-Clearbricks::lib()->autoload([
-    'zoneclearFeedServer'         => __DIR__ . '/inc/class.zoneclearfeedserver.php',
-    'zcfsAdminBehaviors'          => __DIR__ . '/inc/class.zcfsadminbehaviors.php',
-    'zcfsPostFilter'              => __DIR__ . '/inc/class.zcfspostfilter.php',
-    'zcfsEntriesList'             => __DIR__ . '/inc/class.zcfsentrieslist.php',
-    'zcfsFeedsList'               => __DIR__ . '/inc/class.zcfsfeedslist.php',
-    'zcfsFeedsActions'            => __DIR__ . '/inc/class.zcfsfeedsactions.php',
-    'zcfsDefaultFeedsActions'     => __DIR__ . '/inc/class.zcfsdefaultfeedsactions.php',
-    'zcfsTemplate'                => __DIR__ . '/inc/class.zcfstemplate.php',
-    'zcfsPublicBehaviors'         => __DIR__ . '/inc/class.zcfspublicbehaviors.php',
-    'zcfsRsExtPosts'              => __DIR__ . '/inc/class.zcfsrsextposts.php',
-    'zcfsUrlHandler'              => __DIR__ . '/inc/class.zcfsurlhandler.php',
-    'zcfsActivityReportBehaviors' => __DIR__ . '/inc/class.zcfsactivityreportbehaviors.php',
-    'zcfsUpgrade'                 => __DIR__ . '/inc/class.zcfsupgrade.php',
-]);
+namespace Dotclear\Plugin\zoneclearFeedServer;
 
-// public url for page of description of the flux
-dcCore::app()->url->register(
-    'zoneclearFeedsPage',
-    'zcfeeds',
-    '^zcfeeds(.*?)$',
-    ['zcfsUrlHandler', 'zcFeedsPage']
-);
+use dcCore;
+use dcNsProcess;
 
-// Add to report on plugin activityReport
-if (defined('ACTIVITY_REPORT_V2')) {
-    zcfsActivityReportBehaviors::init();
+/**
+ * Module prepend.
+ */
+class Prepend extends dcNsProcess
+{
+    public static function init(): bool
+    {
+        static::$init = My::phpCompliant();
+
+        return static::$init;
+    }
+
+    public static function process(): bool
+    {
+        if (!static::$init) {
+            return false;
+        }
+
+        // public url for page of description of the flux
+        dcCore::app()->url->register(
+            'zoneclearFeedsPage',
+            'zcfeeds',
+            '^zcfeeds(.*?)$',
+            [UrlHandler::class, 'zoneclearFeedsPage']
+        );
+
+        // report zoneclearFeedServer activities
+        if (defined('ACTIVITY_REPORT') && ACTIVITY_REPORT == 3) {
+            ActivityReportActions::init();
+        }
+
+        return true;
+    }
 }

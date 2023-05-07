@@ -10,68 +10,90 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_CONTEXT_ADMIN')) {
-    return null;
-}
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\zoneclearFeedServer;
+
+use ArrayObject;
+use dcCore;
+use dcMeta;
+use dcPage;
+use Dotclear\Database\Statement\DeleteStatement;
+use Dotclear\Helper\Html\Form\{
+    Form,
+    Hidden,
+    Label,
+    Para,
+    Select,
+    Submit,
+    Text
+};
+use Dotclear\Helper\Html\Html;
+use Exception;
 
 /**
- * @ingroup DC_PLUGIN_ZONECLEARFEEDSERVER
- * @brief Feeds server - Default actions methods
- * @since 2.6
- * @see  dcDefaultPostsActionsPage for mor info
+ * Backend feeds list default actions.
  */
-class zcfsDefaultFeedsActions
+class FeedsDefaultActions
 {
-    public static function zcfsFeedsActions(zcfsFeedsActions $ap)
+    /**
+     * Add feeds list actions.
+     */
+    public static function addDefaultFeedsActions(FeedsActions $ap): void
     {
         $ap->addAction(
             [__('Change category') => 'changecat'],
-            ['zcfsDefaultFeedsActions', 'doChangeCategory']
+            [self::class, 'doChangeCategory']
         );
         $ap->addAction(
             [__('Change update interval') => 'changeint'],
-            ['zcfsDefaultFeedsActions', 'doChangeInterval']
+            [self::class, 'doChangeInterval']
         );
         $ap->addAction(
             [__('Disable feed update') => 'disablefeed'],
-            ['zcfsDefaultFeedsActions', 'doEnableFeed']
+            [self::class, 'doEnableFeed']
         );
         $ap->addAction(
             [__('Enable feed update') => 'enablefeed'],
-            ['zcfsDefaultFeedsActions', 'doEnableFeed']
+            [self::class, 'doEnableFeed']
         );
         $ap->addAction(
             [__('Reset last update') => 'resetupdlast'],
-            ['zcfsDefaultFeedsActions', 'doResetUpdate']
+            [self::class, 'doResetUpdate']
         );
         $ap->addAction(
             [__('Update (check) feed') => 'updatefeed'],
-            ['zcfsDefaultFeedsActions', 'doUpdateFeed']
+            [self::class, 'doUpdateFeed']
         );
         $ap->addAction(
             [__('Delete related posts') => 'deletepost'],
-            ['zcfsDefaultFeedsActions', 'doDeletePost']
+            [self::class, 'doDeletePost']
         );
         $ap->addAction(
             [__('Delete feed (without related posts)') => 'deletefeed'],
-            ['zcfsDefaultFeedsActions', 'doDeleteFeed']
+            [self::class, 'doDeleteFeed']
         );
     }
 
-    public static function doEnableFeed(zcfsFeedsActions $ap, $post)
+    /**
+     * Enable / disable feeds.
+     */
+    public static function doEnableFeed(FeedsActions $ap, ArrayObject $post): void
     {
         $enable = $ap->getAction() == 'enablefeed';
         $ids    = $ap->getIDs();
 
         if (empty($ids)) {
-            throw new Exception(__('No feeds selected'));
+            $ap->error(new Exception(__('No feeds selected')));
+
+            return;
         }
 
         foreach ($ids as $id) {
             $ap->zcfs->enableFeed($id, $enable);
         }
 
-        dcAdminNotices::addSuccessNotice(sprintf(
+        dcPage::addSuccessNotice(sprintf(
             $enable ?
                 __(
                     '%d feed has been successfully enabled.',
@@ -89,20 +111,25 @@ class zcfsDefaultFeedsActions
         $ap->redirect(true);
     }
 
-    public static function doDeletePost(zcfsFeedsActions $ap, $post)
+    /**
+     * Delete feeds posts.
+     */
+    public static function doDeletePost(FeedsActions $ap, ArrayObject $post): void
     {
         $types = [
-            'zoneclearfeed_url',
-            'zoneclearfeed_author',
-            'zoneclearfeed_site',
-            'zoneclearfeed_sitename',
-            'zoneclearfeed_id',
+            My::META_PREFIX . 'url',
+            My::META_PREFIX . 'author',
+            My::META_PREFIX . 'site',
+            My::META_PREFIX . 'sitename',
+            My::META_PREFIX . 'id',
         ];
 
         $ids = $ap->getIDs();
 
         if (empty($ids)) {
-            throw new Exception(__('No feeds selected'));
+            $ap->error(new Exception(__('No feeds selected')));
+
+            return;
         }
 
         foreach ($ids as $id) {
@@ -111,34 +138,42 @@ class zcfsDefaultFeedsActions
             ]);
 
             while ($posts->fetch()) {
-                dcCore::app()->blog->delPost($posts->post_id);
-                dcCore::app()->con->execute(
-                    'DELETE FROM ' . dcCore::app()->prefix . dcMeta::META_TABLE_NAME . ' ' .
-                    'WHERE post_id = ' . $posts->post_id . ' ' .
-                    'AND meta_type ' . dcCore::app()->con->in($types) . ' '
-                );
+                if (is_numeric($posts->f('post_id'))) {
+                    dcCore::app()->blog?->delPost((int) $posts->f('post_id'));
+                    $sql = new DeleteStatement();
+                    $sql
+                        ->from(dcCore::app()->prefix . dcMeta::META_TABLE_NAME)
+                        ->where('post_id = ' . $posts->f('post_id'))
+                        ->and('meta_type ' . $sql->in($types))
+                        ->delete();
+                }
             }
         }
 
-        dcAdminNotices::addSuccessNotice(
+        dcPage::addSuccessNotice(
             __('Entries have been successfully deleted.')
         );
         $ap->redirect(true);
     }
 
-    public static function doDeleteFeed(zcfsFeedsActions $ap, $post)
+    /**
+     * Delete feeds.
+     */
+    public static function doDeleteFeed(FeedsActions $ap, ArrayObject $post): void
     {
         $ids = $ap->getIDs();
 
         if (empty($ids)) {
-            throw new Exception(__('No feeds selected'));
+            $ap->error(new Exception(__('No feeds selected')));
+
+            return;
         }
 
         foreach ($ids as $id) {
-            $ap->zcfs->delFeed($id);
+            $ap->zcfs->deleteFeed($id);
         }
 
-        dcAdminNotices::addSuccessNotice(sprintf(
+        dcPage::addSuccessNotice(sprintf(
             __(
                 '%d feed has been successfully deleted.',
                 '%d feeds have been successfully deleted.',
@@ -149,116 +184,148 @@ class zcfsDefaultFeedsActions
         $ap->redirect(true);
     }
 
-    public static function doUpdateFeed(zcfsFeedsActions $ap, $post)
+    /**
+     * Update feeds properties.
+     */
+    public static function doUpdateFeed(FeedsActions $ap, ArrayObject $post): void
     {
         $ids = $ap->getIDs();
 
         if (empty($ids)) {
-            throw new Exception(__('No feeds selected'));
+            $ap->error(new Exception(__('No feeds selected')));
+
+            return;
         }
 
         foreach ($ids as $id) {
             $ap->zcfs->checkFeedsUpdate($id, true);
         }
 
-        dcAdminNotices::addSuccessNotice(sprintf(
+        dcPage::addSuccessNotice(sprintf(
             __('%d feed has been successfully updated.', '%d feeds have been successfully updated.', count($ids)),
             count($ids)
         ));
         $ap->redirect(true);
     }
 
-    public static function doResetUpdate(zcfsFeedsActions $ap, $post)
+    /**
+     * Reset feeds update timer.
+     */
+    public static function doResetUpdate(FeedsActions $ap, ArrayObject $post): void
     {
         $ids = $ap->getIDs();
 
         if (empty($ids)) {
-            throw new Exception(__('No feeds selected'));
+            $ap->error(new Exception(__('No feeds selected')));
+
+            return;
         }
 
+        $cur = $ap->zcfs->openCursor();
         foreach ($ids as $id) {
-            $cur                = $ap->zcfs->openCursor();
-            $cur->feed_upd_last = 0;
-            $ap->zcfs->updFeed($id, $cur);
+            $cur->clean();
+            $cur->setField('feed_upd_last', 0);
+            $ap->zcfs->updateFeed($id, $cur);
             $ap->zcfs->checkFeedsUpdate($id, true);
         }
 
-        dcAdminNotices::addSuccessNotice(sprintf(
+        dcPage::addSuccessNotice(sprintf(
             __('Last update of %s feed successfully reseted.', 'Last update of %s feeds successfully reseted.', count($ids)),
             count($ids)
         ));
         $ap->redirect(true);
     }
 
-    public static function doChangeCategory(zcfsFeedsActions $ap, $post)
+    /**
+     * Change feeds categories.
+     */
+    public static function doChangeCategory(FeedsActions $ap, ArrayObject $post): void
     {
         if (isset($post['upd_cat_id'])) {
             $ids = $ap->getIDs();
 
             if (empty($ids)) {
-                throw new Exception(__('No feeds selected'));
+                $ap->error(new Exception(__('No feeds selected')));
+
+                return;
             }
 
-            $cat_id = abs((int) $post['upd_cat_id']);
+            $cat_id = is_numeric($post['upd_cat_id']) ? abs((int) $post['upd_cat_id']) : null;
 
+            $cur = $ap->zcfs->openCursor();
             foreach ($ids as $id) {
-                $cur         = $ap->zcfs->openCursor();
-                $cur->cat_id = $cat_id == 0 ? null : $cat_id;
-                $ap->zcfs->updFeed($id, $cur);
+                $cur->clean();
+                $cur->setField('cat_id', $cat_id == 0 ? null : $cat_id);
+                $ap->zcfs->updateFeed($id, $cur);
             }
 
-            dcAdminNotices::addSuccessNotice(sprintf(
+            dcPage::addSuccessNotice(sprintf(
                 __('Category of %s feed successfully changed.', 'Category of %s feeds successfully changed.', count($ids)),
                 count($ids)
             ));
             $ap->redirect(true);
         } else {
-            $categories_combo = dcAdminCombos::getCategoriesCombo(
-                dcCore::app()->blog->getCategories()
-            );
-
             $ap->beginPage(
                 dcPage::breadcrumb([
-                    html::escapeHTML(dcCore::app()->blog->name) => '',
-                    __('Feeds server')                          => '',
-                    $ap->getCallerTitle()                       => $ap->getRedirection(true),
-                    __('Change category for this selection')    => '',
+                    Html::escapeHTML((string) dcCore::app()->blog?->name) => '',
+                    __('Feeds server')                                    => '',
+                    $ap->getCallerTitle()                                 => $ap->getRedirection(true),
+                    __('Change category for this selection')              => '',
                 ])
             );
 
             echo
-            '<form action="' . $ap->getURI() . '" method="post">' .
-            $ap->getCheckboxes() .
-            '<p><label for="upd_cat_id" class="classic">' . __('Category:') . '</label> ' .
-            form::combo(['upd_cat_id'], $categories_combo, '') .
-            dcCore::app()->formNonce() .
-            $ap->getHiddenFields() .
-            form::hidden(['action'], 'changecat') .
-            '<input type="submit" value="' . __('Save') . '" /></p>' .
-            '</form>';
+            (new Form('form-action'))
+                ->method('post')
+                ->action($ap->getURI())
+                ->fields([
+                    (new Text('', $ap->getCheckboxes())),
+                    (new Para())
+                        ->items(array_merge(
+                            $ap->hiddenFields(),
+                            [
+                                (new Label(__('Category:'), Label::OUTSIDE_LABEL_BEFORE))
+                                    ->for('upd_cat_id'),
+                                (new Select('upd_cat_id'))
+                                    ->items(Combo::postCategories()),
+                                (new Submit('do-action'))
+                                    ->value(__('Save')),
+                                (new Hidden(['action'], 'changecat')),
+                                dcCore::app()->formNonce(false),
+                            ]
+                        )),
+
+                ])
+                ->render();
 
             $ap->endPage();
         }
     }
 
-    public static function doChangeInterval(zcfsFeedsActions $ap, $post)
+    /**
+     * Change feeds update interval.
+     */
+    public static function doChangeInterval(FeedsActions $ap, ArrayObject $post): void
     {
         if (isset($post['upd_upd_int'])) {
             $ids = $ap->getIDs();
 
             if (empty($ids)) {
-                throw new Exception(__('No feeds selected'));
+                $ap->error(new Exception(__('No feeds selected')));
+
+                return;
             }
 
-            $upd_int = abs((int) $post['upd_upd_int']);
+            $upd_int = is_numeric($post['upd_upd_int']) ? abs((int) $post['upd_upd_int']) : 0;
 
+            $cur = $ap->zcfs->openCursor();
             foreach ($ids as $id) {
-                $cur               = $ap->zcfs->openCursor();
-                $cur->feed_upd_int = $upd_int;
-                $ap->zcfs->updFeed($id, $cur);
+                $cur->clean();
+                $cur->setField('feed_upd_int', $upd_int);
+                $ap->zcfs->updateFeed($id, $cur);
             }
 
-            dcAdminNotices::addSuccessNotice(sprintf(
+            dcPage::addSuccessNotice(sprintf(
                 __('Update frequency of %s feed successfully changed.', 'Update frequency of %s feeds successfully changed.', count($ids)),
                 count($ids)
             ));
@@ -267,24 +334,37 @@ class zcfsDefaultFeedsActions
             $ap->beginPage(
                 dcPage::breadcrumb(
                     [
-                        html::escapeHTML(dcCore::app()->blog->name)      => '',
-                        __('Feeds server')                               => '',
-                        $ap->getCallerTitle()                            => $ap->getRedirection(true),
-                        __('Change update frequency for this selection') => '',
+                        Html::escapeHTML((string) dcCore::app()->blog?->name) => '',
+                        __('Feeds server')                                    => '',
+                        $ap->getCallerTitle()                                 => $ap->getRedirection(true),
+                        __('Change update frequency for this selection')      => '',
                     ]
                 )
             );
 
             echo
-            '<form action="' . $ap->getURI() . '" method="post">' .
-            $ap->getCheckboxes() .
-            '<p><label for="upd_upd_int" class="classic">' . __('Frequency:') . '</label> ' .
-            form::combo(['upd_upd_int'], $ap->zcfs->getAllUpdateInterval(), '') .
-            dcCore::app()->formNonce() .
-            $ap->getHiddenFields() .
-            form::hidden(['action'], 'changeint') .
-            '<input type="submit" value="' . __('Save') . '" /></p>' .
-            '</form>';
+            (new Form('form-action'))
+                ->method('post')
+                ->action($ap->getURI())
+                ->fields([
+                    (new Text('', $ap->getCheckboxes())),
+                    (new Para())
+                        ->items(array_merge(
+                            $ap->hiddenFields(),
+                            [
+                                (new Label(__('Frequency:'), Label::OUTSIDE_LABEL_BEFORE))
+                                    ->for('upd_upd_int'),
+                                (new Select('upd_upd_int'))
+                                    ->items(Combo::updateInterval()),
+                                (new Submit('do-action'))
+                                    ->value(__('Save')),
+                                (new Hidden(['action'], 'changeint')),
+                                dcCore::app()->formNonce(false),
+                            ]
+                        )),
+
+                ])
+                ->render();
 
             $ap->endPage();
         }

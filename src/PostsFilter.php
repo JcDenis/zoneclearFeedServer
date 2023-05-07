@@ -10,23 +10,31 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_CONTEXT_ADMIN')) {
-    return null;
-}
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\zoneclearFeedServer;
+
+use ArrayObject;
+use adminGenericFilterV2;
+use dcAdminCombos;
+use dcAdminFilter;
+use dcAdminFilters;
+use dcCore;
+use dcUtils;
+use Dotclear\Helper\Html\Html;
+use Exception;
 
 /**
- * @ingroup DC_PLUGIN_ZONECLEARFEEDSERVER
- * @brief Feeds server - Posts list filters methods
- * @since 2.20
- * @see  adminGenericFilter for more info
+ * Backend feed posts list filters.
  */
-class zcfsPostFilter extends adminGenericFilter
+class PostsFilter extends adminGenericFilterV2
 {
     public function __construct()
     {
-        parent::__construct(dcCore::app(), 'zcfs_entries');
+        // use user posts pref
+        parent::__construct('posts');
 
-        $filters = new arrayObject([
+        $filters = new ArrayObject([
             dcAdminFilters::getPageFilter(),
             $this->getPostUserFilter(),
             $this->getPostCategoriesFilter(),
@@ -50,8 +58,8 @@ class zcfsPostFilter extends adminGenericFilter
         $users = null;
 
         try {
-            $users = dcCore::app()->blog->getPostsUsers();
-            if ($users->isEmpty()) {
+            $users = dcCore::app()->blog?->getPostsUsers();
+            if (is_null($users) || $users->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {
@@ -81,8 +89,8 @@ class zcfsPostFilter extends adminGenericFilter
         $categories = null;
 
         try {
-            $categories = dcCore::app()->blog->getCategories();
-            if ($categories->isEmpty()) {
+            $categories = dcCore::app()->blog?->getCategories();
+            if (is_null($categories) || $categories->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {
@@ -96,10 +104,12 @@ class zcfsPostFilter extends adminGenericFilter
             __('(No cat)') => 'NULL',
         ];
         while ($categories->fetch()) {
-            $combo[
-                str_repeat('&nbsp;', ($categories->level - 1) * 4) .
-                html::escapeHTML($categories->cat_title) . ' (' . $categories->nb_post . ')'
-            ] = $categories->cat_id;
+            if (is_numeric($categories->f('level')) && is_string($categories->f('cat_title'))) {
+                $combo[
+                    str_repeat('&nbsp;', ((int) $categories->f('level') - 1) * 4) .
+                    Html::escapeHTML($categories->f('cat_title')) . ' (' . $categories->f('nb_post') . ')'
+                ] = $categories->f('cat_id');
+            }
         }
 
         return (new dcAdminFilter('cat_id'))
@@ -131,8 +141,8 @@ class zcfsPostFilter extends adminGenericFilter
         $dates = null;
 
         try {
-            $dates = dcCore::app()->blog->getDates(['type' => 'month']);
-            if ($dates->isEmpty()) {
+            $dates = dcCore::app()->blog?->getDates(['type' => 'month']);
+            if (is_null($dates) || $dates->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {

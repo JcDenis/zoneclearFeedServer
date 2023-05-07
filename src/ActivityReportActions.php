@@ -10,138 +10,137 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return null;
-}
+declare(strict_types=1);
 
-class zcfsActivityReportBehaviors
+namespace Dotclear\Plugin\zoneclearFeedServer;
+
+use dcCore;
+use Dotclear\Database\Cursor;
+use Dotclear\Plugin\activityReport\{
+    Action,
+    ActivityReport,
+    Group
+};
+
+/**
+ * Add feeds actions to the plugin activity report.
+ */
+class ActivityReportActions
 {
-    public static function init()
+    public static function init(): void
     {
-        # This file is used with plugin activityReport
-        dcCore::app()->activityReport->addGroup(
-            'zoneclearFeedServer',
-            __('Plugin zoneclearFeedServer')
-        );
+        $group = new Group(My::id(), My::name());
 
-        # from BEHAVIOR zoneclearFeedServerAfterAddFeed in zoneclearFeedServer/inc/class.zoneclear.feed.server.php
-        dcCore::app()->activityReport->addAction(
-            'zoneclearFeedServer',
-            'create',
-            __('feed creation'),
+        $group->add(new Action(
+            'updateFeed',
+            __('Feed properties update'),
+            __('Feed named "%s" point to "%s" has been updated by "%s"'),
+            'zoneclearFeedServerAfterUpdateFeed',
+            function (Cursor $cur, int $id): void {
+                $user = dcCore::app()->auth?->getInfo('user_cn');
+                if (!is_string($user)) {
+                    return;
+                }
+
+                $rs = ZoneclearFeedServer::instance()->getFeeds(['feed_id' => $id]);
+                if ($rs->isEmpty()) {
+                    return;
+                }
+                $row = new FeedRow($rs);
+
+                $logs = [
+                    $row->name,
+                    $row->feed,
+                    $user,
+                ];
+
+                ActivityReport::instance()->addLog(My::id(), 'updateFeed', $logs);
+            }
+        ));
+
+        $group->add(new Action(
+            'addFeed',
+            __('Feed creation'),
             __('A new feed named "%s" point to "%s" was added by "%s"'),
             'zoneclearFeedServerAfterAddFeed',
-            function ($cur) {
+            function (Cursor $cur, int $id): void {
+                $user = dcCore::app()->auth?->getInfo('user_cn');
+                if (!is_string($user)) {
+                    return;
+                }
                 $logs = [
-                    $cur->feed_name,
-                    $cur->feed_feed,
-                    dcCore::app()->auth->getInfo('user_cn'),
+                    $cur->getField('feed_name'),
+                    $cur->getField('feed_feed'),
+                    $user,
                 ];
 
-                dcCore::app()->activityReport->addLog(
-                    'zoneclearFeedServer',
-                    'create',
-                    $logs
-                );
+                ActivityReport::instance()->addLog(My::id(), 'addFeed', $logs);
             }
-        );
-        # from BEHAVIOR zoneclearFeedServerAfterUpdFeed in in zoneclearFeedServer/inc/class.zoneclear.feed.server.php
-        dcCore::app()->activityReport->addAction(
-            'zoneclearFeedServer',
-            'updatefeedinfo',
-            __('updating feed info'),
-            __('Feed named "%s" point to "%s" has been updated by "%s"'),
-            'zoneclearFeedServerAfterUpdFeed',
-            function ($cur, $id) {
-                if (defined('DC_CONTEXT_ADMIN')) {
-                    $zc = new zoneclearFeedServer();
-                    $rs = $zc->getFeeds(['feed_id' => $id]);
+        ));
 
-                    $logs = [
-                        $rs->feed_name,
-                        $rs->feed_feed,
-                        dcCore::app()->auth->getInfo('user_cn'),
-                    ];
-
-                    dcCore::app()->activityReport->addLog(
-                        'zoneclearFeedServer',
-                        'updatefeedinfo',
-                        $logs
-                    );
-                }
-            }
-        );
-        # from BEHAVIOR zoneclearFeedServerAfterUpdFeed in in zoneclearFeedServer/inc/class.zoneclear.feed.server.php
-        dcCore::app()->activityReport->addAction(
-            'zoneclearFeedServer',
-            'updatefeedrecords',
-            __('updating feed records'),
-            __('Records of the feed named "%s" have been updated automatically'),
-            'zoneclearFeedServerAfterUpdFeed',
-            function ($cur, $id) {
-                if (!defined('DC_CONTEXT_ADMIN')) {
-                    $zc = new zoneclearFeedServer();
-                    $rs = $zc->getFeeds(['feed_id' => $id]);
-
-                    $logs = [
-                        $rs->feed_name,
-                    ];
-
-                    dcCore::app()->activityReport->addLog(
-                        'zoneclearFeedServer',
-                        'updatefeedrecords',
-                        $logs
-                    );
-                }
-            }
-        );
-        # from BEHAVIOR zoneclearFeedServerAfterDelFeed in in zoneclearFeedServer/inc/class.zoneclear.feed.server.php
-        dcCore::app()->activityReport->addAction(
-            'zoneclearFeedServer',
-            'delete',
-            __('feed deletion'),
-            __('Feed named "%s" point to "%s" has been deleted by "%s"'),
-            'zoneclearFeedServerAfterDelFeed',
-            function ($id) {
-                $zc = new zoneclearFeedServer();
-                $rs = $zc->getFeeds(['feed_id' => $id]);
-
-                $logs = [
-                    $rs->feed_name,
-                    $rs->feed_feed,
-                    dcCore::app()->auth->getInfo('user_cn'),
-                ];
-
-                dcCore::app()->activityReport->addLog(
-                    'zoneclearFeedServer',
-                    'delete',
-                    $logs
-                );
-            }
-        );
-        # from BEHAVIOR zoneclearFeedServerAfterEnableFeed in in zoneclearFeedServer/inc/class.zoneclear.feed.server.php
-        dcCore::app()->activityReport->addAction(
-            'zoneclearFeedServer',
-            'status',
-            __('feed status'),
+        $group->add(new Action(
+            'enableFeed',
+            __('Feed status'),
             __('Feed named "%s" point to "%s" has been set to "%s"'),
             'zoneclearFeedServerAfterEnableFeed',
-            function ($id, $enable, $time) {
-                $zc = new zoneclearFeedServer();
-                $rs = $zc->getFeeds(['feed_id' => $id]);
+            function (int $id, bool $enable, int $time): void {
+                $rs = ZoneclearFeedServer::instance()->getFeeds(['feed_id' => $id]);
+                if ($rs->isEmpty()) {
+                    return;
+                }
+                $row = new FeedRow($rs);
 
                 $logs = [
-                    $rs->feed_name,
-                    $rs->feed_feed,
-                    $enable ? 'enable' : 'disable',
+                    $row->name,
+                    $row->feed,
+                    $enable ? 'enabled' : 'disabled',
                 ];
 
-                dcCore::app()->activityReport->addLog(
-                    'zoneclearFeedServer',
-                    'status',
-                    $logs
-                );
+                ActivityReport::instance()->addLog(My::id(), 'enableFeed', $logs);
             }
-        );
+        ));
+
+        $group->add(new Action(
+            'deleteFeed',
+            __('Feed deletion'),
+            __('Feed named "%s" point to "%s" has been deleted by "%s"'),
+            'zoneclearFeedServerBeforeDeleteFeed',
+            function (int $id): void {
+                $rs = ZoneclearFeedServer::instance()->getFeeds(['feed_id' => $id]);
+                if ($rs->isEmpty()) {
+                    return;
+                }
+                $row = new FeedRow($rs);
+
+                $user = dcCore::app()->auth?->getInfo('user_cn');
+                if (!is_string($user)) {
+                    return;
+                }
+
+                $logs = [
+                    $row->name,
+                    $row->feed,
+                    $user,
+                ];
+
+                ActivityReport::instance()->addLog(My::id(), 'deleteFeed', $logs);
+            }
+        ));
+
+        $group->add(new Action(
+            'checkFeedUpdate',
+            __('Check feed update'),
+            __('Feed named "%s" has been updated automatically'),
+            'zoneclearFeedServerAfterCheckFeedUpdate',
+            function (FeedRow $row): void {
+                $logs = [
+                    $row->name,
+                ];
+
+                ActivityReport::instance()->addLog(My::id(), 'checkFeedUpdate', $logs);
+            }
+        ));
+
+        ActivityReport::instance()->groups->add($group);
     }
 }

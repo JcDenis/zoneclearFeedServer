@@ -1,399 +1,560 @@
+# Language: Français
+# Module: zoneclearFeedServer - 2022.12.11.00001
+# Date: 2023-05-07 22:36:31
+# Author: Jean-Christian Denis
+# Translated with translater 2023.04.23
+
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: zoneclearFeedServer 2022.11.26\n"
+"Project-Id-Version: zoneclearFeedServer 2022.12.11.00001\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2022-12-10T22:19:59+00:00\n"
+"PO-Revision-Date: 2023-05-07T22:36:31+00:00\n"
 "Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "Feeds server"
-msgstr "Serveur de flux"
-
-msgid "Disable"
-msgstr "Désactiver"
-
-msgid "Before display"
-msgstr "Avant l'affichage"
-
-msgid "After display"
-msgstr "Après l'affichage"
-
-msgid "Through Ajax"
-msgstr "À travers Ajax"
-
-msgid "Keep source case"
-msgstr "Garder la casse de la source"
-
-msgid "First upper case"
-msgstr "Premier caractère en majuscule"
-
-msgid "All lower case"
-msgstr "Tout en minuscule"
-
-msgid "All upper case"
-msgstr "Tout en majuscule"
-
-msgid "Dotclear cache is not writable or not well configured!"
-msgstr "Le cache de Dotclear n'est pas accessible en écriture ou n'est pas configuré !"
-
-msgid "Enable plugin"
-msgstr "Activer le plugin"
-
-msgid "View the public list of feeds"
-msgstr "Voir la page publique de la liste des flux"
-
-msgid "Rules"
-msgstr "Règles"
-
-msgid "Status of new posts:"
-msgstr "Status des nouveaux billets :"
-
-msgid "Owner of entries created by zoneclearFeedServer:"
-msgstr "Propriétaire des billets créés par zoneclearFeedServer :"
-
-msgid "How to transform imported tags:"
-msgstr "Comment tranformer la casse des mots-clés importés :"
-
-msgid "Update feeds on public side:"
-msgstr "Mettre à jour les flux depuis la partie publique :"
-
-msgid "Update %s feed(s) at a time."
-msgstr "Mettre à jour %s flux à la fois."
-
-msgid "Keep active empty feeds"
-msgstr "Garder actif les flux vides"
-
-msgid "Enable public page"
-msgstr "Activer la page publique"
-
-msgid "Redirect to original post on:"
-msgstr "Rediriger vers le billet original sur :"
-
-msgid "Show full content on:"
-msgstr "Afficher le contenu complet sur :"
-
+#: default-templates/currywurst/zcfeeds.html:4
+#: default-templates/mustek/zcfeeds.html:4
+#: src/Frontend.php:52
 msgid "List of feeds"
 msgstr "Liste des sources"
 
-msgid "Feeds server: sources"
-msgstr "Serveur de flux : les sources"
+#: src/ActivityReportActions.php:36
+msgid "Feed properties update"
+msgstr "Mise à jour de flux"
 
-msgid "List sources of feeds"
-msgstr "Liste des sources du flux"
-
-msgid "Feeds sources"
-msgstr "Sources des flux"
-
-msgid "Create date"
-msgstr "Date de création"
-
-msgid "Limit:"
-msgstr "Limite :"
-
-msgid "Link to the list of sources:"
-msgstr "Lien vers la liste des sources :"
-
-msgid "All sources"
-msgstr "Toutes les sources"
-
-msgid "Feeds server: numbers"
-msgstr "Serveur de flux : les chiffres"
-
-msgid "Show some numbers about feeds"
-msgstr "Afficher quelques chiffres à propose du flux"
-
-msgid "Feeds numbers"
-msgstr "Le flux en chiffres"
-
-msgid "Show feeds count"
-msgstr "Afficher le nombre de flux"
-
-msgid "Title for feeds count:"
-msgstr "Titre pour le nombre de flux :"
-
-msgid "Feeds:"
-msgstr "Flux :"
-
-msgid "Show entries count"
-msgstr "Afficher le nombre de billets"
-
-msgid "Title for entries count:"
-msgstr "Titre pour le nombre de billets :"
-
-msgid "Entries:"
-msgstr "Billets :"
-
-msgid "one source"
-msgstr "une source"
-
-msgid "no sources"
-msgstr "aucune source"
-
-msgid "one entry"
-msgstr "une publication"
-
-msgid "no entries"
-msgstr "aucune publication"
-
-msgid "feed creation"
-msgstr "création d'un flux"
-
-msgid "A new feed named \"%s\" point to \"%s\" was added by \"%s\""
-msgstr "Un nouveau flux nommé \"%s\" pointant vers \"%s\" a été ajouté par \"%s\""
-
-msgid "updating feed info"
-msgstr "mise à jour des informations du flux (administration)"
-
+#: src/ActivityReportActions.php:37
 msgid "Feed named \"%s\" point to \"%s\" has been updated by \"%s\""
 msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été mis à jour par \"%s\""
 
-msgid "updating feed records"
-msgstr "mise à jour des enregistrements du flux (automatique)"
+#: src/ActivityReportActions.php:63
+msgid "Feed creation"
+msgstr "Création de flux"
 
-msgid "Records of the feed named \"%s\" have been updated automatically"
-msgstr "Les enregistrements du flux nommé \"%s\" ont été automatiquement mis à jour"
+#: src/ActivityReportActions.php:64
+msgid "A new feed named \"%s\" point to \"%s\" was added by \"%s\""
+msgstr "Un nouveau flux nommé \"%s\" pointant vers \"%s\" a été ajouté par \"%s\""
 
-msgid "feed deletion"
-msgstr "suppression d'un flux"
+#: src/ActivityReportActions.php:83
+msgid "Feed status"
+msgstr "Satut de flux"
 
-msgid "Feed named \"%s\" point to \"%s\" has been deleted by \"%s\""
-msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été supprimé par \"%s\""
-
-msgid "feed status"
-msgstr "status d'un flux"
-
+#: src/ActivityReportActions.php:84
 msgid "Feed named \"%s\" point to \"%s\" has been set to \"%s\""
 msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été marqué comme \"%s\""
 
-msgid "Update date"
-msgstr "Date de mise à jour"
+#: src/ActivityReportActions.php:105
+msgid "Feed deletion"
+msgstr "Suppression de flux"
 
+#: src/ActivityReportActions.php:106
+msgid "Feed named \"%s\" point to \"%s\" has been deleted by \"%s\""
+msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été supprimé par \"%s\""
+
+#: src/ActivityReportActions.php:132
+msgid "Check feed update"
+msgstr "Vérification de flux"
+
+#: src/ActivityReportActions.php:133
+msgid "Feed named \"%s\" has been updated automatically"
+msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été vérifié automatiquement"
+
+#: src/BackendBehaviors.php:68
 msgid "%s feed disabled"
 msgid_plural "%s feeds disabled"
 msgstr[0] "%s flux désactivé"
 msgstr[1] "%s flux désactivés"
 
+#: src/BackendBehaviors.php:85
 msgid "Feeds server: Feeds"
 msgstr "Serveur de flux : Flux"
 
+#: src/BackendBehaviors.php:87
+#: src/FeedsList.php:62
+#: src/ManageFeed.php:236
 msgid "Feed"
 msgstr "Flux"
 
+#: src/BackendBehaviors.php:95
 msgid "Feeds server: Entries"
 msgstr "Serveur de flux : Billets"
 
+#: src/BackendBehaviors.php:103
+msgid "Feed server"
+msgstr "Serveur de flux"
+
+#: src/BackendBehaviors.php:117
 msgid "feeds per page"
 msgstr "flux par page"
 
-msgid "entries per page"
-msgstr "billets par page"
+#: src/BackendBehaviors.php:149
+msgid "edit feed"
+msgstr "Modifier le flux"
 
+#: src/BackendBehaviors.php:225
 msgid "Edit this feed"
 msgstr "Modifier ce flux"
 
+#: src/BackendBehaviors.php:231
 msgid "Feed source"
 msgstr "Source du flux"
 
+#: src/BackendBehaviors.php:238
 msgid "feed URL"
 msgstr "URL du fil"
 
+#: src/BackendBehaviors.php:242
 msgid "site URL"
 msgstr "URL du site"
 
+#: src/Combo.php:35
+msgid "Update date"
+msgstr "Date de mise à jour"
+
+#: src/Combo.php:60
+msgid "Disabled"
+msgstr "Désactivé"
+
+#: src/Combo.php:61
+msgid "Enabled"
+msgstr "Activé"
+
+#: src/Combo.php:82
+msgid "Every hour"
+msgstr "Toutes les heures"
+
+#: src/Combo.php:83
+msgid "Every two hours"
+msgstr "Toutes les deux heures"
+
+#: src/Combo.php:84
+msgid "Two times per day"
+msgstr "Deux fois par jour"
+
+#: src/Combo.php:85
+msgid "Every day"
+msgstr "Chaque jour"
+
+#: src/Combo.php:86
+msgid "Every two days"
+msgstr "Tous les deux jours"
+
+#: src/Combo.php:97
+msgid "Keep source case"
+msgstr "Garder la casse de la source"
+
+#: src/Combo.php:98
+msgid "First upper case"
+msgstr "Premier caractère en majuscule"
+
+#: src/Combo.php:99
+msgid "All lower case"
+msgstr "Tout en minuscule"
+
+#: src/Combo.php:100
+msgid "All upper case"
+msgstr "Tout en majuscule"
+
+#: src/Combo.php:110
+msgid "Disable"
+msgstr "Désactiver"
+
+#: src/Combo.php:111
+msgid "Before display"
+msgstr "Avant l'affichage"
+
+#: src/Combo.php:112
+msgid "After display"
+msgstr "Après l'affichage"
+
+#: src/Combo.php:113
+msgid "Through Ajax"
+msgstr "À travers Ajax"
+
+#: src/Config.php:69
+msgid "Configuration has been successfully updated."
+msgstr "La configuration a été mise à jour avec succés."
+
+#: src/Config.php:101
+msgid "Dotclear cache is not writable or not well configured!"
+msgstr "Le cache de Dotclear n'est pas accessible en écriture ou n'est pas configuré !"
+
+#: src/Config.php:108
+msgid "View the public list of feeds"
+msgstr "Voir la page publique de la liste des flux"
+
+#: src/Config.php:146
+msgid "Enable plugin"
+msgstr "Activer le plugin"
+
+#: src/Config.php:158
+msgid "Status of new posts:"
+msgstr "Status des nouveaux billets :"
+
+#: src/Config.php:166
+msgid "Owner of entries created by the feed server:"
+msgstr "Propriétaire des billets créés par le serveur de flux :"
+
+#: src/Config.php:174
+msgid "How to transform imported tags:"
+msgstr "Comment tranformer la casse des mots-clés importés :"
+
+#: src/Config.php:186
+msgid "Update feeds on public side:"
+msgstr "Mettre à jour les flux depuis la partie publique :"
+
+#: src/Config.php:194
+msgid "Number of feeds to update at one time:"
+msgstr "Nombre de flux mis à jour à la fois :"
+
+#: src/Config.php:205
+msgid "Keep active empty feeds"
+msgstr "Garder actif les flux vides"
+
+#: src/Config.php:213
+msgid "Enable public page"
+msgstr "Activer la page publique"
+
+#: src/Config.php:225
+msgid "Redirect to original post on:"
+msgstr "Rediriger vers le billet original sur :"
+
+#: src/Config.php:232
+msgid "Show full content on:"
+msgstr "Afficher le contenu complet sur :"
+
+#: src/FeedsActions.php:46
+msgid "Feeds"
+msgstr "Flux de syndication"
+
+#: src/FeedsActions.php:61
+#: src/FeedsDefaultActions.php:271
+msgid "Feeds server"
+msgstr "Serveur de flux"
+
+#: src/FeedsActions.php:67
+msgid "Back to feeds list"
+msgstr "Retour à la liste des flux"
+
+#: src/FeedsActions.php:82
+msgid "Feeds actions"
+msgstr "Actions sur les flux"
+
+#: src/FeedsDefaultActions.php:49
 msgid "Change update interval"
 msgstr "Changer l'interval de mise à jour"
 
+#: src/FeedsDefaultActions.php:53
 msgid "Disable feed update"
 msgstr "Désactiver la mise à jour du flux"
 
+#: src/FeedsDefaultActions.php:57
 msgid "Enable feed update"
 msgstr "Activer la mise à jour du flux"
 
+#: src/FeedsDefaultActions.php:61
 msgid "Reset last update"
 msgstr "Remettre à zéro le chronomètre de mise à jour"
 
+#: src/FeedsDefaultActions.php:65
 msgid "Update (check) feed"
 msgstr "Mettre à jour (vérifier) le flux"
 
+#: src/FeedsDefaultActions.php:69
 msgid "Delete related posts"
 msgstr "Effacer les billets liés"
 
+#: src/FeedsDefaultActions.php:73
 msgid "Delete feed (without related posts)"
 msgstr "Effacer le flux (sans effacer les billets liés)"
 
+#: src/FeedsDefaultActions.php:87
 msgid "No feeds selected"
 msgstr "Aucun flux selectionné"
 
+#: src/FeedsDefaultActions.php:154
 msgid "Entries have been successfully deleted."
 msgstr "Les billets ont été effacé avec succès."
 
+#: src/FeedsDefaultActions.php:205
 msgid "%d feed has been successfully updated."
 msgid_plural "%d feeds have been successfully updated."
 msgstr[0] "%s flux a été mis à jour."
 msgstr[1] "%s flux ont été mis à jour."
 
+#: src/FeedsDefaultActions.php:233
 msgid "Last update of %s feed successfully reseted."
 msgid_plural "Last update of %s feeds successfully reseted."
 msgstr[0] "La date de dernière mise à jour de %s flux a été remis à zéro."
 msgstr[1] "Les date de dernière mise à jour de %s flux ont été remis à zéro."
 
+#: src/FeedsDefaultActions.php:263
 msgid "Category of %s feed successfully changed."
 msgid_plural "Category of %s feeds successfully changed."
 msgstr[0] "La catégorie de %s flux a été changé."
 msgstr[1] "Les catégories de %s flux ont été changé."
 
+#: src/FeedsDefaultActions.php:329
 msgid "Update frequency of %s feed successfully changed."
 msgid_plural "Update frequency of %s feeds successfully changed."
 msgstr[0] "La fréquence de mise à jour de %s flux a été changé."
 msgstr[1] "Les fréquences de mise à jour de %s flux ont été changé."
 
+#: src/FeedsDefaultActions.php:340
 msgid "Change update frequency for this selection"
 msgstr "Changer la fréquence de mise à jour pour la selection"
 
+#: src/FeedsDefaultActions.php:355
 msgid "Frequency:"
 msgstr "Fréquence :"
 
-msgid "No entries matches the filter"
-msgstr "Aucun billet correspondant au filtre."
-
-msgid "No entries"
-msgstr "Aucun billet"
-
-msgid "Feeds"
-msgstr "Flux de syndication"
-
-msgid "Back to feeds list"
-msgstr "Retour à la liste des flux"
-
-msgid "Feeds actions"
-msgstr "Actions sur les flux"
-
+#: src/FeedsList.php:44
 msgid "No feeds matches the filter"
 msgstr "Aucun flux correspondant au filtre."
 
+#: src/FeedsList.php:45
 msgid "No feeds"
 msgstr "Aucun flux"
 
+#: src/FeedsList.php:93
 msgid "List of %s feeds matching the filter."
 msgstr "Liste des %s flux correspondant au filtre."
 
-msgid "List of feeds (%s)"
-msgstr "Liste des flux (%s)"
+#: src/FeedsList.php:94
+msgid "List of feeds. (%s)"
+msgstr "Liste des flux. (%s)"
 
+#: src/FeedsList.php:110
+msgid "enabled"
+msgstr "activé"
+
+#: src/FeedsList.php:110
+msgid "disabled"
+msgstr "désactivé"
+
+#: src/FeedsList.php:161
 msgid "never"
 msgstr "jamais"
 
+#: src/FeedsList.php:169
 msgid "View entries"
 msgstr "Voir les billets"
 
-msgid "Original post on <a href=\"%s\">%s</a>"
-msgstr "Billet original sur <a href=\"%s\">%s</a>"
+#: src/Manage.php:68
+msgid "Module is not wel configured"
+msgstr "Le module n'est pas configuré correctement"
 
-msgid "Read more details about this feed"
-msgstr "Lire plus de détails à propos de ce flux"
+#: src/Manage.php:157
+msgid "Feeds list"
+msgstr "Liste de flux"
 
-msgid "Disabled"
-msgstr "Désactivé"
-
-msgid "Enabled"
-msgstr "Activé"
-
-msgid "Every hour"
-msgstr "Toutes les heures"
-
-msgid "Every two hours"
-msgstr "Toutes les deux heures"
-
-msgid "Two times per day"
-msgstr "Deux fois par jour"
-
-msgid "Every day"
-msgstr "Chaque jour"
-
-msgid "Every two days"
-msgstr "Tous les deux jours"
-
-msgid "Entries pages"
-msgstr "Pages des billets"
-
-msgid "Tags pages"
-msgstr "Pages des mots-clés"
-
-msgid "Archives pages"
-msgstr "Pages des archives"
-
-msgid "Category pages"
-msgstr "Pages de catégories"
-
-msgid "This feed does not exist."
-msgstr "Ce flux n'existe pas."
-
-msgid "next feed"
-msgstr "flux suivant"
-
-msgid "previous feed"
-msgstr "flux précédent"
-
-msgid "Record with same feed URL already exists."
-msgstr "Un enregistrement avec la même URL de flux existe déjà."
-
-msgid "You must provide a name."
-msgstr "Vous devez indiquer un nom."
-
-msgid "You must provide an owner."
-msgstr "Vous devez indiquer un propriétaire."
-
-msgid "You must provide valid site URL."
-msgstr "Vous devez donner une URL de site valide."
-
-msgid "You must provide valid feed URL."
-msgstr "Vous devez donner une URL de flux valide."
-
-msgid "You must provide valid category."
-msgstr "Vous devez donner une catégorie valide."
-
-msgid "Feed successfully updated."
-msgstr "Flux mis à jour avec succès."
-
-msgid "Feed successfully created."
-msgstr "Flux créé avec succcès."
-
-msgid "Edit feed"
-msgstr "Edition de flux"
-
+#: src/Manage.php:167
+#: src/ManageFeed.php:212
 msgid "New feed"
 msgstr "Nouveau flux"
 
+#: src/Manage.php:195
+msgid "Selected feeds action:"
+msgstr "Action sur les flux sélectionnés :"
+
+#: src/ManageFeed.php:78
+msgid "Record with same feed URL already exists."
+msgstr "Un enregistrement avec la même URL de flux existe déjà."
+
+#: src/ManageFeed.php:81
+msgid "You must provide a name."
+msgstr "Vous devez indiquer un nom."
+
+#: src/ManageFeed.php:84
+msgid "You must provide an owner."
+msgstr "Vous devez indiquer un propriétaire."
+
+#: src/ManageFeed.php:87
+msgid "You must provide valid site URL."
+msgstr "Vous devez donner une URL de site valide."
+
+#: src/ManageFeed.php:90
+msgid "You must provide valid feed URL."
+msgstr "Vous devez donner une URL de flux valide."
+
+#: src/ManageFeed.php:93
+msgid "You must provide valid category."
+msgstr "Vous devez donner une catégorie valide."
+
+#: src/ManageFeed.php:105
+msgid "Failed to save feed."
+msgstr "Impossible de sauvegarder le flux."
+
+#: src/ManageFeed.php:109
+msgid "Feed successfully created."
+msgstr "Flux créé avec succcès."
+
+#: src/ManageFeed.php:212
+msgid "Edit feed"
+msgstr "Edition de flux"
+
+#: src/ManageFeed.php:215
 msgid "Edit feed \"%s\""
 msgstr "Modifier le flux \"%s\""
 
+#: src/ManageFeed.php:248
 msgid "Feed information"
 msgstr "Information sur le flux"
 
+#: src/ManageFeed.php:264
 msgid "Owner:"
 msgstr "Propriétaire :"
 
-msgid "Tweeter or Identica ident:"
-msgstr "Identifiant Twiiter ou Identi.ca :"
-
+#: src/ManageFeed.php:276
 msgid "Site URL:"
 msgstr "URL du site :"
 
+#: src/ManageFeed.php:322
+msgid "Tweeter or Identica ident:"
+msgstr "Identifiant Twiiter ou Identi.ca :"
+
+#: src/ManageFeed.php:334
 msgid "Local settings"
 msgstr "Paramètres locaux"
 
+#: src/ManageFeed.php:358
 msgid "Update:"
 msgstr "Mise à jour :"
 
+#: src/ManageFeed.php:379
 msgid "Import tags from feed"
 msgstr "Importer les tags depuis le flux"
 
-msgid "Selected feeds action:"
-msgstr "Action sur les flux sélectionnés :"
+#: src/ManageFeedVars.php:85
+msgid "This feed does not exist."
+msgstr "Ce flux n'existe pas."
+
+#: src/ManageFeedVars.php:115
+msgid "next feed"
+msgstr "flux suivant"
+
+#: src/ManageFeedVars.php:137
+msgid "previous feed"
+msgstr "flux précédent"
+
+#: src/PostsList.php:43
+msgid "No entries matches the filter"
+msgstr "Aucun billet correspondant au filtre."
+
+#: src/PostsList.php:44
+msgid "No entries"
+msgstr "Aucun billet"
+
+#: src/PostsList.php:92
+msgid "List of entries. (%s)"
+msgstr "Liste des billets. (%s)"
+
+#: src/RsExtPosts.php:146
+msgid "Original post on <a href=\"%s\">%s</a>"
+msgstr "Billet original sur <a href=\"%s\">%s</a>"
+
+#: src/RsExtPosts.php:157
+msgid "Read more details about this feed"
+msgstr "Lire plus de détails à propos de ce flux"
+
+#: src/Widgets.php:38
+msgid "Feeds server: sources"
+msgstr "Serveur de flux : les sources"
+
+#: src/Widgets.php:41
+msgid "List sources of feeds"
+msgstr "Liste des sources du flux"
+
+#: src/Widgets.php:44
+msgid "Feeds sources"
+msgstr "Sources des flux"
+
+#: src/Widgets.php:54
+msgid "Create date"
+msgstr "Date de création"
+
+#: src/Widgets.php:69
+msgid "Limit:"
+msgstr "Limite :"
+
+#: src/Widgets.php:75
+msgid "Link to the list of sources:"
+msgstr "Lien vers la liste des sources :"
+
+#: src/Widgets.php:76
+msgid "All sources"
+msgstr "Toutes les sources"
+
+#: src/Widgets.php:87
+msgid "Feeds server: numbers"
+msgstr "Serveur de flux : les chiffres"
+
+#: src/Widgets.php:90
+msgid "Show some numbers about feeds"
+msgstr "Afficher quelques chiffres à propose du flux"
+
+#: src/Widgets.php:93
+msgid "Feeds numbers"
+msgstr "Le flux en chiffres"
+
+#: src/Widgets.php:103
+msgid "Show feeds count"
+msgstr "Afficher le nombre de flux"
+
+#: src/Widgets.php:109
+msgid "Title for feeds count:"
+msgstr "Titre pour le nombre de flux :"
+
+#: src/Widgets.php:110
+msgid "Feeds:"
+msgstr "Flux :"
+
+#: src/Widgets.php:115
+msgid "Show entries count"
+msgstr "Afficher le nombre de billets"
+
+#: src/Widgets.php:121
+msgid "Title for entries count:"
+msgstr "Titre pour le nombre de billets :"
+
+#: src/Widgets.php:122
+msgid "Entries:"
+msgstr "Billets :"
+
+#: src/Widgets.php:219
+msgid "one source"
+msgstr "une source"
+
+#: src/Widgets.php:219
+msgid "no sources"
+msgstr "aucune source"
+
+#: src/Widgets.php:250
+msgid "one entry"
+msgstr "une publication"
+
+#: src/Widgets.php:250
+msgid "no entries"
+msgstr "aucune publication"
+
+#: src/ZoneclearFeedServer.php:964
+msgid "Entries pages"
+msgstr "Pages des billets"
+
+#: src/ZoneclearFeedServer.php:965
+msgid "Tags pages"
+msgstr "Pages des mots-clés"
+
+#: src/ZoneclearFeedServer.php:966
+msgid "Archives pages"
+msgstr "Pages des archives"
+
+#: src/ZoneclearFeedServer.php:967
+msgid "Category pages"
+msgstr "Pages de catégories"
 
 msgid "Mix your blog with a feeds planet"
 msgstr "Mixer votre blog avec un planet"
