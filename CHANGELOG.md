@@ -3,6 +3,13 @@
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
 
+2023.05.08
+- require dotclear 2.26
+- require php 8.1+
+- support plugin Uninstaller
+- support plugin tweakurls 4.0
+- use namespace
+
 2022.12.11
 - fix posts owner on feeds update
 - fix category type
