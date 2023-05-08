@@ -19,6 +19,10 @@ use dcActions;
 use dcCore;
 use dcPage;
 use Dotclear\Database\MetaRecord;
+use Dotclear\Helper\Html\Form\{
+    Link,
+    Para
+};
 use Dotclear\Helper\Html\Html;
 use Exception;
 
@@ -57,19 +61,24 @@ class FeedsActions extends dcActions
 
     public function beginPage(string $breadcrumb = '', string $head = ''): void
     {
-        echo
-        '<html><head><title>' . __('Feeds server') . '</title>' .
-        dcPage::jsLoad('js/_posts_actions.js') .
-        $head .
-        '</script></head><body>' .
+        dcPage::openModule(
+            My::name(),
+            dcPage::jsLoad('js/_posts_actions.js') .
+            $head
+        );
+        echo 
         $breadcrumb .
-        '<p><a class="back" href="' . $this->getRedirection(true) . '">' .
-        __('Back to feeds list') . '</a></p>';
+        (new Para())->items([
+            (new Link())
+                ->class('back')
+                ->href($this->getRedirection(true))
+                ->text(__('Back to feeds list'))
+        ])->render();
     }
 
     public function endPage(): void
     {
-        echo '</body></html>';
+        dcPage::closeModule();
     }
 
     public function error(Exception $e): void
