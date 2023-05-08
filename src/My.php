@@ -17,13 +17,10 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 use dcCore;
 
 /**
- * Module definitions.
+ * This module definitions.
  */
 class My
 {
-    /** @var    string  This module required php version */
-    public const PHP_MIN = '8.1';
-
     /** @var    string  This module database table name */
     public const TABLE_NAME = 'zc_feed';
 
@@ -58,8 +55,11 @@ class My
         'FeedFeedURL',
     ];
 
+    /** @var    string  This module required php version */
+    public const PHP_MIN = '8.1';
+
     /**
-     * @return  string  This module id
+     * This module id.
      */
     public static function id(): string
     {
@@ -67,7 +67,7 @@ class My
     }
 
     /**
-     * @return  string  This module name
+     * This module name.
      */
     public static function name(): string
     {
@@ -77,7 +77,7 @@ class My
     }
 
     /**
-     * @return  string  This module path
+     * This module path.
      */
     public static function path(): string
     {
@@ -85,7 +85,7 @@ class My
     }
 
     /**
-     * @return  bool    True on this module php version complied
+     * Check this module PHP version compliant.
      */
     public static function phpCompliant(): bool
     {
