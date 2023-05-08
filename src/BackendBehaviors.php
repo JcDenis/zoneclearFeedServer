@@ -131,7 +131,7 @@ class BackendBehaviors
      */
     public static function adminPostListHeaderV2(MetaRecord $rs, ArrayObject $cols): void
     {
-        $cols['feed'] = '<th scope="col">' . __('Feed') . '</th>';
+        $cols['feed'] = (new Para(null, 'th'))->text(__('Feed'))->extra('scope="col"')->render();
     }
 
     /**
