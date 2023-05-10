@@ -27,8 +27,7 @@ class Backend extends dcNsProcess
 {
     public static function init(): bool
     {
-        static::$init = defined('DC_CONTEXT_ADMIN')
-            && My::phpCompliant();
+        static::$init = defined('DC_CONTEXT_ADMIN');
 
         return static::$init;
     }

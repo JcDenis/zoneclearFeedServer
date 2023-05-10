@@ -54,7 +54,7 @@ class Uninstall extends dcNsProcess
             ->addUserAction(
                 'tables',
                 'delete',
-                My::TABLE_NAME
+                My::TABLE_NAME,
             )
             ->addUserAction(
                 'plugins',
