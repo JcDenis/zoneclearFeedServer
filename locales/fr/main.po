@@ -1,15 +1,15 @@
 # Language: Français
-# Module: zoneclearFeedServer - 2022.12.11.00001
-# Date: 2023-05-07 22:36:31
+# Module: zoneclearFeedServer - 2023.05.08
+# Date: 2023-05-11 21:34:02
 # Author: Jean-Christian Denis
 # Translated with translater 2023.04.23
 
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: zoneclearFeedServer 2022.12.11.00001\n"
+"Project-Id-Version: zoneclearFeedServer 2023.05.08\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2023-05-07T22:36:31+00:00\n"
+"PO-Revision-Date: 2023-05-11T21:34:02+00:00\n"
 "Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -60,7 +60,7 @@ msgstr "Vérification de flux"
 
 #: src/ActivityReportActions.php:133
 msgid "Feed named \"%s\" has been updated automatically"
-msgstr "Le flux nommé \"%s\" pointant vers \"%s\" a été vérifié automatiquement"
+msgstr "Le flux nommé \"%s\" a été vérifié automatiquement"
 
 #: src/BackendBehaviors.php:68
 msgid "%s feed disabled"
@@ -74,7 +74,7 @@ msgstr "Serveur de flux : Flux"
 
 #: src/BackendBehaviors.php:87
 #: src/FeedsList.php:62
-#: src/ManageFeed.php:236
+#: src/ManageFeed.php:235
 msgid "Feed"
 msgstr "Flux"
 
@@ -174,72 +174,67 @@ msgstr "Après l'affichage"
 msgid "Through Ajax"
 msgstr "À travers Ajax"
 
-#: src/Config.php:69
+#: src/Config.php:68
 msgid "Configuration has been successfully updated."
 msgstr "La configuration a été mise à jour avec succés."
 
-#: src/Config.php:101
+#: src/Config.php:100
 msgid "Dotclear cache is not writable or not well configured!"
 msgstr "Le cache de Dotclear n'est pas accessible en écriture ou n'est pas configuré !"
 
-#: src/Config.php:108
+#: src/Config.php:107
 msgid "View the public list of feeds"
 msgstr "Voir la page publique de la liste des flux"
 
-#: src/Config.php:146
+#: src/Config.php:145
 msgid "Enable plugin"
 msgstr "Activer le plugin"
 
-#: src/Config.php:158
+#: src/Config.php:157
 msgid "Status of new posts:"
 msgstr "Status des nouveaux billets :"
 
-#: src/Config.php:166
+#: src/Config.php:165
 msgid "Owner of entries created by the feed server:"
 msgstr "Propriétaire des billets créés par le serveur de flux :"
 
-#: src/Config.php:174
+#: src/Config.php:173
 msgid "How to transform imported tags:"
 msgstr "Comment tranformer la casse des mots-clés importés :"
 
-#: src/Config.php:186
+#: src/Config.php:185
 msgid "Update feeds on public side:"
 msgstr "Mettre à jour les flux depuis la partie publique :"
 
-#: src/Config.php:194
+#: src/Config.php:193
 msgid "Number of feeds to update at one time:"
 msgstr "Nombre de flux mis à jour à la fois :"
 
-#: src/Config.php:205
+#: src/Config.php:204
 msgid "Keep active empty feeds"
 msgstr "Garder actif les flux vides"
 
-#: src/Config.php:213
+#: src/Config.php:212
 msgid "Enable public page"
 msgstr "Activer la page publique"
 
-#: src/Config.php:225
+#: src/Config.php:224
 msgid "Redirect to original post on:"
 msgstr "Rediriger vers le billet original sur :"
 
-#: src/Config.php:232
+#: src/Config.php:231
 msgid "Show full content on:"
 msgstr "Afficher le contenu complet sur :"
 
-#: src/FeedsActions.php:46
+#: src/FeedsActions.php:50
 msgid "Feeds"
 msgstr "Flux de syndication"
 
-#: src/FeedsActions.php:61
-#: src/FeedsDefaultActions.php:271
-msgid "Feeds server"
-msgstr "Serveur de flux"
-
-#: src/FeedsActions.php:67
+#: src/FeedsActions.php:75
 msgid "Back to feeds list"
 msgstr "Retour à la liste des flux"
 
-#: src/FeedsActions.php:82
+#: src/FeedsActions.php:91
 msgid "Feeds actions"
 msgstr "Actions sur les flux"
 
@@ -297,6 +292,10 @@ msgid_plural "Category of %s feeds successfully changed."
 msgstr[0] "La catégorie de %s flux a été changé."
 msgstr[1] "Les catégories de %s flux ont été changé."
 
+#: src/FeedsDefaultActions.php:271
+msgid "Feeds server"
+msgstr "Serveur de flux"
+
 #: src/FeedsDefaultActions.php:329
 msgid "Update frequency of %s feed successfully changed."
 msgid_plural "Update frequency of %s feeds successfully changed."
@@ -343,88 +342,88 @@ msgstr "jamais"
 msgid "View entries"
 msgstr "Voir les billets"
 
-#: src/Manage.php:68
+#: src/Manage.php:67
 msgid "Module is not wel configured"
 msgstr "Le module n'est pas configuré correctement"
 
-#: src/Manage.php:157
+#: src/Manage.php:156
 msgid "Feeds list"
 msgstr "Liste de flux"
 
-#: src/Manage.php:167
-#: src/ManageFeed.php:212
+#: src/Manage.php:166
+#: src/ManageFeed.php:211
 msgid "New feed"
 msgstr "Nouveau flux"
 
-#: src/Manage.php:195
+#: src/Manage.php:194
 msgid "Selected feeds action:"
 msgstr "Action sur les flux sélectionnés :"
 
-#: src/ManageFeed.php:78
+#: src/ManageFeed.php:77
 msgid "Record with same feed URL already exists."
 msgstr "Un enregistrement avec la même URL de flux existe déjà."
 
-#: src/ManageFeed.php:81
+#: src/ManageFeed.php:80
 msgid "You must provide a name."
 msgstr "Vous devez indiquer un nom."
 
-#: src/ManageFeed.php:84
+#: src/ManageFeed.php:83
 msgid "You must provide an owner."
 msgstr "Vous devez indiquer un propriétaire."
 
-#: src/ManageFeed.php:87
+#: src/ManageFeed.php:86
 msgid "You must provide valid site URL."
 msgstr "Vous devez donner une URL de site valide."
 
-#: src/ManageFeed.php:90
+#: src/ManageFeed.php:89
 msgid "You must provide valid feed URL."
 msgstr "Vous devez donner une URL de flux valide."
 
-#: src/ManageFeed.php:93
+#: src/ManageFeed.php:92
 msgid "You must provide valid category."
 msgstr "Vous devez donner une catégorie valide."
 
-#: src/ManageFeed.php:105
+#: src/ManageFeed.php:104
 msgid "Failed to save feed."
 msgstr "Impossible de sauvegarder le flux."
 
-#: src/ManageFeed.php:109
+#: src/ManageFeed.php:108
 msgid "Feed successfully created."
 msgstr "Flux créé avec succcès."
 
-#: src/ManageFeed.php:212
+#: src/ManageFeed.php:211
 msgid "Edit feed"
 msgstr "Edition de flux"
 
-#: src/ManageFeed.php:215
+#: src/ManageFeed.php:214
 msgid "Edit feed \"%s\""
 msgstr "Modifier le flux \"%s\""
 
-#: src/ManageFeed.php:248
+#: src/ManageFeed.php:247
 msgid "Feed information"
 msgstr "Information sur le flux"
 
-#: src/ManageFeed.php:264
+#: src/ManageFeed.php:263
 msgid "Owner:"
 msgstr "Propriétaire :"
 
-#: src/ManageFeed.php:276
+#: src/ManageFeed.php:275
 msgid "Site URL:"
 msgstr "URL du site :"
 
-#: src/ManageFeed.php:322
+#: src/ManageFeed.php:321
 msgid "Tweeter or Identica ident:"
 msgstr "Identifiant Twiiter ou Identi.ca :"
 
-#: src/ManageFeed.php:334
+#: src/ManageFeed.php:333
 msgid "Local settings"
 msgstr "Paramètres locaux"
 
-#: src/ManageFeed.php:358
+#: src/ManageFeed.php:357
 msgid "Update:"
 msgstr "Mise à jour :"
 
-#: src/ManageFeed.php:379
+#: src/ManageFeed.php:378
 msgid "Import tags from feed"
 msgstr "Importer les tags depuis le flux"
 

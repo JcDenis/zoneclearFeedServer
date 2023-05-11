@@ -21,7 +21,7 @@ L10n::$locales['Feed named "%s" point to "%s" has been set to "%s"']     = 'Le f
 L10n::$locales['Feed deletion']                                          = 'Suppression de flux';
 L10n::$locales['Feed named "%s" point to "%s" has been deleted by "%s"'] = 'Le flux nommé "%s" pointant vers "%s" a été supprimé par "%s"';
 L10n::$locales['Check feed update']                                      = 'Vérification de flux';
-L10n::$locales['Feed named "%s" has been updated automatically']         = 'Le flux nommé "%s" pointant vers "%s" a été vérifié automatiquement';
+L10n::$locales['Feed named "%s" has been updated automatically']         = 'Le flux nommé "%s" a été vérifié automatiquement';
 L10n::$locales['%s feed disabled']                                       = [
     '%s flux désactivé',
     '%s flux désactivés',
@@ -66,7 +66,6 @@ L10n::$locales['Enable public page']                                     = 'Acti
 L10n::$locales['Redirect to original post on:']                          = 'Rediriger vers le billet original sur :';
 L10n::$locales['Show full content on:']                                  = 'Afficher le contenu complet sur :';
 L10n::$locales['Feeds']                                                  = 'Flux de syndication';
-L10n::$locales['Feeds server']                                           = 'Serveur de flux';
 L10n::$locales['Back to feeds list']                                     = 'Retour à la liste des flux';
 L10n::$locales['Feeds actions']                                          = 'Actions sur les flux';
 L10n::$locales['Change update interval']                                 = 'Changer l\'interval de mise à jour';
@@ -90,6 +89,7 @@ L10n::$locales['Category of %s feed successfully changed.'] = [
     'La catégorie de %s flux a été changé.',
     'Les catégories de %s flux ont été changé.',
 ];
+L10n::$locales['Feeds server']                                      = 'Serveur de flux';
 L10n::$locales['Update frequency of %s feed successfully changed.'] = [
     'La fréquence de mise à jour de %s flux a été changé.',
     'Les fréquences de mise à jour de %s flux ont été changé.',
