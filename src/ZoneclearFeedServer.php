@@ -760,12 +760,12 @@ class ZoneclearFeedServer
 
                             throw $e;
                         }
-
-                        # --BEHAVIOR-- zoneclearFeedServerAfterCheckFeedUpdate -- FeedRow
-                        dcCore::app()->callBehavior('zoneclearFeedServerAfterCheckFeedUpdate', $row);
                     }
                     dcCore::app()->con->commit();
                 }
+
+                # --BEHAVIOR-- zoneclearFeedServerAfterCheckFeedUpdate -- FeedRow
+                dcCore::app()->callBehavior('zoneclearFeedServerAfterCheckFeedUpdate', $row);
             }
         }
         if ($enabled) {
