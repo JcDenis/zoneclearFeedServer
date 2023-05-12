@@ -63,7 +63,7 @@ class ZoneclearFeedServer
     /** @var    Settings    The settings instance */
     public readonly Settings $settings;
 
-    /** @var null|resource  $lock   File lock for update */
+    /** @var null|string  $lock   File lock for update */
     private static $lock = null;
 
     /** @var null|string  $user   Affiliate user ID */
@@ -416,54 +416,30 @@ class ZoneclearFeedServer
      *
      * @return  bool    True if file is locked
      */
-    public function lockUpdate()
+    public function lockUpdate(): bool
     {
         try {
-            # Need flock function
-            if (!function_exists('flock')) {
-                throw new Exception("Can't call php function named flock");
-            }
             # Cache writable ?
             if (!is_writable(DC_TPL_CACHE)) {
                 throw new Exception("Can't write in cache fodler");
             }
             # Set file path
-            $f_md5       = md5((string) dcCore::app()->blog?->id);
-            $cached_file = sprintf(
+            $f_md5 = md5((string) dcCore::app()->blog?->id);
+            $file  = sprintf(
                 '%s/%s/%s/%s/%s.txt',
                 DC_TPL_CACHE,
-                'periodical',
+                My::id(),
                 substr($f_md5, 0, 2),
                 substr($f_md5, 2, 2),
                 $f_md5
             );
-            # Real path
-            $cached_file = Path::real($cached_file, false);
-            if (false === $cached_file) {
-                throw new Exception("Can't get cache file path");
+
+            $file = Lock::lock($file);
+            if (is_null($file) || empty($file)) {
+                return false;
             }
-            # Make dir
-            if (!is_dir(dirname($cached_file))) {
-                Files::makeDir(dirname($cached_file), true);
-            }
-            # Make file
-            if (!file_exists($cached_file)) {
-                !$fp = @fopen($cached_file, 'w');
-                if ($fp === false) {
-                    throw new Exception("Can't create file");
-                }
-                fwrite($fp, '1', strlen('1'));
-                fclose($fp);
-            }
-            # Open file
-            if (!($fp = @fopen($cached_file, 'r+'))) {
-                throw new Exception("Can't open file");
-            }
-            # Lock file
-            if (!flock($fp, LOCK_EX)) {
-                throw new Exception("Can't lock file");
-            }
-            self::$lock = $fp;
+
+            self::$lock = $file;
 
             return true;
         } catch (Exception $e) {
@@ -477,7 +453,7 @@ class ZoneclearFeedServer
     public function unlockUpdate(): void
     {
         if (!is_null(self::$lock)) {
-            @fclose(self::$lock);
+            Lock::unlock(self::$lock);
             self::$lock = null;
         }
     }
@@ -500,13 +476,7 @@ class ZoneclearFeedServer
         }
 
         # Limit to one update at a time
-        try {
-            $this->lockUpdate();
-        } catch (Exception $e) {
-            if ($throw) {
-                throw $e;
-            }
-
+        if (!$this->lockUpdate()) {
             return false;
         }
 
