@@ -66,13 +66,13 @@ class FeedsActions extends dcActions
             dcPage::jsLoad('js/_posts_actions.js') .
             $head
         );
-        echo 
+        echo
         $breadcrumb .
         (new Para())->items([
             (new Link())
                 ->class('back')
                 ->href($this->getRedirection(true))
-                ->text(__('Back to feeds list'))
+                ->text(__('Back to feeds list')),
         ])->render();
     }
 
