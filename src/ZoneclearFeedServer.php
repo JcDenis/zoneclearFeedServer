@@ -116,7 +116,7 @@ class ZoneclearFeedServer
                 throw new Exception(__('No such ID'));
             }
 
-            $cur->setField('feed_upddt', date('Y-m-d H:i:s'));
+            $this->getFeedCursor($cur);
 
             $cur->update(sprintf(
                 "WHERE feed_id = %s AND blog_id = '%s' ",
@@ -150,9 +150,8 @@ class ZoneclearFeedServer
             $cur->setField('feed_id', $this->getNextId());
             $cur->setField('blog_id', dcCore::app()->con->escapeStr((string) dcCore::app()->blog?->id));
             $cur->setField('feed_creadt', date('Y-m-d H:i:s'));
-            $cur->setField('feed_upddt', date('Y-m-d H:i:s'));
 
-            //add getFeedCursor here
+            $this->getFeedCursor($cur);
 
             $cur->insert();
             dcCore::app()->con->unlock();
@@ -169,6 +168,14 @@ class ZoneclearFeedServer
         dcCore::app()->callBehavior('zoneclearFeedServerAfterAddFeed', $cur, $id);
 
         return $id;
+    }
+
+    protected function getFeedCursor(Cursor $cur): void
+    {
+        if ($cur->isField('feed_get_tags')) {
+            $cur->setField('feed_get_tags', is_numeric($cur->getField('feed_get_tags')) ? (int) $cur->getField('feed_get_tags') : 0);
+        }
+        $cur->setField('feed_upddt', date('Y-m-d H:i:s'));
     }
 
     /**
@@ -255,7 +262,7 @@ class ZoneclearFeedServer
                 My::META_PREFIX . 'id',
             ]));
 
-        if (!is_null($post_id)) {
+        if (!is_null($id)) {
             $sql->and('post_id = ' . $id);
         }
 
