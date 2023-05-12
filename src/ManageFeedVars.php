@@ -157,7 +157,7 @@ class ManageFeedVars
             $feed_lang     = !empty($_POST['feed_lang'])    && is_string($_POST['feed_lang']) ? $_POST['feed_lang'] : $feed_lang;
             $feed_tags     = !empty($_POST['feed_tags'])    && is_string($_POST['feed_tags']) ? $_POST['feed_tags'] : $feed_tags;
             $feed_get_tags = empty($_POST['feed_get_tags']) ? $feed_get_tags : true;
-            $feed_cat_id   = empty($_POST['feed_cat_id']) ? $feed_cat_id : $_POST['feed_cat_id'];
+            $feed_cat_id   = !empty($_POST['feed_cat_id'])  && is_numeric($_POST['feed_cat_id']) ? (int) $_POST['feed_cat_id'] : $feed_cat_id;
             $feed_upd_int  = !empty($_POST['feed_upd_int']) && is_numeric($_POST['feed_upd_int']) ? (int) $_POST['feed_upd_int'] : $feed_upd_int;
             $feed_status   = empty($_POST['feed_status']) ? $feed_status : 1;
         }
