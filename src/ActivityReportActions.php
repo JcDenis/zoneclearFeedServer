@@ -65,7 +65,10 @@ class ActivityReportActions
             'zoneclearFeedServerAfterAddFeed',
             function (Cursor $cur, int $id): void {
                 $user = dcCore::app()->auth?->getInfo('user_cn');
-                if (!is_string($user)) {
+                if (!is_string($user)
+                    || !is_string($cur->getField('feed_name'))
+                    || !is_string($cur->getField('feed_feed'))
+                ) {
                     return;
                 }
                 $logs = [
