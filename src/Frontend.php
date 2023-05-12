@@ -85,7 +85,6 @@ class Frontend extends dcNsProcess
                 try {
                     ZoneclearFeedServer::instance()->checkFeedsUpdate();
                 } catch (Exception $e) {
-                    pdump($e);
                 }
             });
         } elseif (3 == $s->bhv_pub_upd) {
