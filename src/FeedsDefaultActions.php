@@ -226,7 +226,7 @@ class FeedsDefaultActions
             $cur->clean();
             $cur->setField('feed_upd_last', 0);
             $ap->zcfs->updateFeed($id, $cur);
-            $ap->zcfs->checkFeedsUpdate($id, true);
+            //$ap->zcfs->checkFeedsUpdate($id, true);
         }
 
         dcPage::addSuccessNotice(sprintf(
