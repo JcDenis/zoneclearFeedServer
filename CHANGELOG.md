@@ -3,6 +3,19 @@
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
 
+2023.05.13
+- require dotclear 2.26
+- require php 8.1+
+- use define php_min
+- use form helper
+- use dotclear lock method
+- add feed cursor helper
+- fix action pages
+- fix behaviors level
+- fix null category
+- fix translation
+- fix type hint and nullsafe warnings
+
 2023.05.08
 - require dotclear 2.26
 - require php 8.1+
