@@ -18,6 +18,7 @@ use ArrayObject;
 use dcCore;
 use dcPage;
 use dcFavorites;
+use dcSettings;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\Html\Form\{
     Checkbox,
@@ -25,7 +26,9 @@ use Dotclear\Helper\Html\Form\{
     Input,
     Label,
     Link,
+    Number,
     Para,
+    Select,
     Text
 };
 use Dotclear\Helper\Html\Html;
@@ -35,6 +38,196 @@ use Dotclear\Helper\Html\Html;
  */
 class BackendBehaviors
 {
+    /**
+     * Module settings save.
+     *
+     * Used in blog settings and module config.
+     */
+    public static function adminBeforeBlogSettingsUpdate(?dcSettings $blog_settings): void
+    {
+        // read settings
+        $s = ZoneclearFeedServer::instance()->settings;
+
+        // write settings
+        foreach ($s->dump() as $key => $value) {
+            $s->set($key, $_POST[My::id() . $key] ?? $value);
+        }
+    }
+
+    /**
+     * Module settings form.
+     *
+     * Used in blog settings and module config.
+     */
+    public static function adminBlogPreferencesFormV2(?dcSettings $blog_settings): void
+    {
+        // nullsafe
+        if (is_null(dcCore::app()->blog)) {
+            return;
+        }
+
+        $z = ZoneclearFeedServer::instance();
+        $s = $z->settings;
+
+        $msg = [];
+        if (!is_writable(DC_TPL_CACHE)) {
+            $msg[] = (new Para())
+                ->class('error')
+                ->text(__('Dotclear cache is not writable or not well configured!'));
+        }
+        if ($s->pub_active) {
+            $msg[] = (new Para())
+                ->items([
+                    (new Link())
+                        ->class('onblog_link outgoing')
+                        ->text(__('View the public list of feeds') . ' <img alt="" src="images/outgoing-link.svg">')
+                        ->href(dcCore::app()->blog->url . dcCore::app()->url->getBase('zoneclearFeedsPage')),
+                ]);
+        }
+
+        $titles = [];
+        foreach ($z->getPublicUrlTypes() as $k => $v) {
+            $titles[] = (new Para(null, 'li'))
+                ->items([
+                    (new Checkbox([My::id() . 'post_title_redir[]', My::id() . 'post_title_redir_' . $v], in_array($v, $s->post_title_redir)))
+                        ->value($v),
+                    (new Label(__($k), Label::OUTSIDE_LABEL_AFTER))
+                        ->class('classic')
+                        ->for(My::id() . 'post_title_redir_' . $v),
+                ]);
+        }
+
+        $contents = [];
+        foreach ($z->getPublicUrlTypes() as $k => $v) {
+            $contents[] = (new Para(null, 'li'))
+                ->items([
+                    (new Checkbox([My::id() . 'post_full_tpl_[]', My::id() . 'post_full_tpl_' . $v], in_array($v, $s->post_full_tpl)))
+                        ->value($v),
+                    (new Label(__($k), Label::OUTSIDE_LABEL_AFTER))
+                        ->class('classic')
+                        ->for(My::id() . 'post_full_tpl_' . $v),
+                ]);
+        }
+
+        echo
+        (new Div())->class('fieldset')
+            ->items([
+                !is_null($blog_settings) ? 
+                    (new Text('h4', My::name()))
+                        ->id('disclaimerParam') : 
+                    (new Text()),
+                (new Div())
+                    ->items($msg),
+                (new Para())
+                    ->items([
+                        (new Checkbox(My::id() . 'active', $s->active))
+                            ->value(1),
+                        (new Label(__('Enable plugin'), Label::OUTSIDE_LABEL_AFTER))
+                            ->class('classic')
+                            ->for(My::id() . 'active'),
+                    ]),
+                (new Div())
+                    ->class('clear two-cols')
+                    ->items([
+                        (new Div())
+                            ->class('fieldset col')
+                            ->items([
+                                (new Para())
+                                    ->items([
+                                        (new Label(__('Status of new posts:'), Label::OUTSIDE_LABEL_BEFORE))
+                                            ->for(My::id() . 'post_status_new'),
+                                        (new Select(My::id() . 'post_status_new'))
+                                            ->items(Combo::postsStatus())
+                                            ->default((string) $s->post_status_new),
+                                    ]),
+                                (new Para())
+                                    ->items([
+                                        (new Label(__('Owner of entries created by the feed server:'), Label::OUTSIDE_LABEL_BEFORE))
+                                            ->for(My::id() . 'user'),
+                                        (new Select(My::id() . 'user'))
+                                            ->items($z->getAllBlogAdmins())
+                                            ->default($s->user),
+                                    ]),
+                                (new Para())
+                                    ->items([
+                                        (new Label(__('How to transform imported tags:'), Label::OUTSIDE_LABEL_BEFORE))
+                                            ->for(My::id() . 'tag_case'),
+                                        (new Select(My::id() . 'tag_case'))
+                                            ->items(Combo::tagCase())
+                                            ->default((string) $s->tag_case),
+                                    ]),
+                            ]),
+                        (new Div())
+                            ->class('fieldset col')
+                            ->items([
+                                (new Para())
+                                    ->items([
+                                        (new Label(__('Update feeds on public side:'), Label::OUTSIDE_LABEL_BEFORE))
+                                            ->for(My::id() . 'bhv_pub_upd'),
+                                        (new Select(My::id() . 'bhv_pub_upd'))
+                                            ->items(Combo::pubUpdate())
+                                            ->default((string) $s->bhv_pub_upd),
+                                    ]),
+                                (new Para())
+                                    ->items([
+                                        (new Label(__('Number of feeds to update at one time:'), Label::OUTSIDE_LABEL_BEFORE))
+                                            ->for(My::id() . 'update_limit'),
+                                        (new Number(My::id() . 'update_limit'))
+                                            ->min(0)
+                                            ->max(20)
+                                            ->value($s->update_limit),
+                                    ]),
+                                (new Para())
+                                    ->items([
+                                        (new Checkbox(My::id() . 'keep_empty_feed', $s->keep_empty_feed))
+                                            ->value(1),
+                                        (new Label(__('Keep active empty feeds'), Label::OUTSIDE_LABEL_AFTER))
+                                            ->class('classic')
+                                            ->for(My::id() . 'keep_empty_feed'),
+                                    ]),
+                                (new Para())
+                                    ->items([
+                                        (new Checkbox(My::id() . 'pub_active', $s->pub_active))
+                                            ->value(1),
+                                        (new Label(__('Enable public page'), Label::OUTSIDE_LABEL_AFTER))
+                                            ->class('classic')
+                                            ->for(My::id() . 'pub_active'),
+                                    ]),
+                            ]),
+                    ]),
+                (new Div())
+                    ->class('two-cols')
+                    ->items([
+                        (new Div())
+                            ->class('fieldset col')
+                            ->items([
+                                (new Text('p', __('Redirect to original post on:'))),
+                                (new Para(null, 'ul'))
+                                    ->items($titles),
+                            ]),
+                        (new Div())
+                            ->class('fieldset col')
+                            ->items([
+                                (new Text('p', __('Show full content on:'))),
+                                (new Para(null, 'ul'))
+                                    ->items($contents),
+                            ]),
+                    ]),
+                (new Div())->class('clear')->items(
+                    !is_null($blog_settings) && $s->active ? 
+                        [(new Para())
+                            ->items([
+                                (new Link())
+                                    ->href(dcCore::app()->adminurl?->get('admin.plugin.' . My::id()))
+                                    ->text(__('Configure feeds'))
+                            ])] :
+                        [],
+                ),
+                (new Div())->class('clear')
+            ])
+            ->render();
+    }
+
     /**
      * User dashboard favorites icon.
      */

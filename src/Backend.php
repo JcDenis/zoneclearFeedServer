@@ -50,6 +50,8 @@ class Backend extends dcNsProcess
             'UninstallerCleanersConstruct' => function ($uninstaller_stack) {
                 UninstallCleaner::init($uninstaller_stack);
             },
+            'adminBeforeBlogSettingsUpdate' => [BackendBehaviors::class, 'adminBeforeBlogSettingsUpdate'],
+            'adminBlogPreferencesFormV2'    => [BackendBehaviors::class, 'adminBlogPreferencesFormV2'],
         ]);
 
         // nullsafe
