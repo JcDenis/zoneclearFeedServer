@@ -112,9 +112,9 @@ class BackendBehaviors
         echo
         (new Div())->class('fieldset')
             ->items([
-                !is_null($blog_settings) ? 
+                !is_null($blog_settings) ?
                     (new Text('h4', My::name()))
-                        ->id('disclaimerParam') : 
+                        ->id('disclaimerParam') :
                     (new Text()),
                 (new Div())
                     ->items($msg),
@@ -214,16 +214,16 @@ class BackendBehaviors
                             ]),
                     ]),
                 (new Div())->class('clear')->items(
-                    !is_null($blog_settings) && $s->active ? 
+                    !is_null($blog_settings) && $s->active ?
                         [(new Para())
                             ->items([
                                 (new Link())
                                     ->href(dcCore::app()->adminurl?->get('admin.plugin.' . My::id()))
-                                    ->text(__('Configure feeds'))
+                                    ->text(__('Configure feeds')),
                             ])] :
                         [],
                 ),
-                (new Div())->class('clear')
+                (new Div())->class('clear'),
             ])
             ->render();
     }

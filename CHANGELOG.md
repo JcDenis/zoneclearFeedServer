@@ -3,9 +3,12 @@
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
 
-2023.06.30
+2023.07.01
 - require dotclear 2.26
-- fix php8.1 compliant (hope so)
+- require php 8.1+
+- fix php8.1 compliant
+- duplicate settings to blog pref
+- fix checkbox helpers
 
 2023.05.13
 - require dotclear 2.26
