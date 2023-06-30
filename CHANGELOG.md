@@ -3,6 +3,10 @@
 - [ ] add plugin muppet support (request Mathieu M.)
 - [ ] add log for errors
 
+2023.06.30
+- require dotclear 2.26
+- fix php8.1 compliant (hope so)
+
 2023.05.13
 - require dotclear 2.26
 - require php 8.1+
