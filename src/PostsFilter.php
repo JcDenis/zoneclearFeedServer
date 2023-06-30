@@ -52,8 +52,10 @@ class PostsFilter extends adminGenericFilterV2
 
     /**
      * Posts users select
+     *
+     * @return null|dcAdminFilter
      */
-    public function getPostUserFilter(): ?dcAdminFilter
+    public function getPostUserFilter()
     {
         $users = null;
 
@@ -83,8 +85,10 @@ class PostsFilter extends adminGenericFilterV2
 
     /**
      * Posts categories select
+     *
+     * @return null|dcAdminFilter
      */
-    public function getPostCategoriesFilter(): ?dcAdminFilter
+    public function getPostCategoriesFilter()
     {
         $categories = null;
 
@@ -135,8 +139,10 @@ class PostsFilter extends adminGenericFilterV2
 
     /**
      * Posts by month select
+     *
+     * @return null|dcAdminFilter
      */
-    public function getPostMonthFilter(): ?dcAdminFilter
+    public function getPostMonthFilter()
     {
         $dates = null;
 

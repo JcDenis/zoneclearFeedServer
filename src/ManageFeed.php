@@ -386,7 +386,7 @@ class ManageFeed extends dcNsProcess
                                 ->items(array_merge(
                                     dcCore::app()->adminurl->hiddenFormFields('admin.plugin.' . My::id(), [
                                         'part'    => 'feed',
-                                        'feed_id' => $v->id,
+                                        'feed_id' => (string) $v->id,
                                         'action'  => 'savefeed',
                                     ]),
                                     [

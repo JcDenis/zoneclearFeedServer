@@ -770,8 +770,9 @@ class ZoneclearFeedServer
             }
         # Disable
         } else {
-            dcCore::app()->auth = null;
-            dcCore::app()->auth = new dcAuth();
+            // auth on branch My goes readonly
+            //dcCore::app()->auth = null;
+            //dcCore::app()->auth = new dcAuth();
             // restore current user
             dcCore::app()->auth->checkUser($this->user ?? '');
         }
@@ -784,7 +785,7 @@ class ZoneclearFeedServer
      *
      * @return  Parser|false    The parsed feed
      */
-    public static function readFeed(string $url): false|Parser
+    public static function readFeed(string $url)
     {
         try {
             $feed_reader = new Reader();
