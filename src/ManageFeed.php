@@ -197,7 +197,7 @@ class ManageFeed extends dcNsProcess
             (
                 $v->id && isset($post_filter) && !dcCore::app()->error->flag() ?
                 $post_filter->js(dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'feed', 'feed_id' => $v->id], '&') . '#entries') .
-                    dcPage::jsModuleLoad(My::id() . '/js/list.js')
+                    dcPage::jsModuleLoad(My::id() . '/js/feed.js')
                 : ''
             ) .
             dcPage::jsPageTabs() .

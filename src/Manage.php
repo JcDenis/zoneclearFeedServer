@@ -143,7 +143,7 @@ class Manage extends dcNsProcess
             (
                 isset($feeds_list) && !dcCore::app()->error->flag() ?
                 $feeds_filter->js(dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'feeds'], '&')) .
-                    dcPage::jsModuleLoad(My::id() . '/js/list.js')
+                    dcPage::jsModuleLoad(My::id() . '/js/feeds.js')
                 : ''
             ) .
             dcPage::jsPageTabs()
