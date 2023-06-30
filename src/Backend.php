@@ -47,7 +47,9 @@ class Backend extends dcNsProcess
             // widgets registration
             'initWidgets' => [Widgets::class, 'init'],
             // add Uninstaller cleaner for special direct action
-            'UninstallerCleanersConstruct' => [UninstallCleaner::class, 'init'],
+            'UninstallerCleanersConstruct' => function ($uninstaller_stack) {
+                UninstallCleaner::init($uninstaller_stack);
+            },
         ]);
 
         // nullsafe
