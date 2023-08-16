@@ -471,7 +471,7 @@ class ZoneclearFeedServer
         $s = $this->settings;
 
         # Not configured
-        if (is_null(dcCore::app()->auth) || !$s->active || !$s->user) {
+        if (!$s->active || !$s->user) {
             return false;
         }
 
@@ -753,10 +753,6 @@ class ZoneclearFeedServer
      */
     public function enableUser(bool $enable = false): void
     {
-        if (is_null(dcCore::app()->auth)) {
-            return;
-        }
-
         # Enable
         if ($enable) {
             // backup current user

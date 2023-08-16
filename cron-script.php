@@ -75,7 +75,7 @@ if (is_null(dcCore::app()->blog) || dcCore::app()->blog->id == null) {
     exit(1);
 }
 
-if (!isset($opts['u']) || is_null(dcCore::app()->auth) || !dcCore::app()->auth->checkUser(is_string($opts['u']) ? $opts['u'] : '')) {
+if (!isset($opts['u']) || !dcCore::app()->auth->checkUser(is_string($opts['u']) ? $opts['u'] : '')) {
     fwrite(STDERR, "Unable to set user\n");
     exit(1);
 }

@@ -233,11 +233,6 @@ class BackendBehaviors
      */
     public static function adminDashboardFavoritesV2(dcFavorites $favs): void
     {
-        // nullsafe
-        if (is_null(dcCore::app()->auth) || is_null(dcCore::app()->adminurl)) {
-            return;
-        }
-
         $favs->register(My::id(), [
             'title'       => My::name(),
             'url'         => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
@@ -249,10 +244,6 @@ class BackendBehaviors
             ]),
             // update user dashboard favorites icon with nb of updated feeds
             'dashboard_cb' => function (ArrayObject $fav): void {
-                if (is_null(dcCore::app()->adminurl)) {
-                    return;
-                }
-
                 $count = ZoneclearFeedServer::instance()->getFeeds(['feed_status' => '0'], true)->f(0);
                 if (!$count || !is_numeric($count)) {
                     return;
@@ -359,7 +350,7 @@ class BackendBehaviors
     public static function adminPostFormItems(ArrayObject $main_items, ArrayObject $sidebar_items, ?MetaRecord $post): void
     {
         // nullsafe
-        if (is_null(dcCore::app()->auth) || is_null(dcCore::app()->blog) || is_null(dcCore::app()->adminurl)) {
+        if (is_null(dcCore::app()->blog)) {
             return;
         }
 

@@ -55,10 +55,7 @@ class Backend extends dcNsProcess
         ]);
 
         // nullsafe
-        if (is_null(dcCore::app()->auth)
-            || is_null(dcCore::app()->blog)
-            || is_null(dcCore::app()->adminurl)
-        ) {
+        if (is_null(dcCore::app()->blog)) {
             return false;
         }
 

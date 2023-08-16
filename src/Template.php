@@ -18,6 +18,7 @@ use ArrayObject;
 use dcCore;
 use dcTemplate;
 use Dotclear\Helper\Html\Html;
+use Dotclear\Helper\L10n;
 
 /**
  * Frontend template blocks and values.
@@ -206,7 +207,7 @@ class Template
     {
         return empty($a['full']) ?
             self::getValue($a, 'dcCore::app()->ctx->feeds->feed_lang') :
-            '<?php $langs = l10n::getISOcodes(); if (isset($langs[dcCore::app()->ctx->feeds->feed_lang])) { ?>' .
+            '<?php $langs = ' . L10n::class . '::getISOcodes(); if (isset($langs[dcCore::app()->ctx->feeds->feed_lang])) { ?>' .
             self::getValue($a, '$langs[dcCore::app()->ctx->feeds->feed_lang]') .
             '<?php } else { ?>' .
             self::getValue($a, 'dcCore::app()->ctx->feeds->feed_lang') .
