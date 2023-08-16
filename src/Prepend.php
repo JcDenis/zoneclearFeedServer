@@ -15,23 +15,21 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use dcCore;
-use dcNsProcess;
+use Dotclear\Core\Process;
 
 /**
  * Module prepend.
  */
-class Prepend extends dcNsProcess
+class Prepend extends Process
 {
     public static function init(): bool
     {
-        static::$init = defined('DC_RC_PATH');
-
-        return static::$init;
+        return self::status(My::checkContext(My::PREPEND));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 

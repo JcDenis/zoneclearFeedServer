@@ -14,11 +14,16 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use adminGenericFilterV2;
-use dcAdminFilters;
 use dcCore;
-use dcNsProcess;
-use dcPage;
+use Dotclear\Core\Backend\Filter\{
+    Filters,
+    FiltersLibrary
+};
+use Dotclear\Core\Backend\{
+    Notices,
+    Page
+};
+use Dotclear\Core\Process;
 use Dotclear\Helper\Html\Form\{
     Div,
     Form,
@@ -34,27 +39,23 @@ use Exception;
 /**
  * Backend feeds list manage page.
  */
-class Manage extends dcNsProcess
+class Manage extends Process
 {
     public static function init(): bool
     {
-        static::$init == defined('DC_CONTEXT_ADMIN')
-            && !is_null(dcCore::app()->blog)
-            && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-                dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
-            ]), dcCore::app()->blog->id);
+        self::status(My::checkContext(My::MANAGE));
 
         // call period manage page
         if (($_REQUEST['part'] ?? 'feeds') === 'feed') {
-            static::$init = ManageFeed::init();
+            self::status(ManageFeed::init());
         }
 
-        return static::$init;
+        return self::status();
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 
@@ -78,7 +79,7 @@ class Manage extends dcNsProcess
 
     public static function render(): void
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return;
         }
 
@@ -87,16 +88,16 @@ class Manage extends dcNsProcess
 
         // not configured
         if (!$s->active || !$s->user) {
-            dcPage::openModule(My::id());
+            Page::openModule(My::id());
 
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
                 My::name()    => '',
             ]) .
-            dcPage::notices();
+            Notices::getNotices();
 
-            dcPage::closeModule();
+            Page::closeModule();
 
             return;
         }
@@ -118,10 +119,10 @@ class Manage extends dcNsProcess
         }
 
         // feeds filters
-        $feeds_filter = new adminGenericFilterV2(My::id() . 'feeds');
+        $feeds_filter = new Filters(My::id() . 'feeds');
         $feeds_filter->add('part', 'feeds');
-        $feeds_filter->add(dcAdminFilters::getPageFilter());
-        $feeds_filter->add(dcAdminFilters::getSearchFilter());
+        $feeds_filter->add(FiltersLibrary::getPageFilter());
+        $feeds_filter->add(FiltersLibrary::getSearchFilter());
         $params = $feeds_filter->params();
 
         // feeds list
@@ -133,24 +134,24 @@ class Manage extends dcNsProcess
             dcCore::app()->error->add($e->getMessage());
         }
 
-        dcPage::openModule(
+        Page::openModule(
             My::id(),
             (
                 isset($feeds_list) && !dcCore::app()->error->flag() ?
-                $feeds_filter->js(dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'feeds'], '&')) .
-                    dcPage::jsModuleLoad(My::id() . '/js/feeds.js')
+                $feeds_filter->js(My::manageUrl(['part' => 'feeds'], '&')) .
+                    My::jsLoad('feeds')
                 : ''
             ) .
-            dcPage::jsPageTabs()
+            Page::jsPageTabs()
         );
 
         echo
-        dcPage::breadcrumb([
+        Page::breadcrumb([
             __('Plugins')    => '',
-            My::name()       => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+            My::name()       => My::manageUrl(),
             __('Feeds list') => '',
         ]) .
-        dcPage::notices();
+        Notices::getNotices();
 
         echo
         (new Para())
@@ -159,21 +160,21 @@ class Manage extends dcNsProcess
                 (new Link())
                     ->class('button add')
                     ->text(__('New feed'))
-                    ->href((string) dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'feed'])),
+                    ->href((string) My::manageUrl(['part' => 'feed'])),
             ])
             ->render();
 
         if (isset($feeds_list)) {
             $feeds_filter->display(
                 'admin.plugin.' . My::id(),
-                dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . My::id(), ['part' => 'feeds'])
+                My::parsedHiddenFields(['part' => 'feeds'])
             );
 
             $feeds_list->display(
                 $feeds_filter,
                 (new Form('form-feeds'))
                     ->method('post')
-                    ->action(dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'feeds']))
+                    ->action(My::manageUrl(['part' => 'feeds']))
                     ->fields([
                         (new Text('', '%s')),
                         (new Div())
@@ -183,25 +184,22 @@ class Manage extends dcNsProcess
                                     ->class('col checkboxes-helpers'),
                                 (new Para())
                                     ->class('col right')
-                                    ->items(array_merge(
-                                        dcCore::app()->adminurl->hiddenFormFields('admin.plugin.' . My::id(), $feeds_filter->values(true)),
-                                        [
-                                            (new Label(__('Selected feeds action:'), Label::OUTSIDE_LABEL_BEFORE))
-                                                ->for('action'),
-                                            (new Select('action'))
-                                                ->items($feeds_actions_page->getCombo()),
-                                            (new Submit('feeds-action'))
-                                                ->value(__('ok')),
-                                            dcCore::app()->formNonce(false),
+                                    ->items([
+                                        (new Label(__('Selected feeds action:'), Label::OUTSIDE_LABEL_BEFORE))
+                                            ->for('action'),
+                                        (new Select('action'))
+                                            ->items($feeds_actions_page->getCombo()),
+                                        (new Submit('feeds-action'))
+                                            ->value(__('ok')),
+                                        ... My::hiddenFields($feeds_filter->values(true)),
 
-                                        ]
-                                    )),
+                                    ]),
                             ]),
                     ])
                     ->render()
             );
         }
 
-        dcPage::closeModule();
+        Page::closeModule();
     }
 }

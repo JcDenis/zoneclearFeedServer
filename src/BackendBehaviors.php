@@ -16,9 +16,8 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
 use dcCore;
-use dcPage;
-use dcFavorites;
 use dcSettings;
+use Dotclear\Core\Backend\Favorites;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\Html\Form\{
     Checkbox,
@@ -218,7 +217,7 @@ class BackendBehaviors
                         [(new Para())
                             ->items([
                                 (new Link())
-                                    ->href(dcCore::app()->adminurl?->get('admin.plugin.' . My::id()))
+                                    ->href(My::managerUrl())
                                     ->text(__('Configure feeds')),
                             ])] :
                         [],
@@ -231,13 +230,13 @@ class BackendBehaviors
     /**
      * User dashboard favorites icon.
      */
-    public static function adminDashboardFavoritesV2(dcFavorites $favs): void
+    public static function adminDashboardFavoritesV2(Favorites $favs): void
     {
         $favs->register(My::id(), [
             'title'       => My::name(),
-            'url'         => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-            'small-icon'  => dcPage::getPF(My::id() . '/icon.svg'),
-            'large-icon'  => dcPage::getPF(My::id() . '/icon.svg'),
+            'url'         => My::manageUrl(),
+            'small-icon'  => My::icons(),
+            'large-icon'  => My::icons(),
             'permissions' => dcCore::app()->auth->makePermissions([
                 dcCore::app()->auth::PERMISSION_USAGE,
                 dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
@@ -250,11 +249,8 @@ class BackendBehaviors
                 }
 
                 $fav['title'] .= '<br />' . sprintf(__('%s feed disabled', '%s feeds disabled', (int) $count), (int) $count);
-                $fav['large-icon'] = dcPage::getPF(My::id() . '/icon-update.svg');
-                $fav['url']        = dcCore::app()->adminurl->get(
-                    'admin.plugin.' . My::id(),
-                    ['part' => 'feeds', 'sortby' => 'feed_status', 'order' => 'asc']
-                );
+                $fav['large-icon'] = My::fileURL('icon-update.svg');
+                $fav['url']        = My::manageUrl(['part' => 'feeds', 'sortby' => 'feed_status', 'order' => 'asc']);
             },
         ]);
     }
@@ -329,7 +325,7 @@ class BackendBehaviors
         } else {
             $row  = new FeedRow(ZoneclearFeedServer::instance()->getFeeds(['feed_id' => $rs_meta->f('meta_id')]));
             $item = (new Link())
-                ->href(dcCore::app()->adminurl?->get('admin.plugin.' . My::id(), ['part' => 'feed', 'feed_id' => $row->id]) . '#feed')
+                ->href(My::manageUrl(['part' => 'feed', 'feed_id' => $row->id]) . '#feed')
                 ->title(__('edit feed'))
                 ->text(Html::escapeHTML($row->name));
         }
@@ -341,7 +337,7 @@ class BackendBehaviors
      */
     public static function adminPostHeaders(): string
     {
-        return dcPage::jsModuleLoad(My::id() . '/js/post.js');
+        return My::jsLoad('post');
     }
 
     /**
@@ -402,10 +398,7 @@ class BackendBehaviors
             ]);
             if (!$fid->isEmpty()) {
                 $edit = (new Link())
-                    ->href(dcCore::app()->adminurl->get(
-                        'admin.plugin.' . My::id(),
-                        ['part' => 'feed', 'feed_id' => $fid->f('meta_id')]
-                    ))
+                    ->href(My::manageUrl(['part' => 'feed', 'feed_id' => $fid->f('meta_id')]))
                     ->text(__('Edit this feed'));
             }
         }

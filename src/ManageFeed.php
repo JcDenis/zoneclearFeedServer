@@ -15,9 +15,12 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use dcCore;
-use dcNsProcess;
-use dcPage;
-use dcPostsActions;
+use Dotclear\Core\Backend\Action\ActionsPosts;
+use Dotclear\Core\Backend\{
+    Notices,
+    Page
+};
+use Dotclear\Core\Process;
 use Dotclear\Helper\Html\Form\{
     Checkbox,
     Div,
@@ -37,23 +40,16 @@ use Exception;
 /**
  * Backend feed and feed posts manage page.
  */
-class ManageFeed extends dcNsProcess
+class ManageFeed extends Process
 {
     public static function init(): bool
     {
-        static::$init == defined('DC_CONTEXT_ADMIN')
-            && !is_null(dcCore::app()->blog)
-            && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-                dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
-            ]), dcCore::app()->blog->id)
-            && ($_REQUEST['part'] ?? 'feeds') === 'feed';
-
-        return static::$init;
+        return self::status(My::checkContext(My::MANAGE) && ($_REQUEST['part'] ?? 'feeds') === 'feed');
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 
@@ -104,13 +100,8 @@ class ManageFeed extends dcNsProcess
                     throw new Exception(__('Failed to save feed.'));
                 }
 
-                dcPage::addSuccessNotice(
-                    __('Feed successfully created.')
-                );
-                dcCore::app()->adminurl?->redirect(
-                    'admin.plugin.' . My::id(),
-                    ['part' => 'feed', 'feed_id' => $id]
-                );
+                Notices::addSuccessNotice(__('Feed successfully created.'));
+                My::redirect(['part' => 'feed', 'feed_id' => $id]);
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
 
@@ -125,7 +116,7 @@ class ManageFeed extends dcNsProcess
 
     public static function render(): void
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return;
         }
 
@@ -136,7 +127,7 @@ class ManageFeed extends dcNsProcess
         // Prepared entries list
         if ($v->id && $v->can_view_page) {
             // posts actions
-            $posts_actions_page = new dcPostsActions(
+            $posts_actions_page = new ActionsPosts(
                 'plugin.php',
                 [
                     'p'       => My::id(),
@@ -188,25 +179,25 @@ class ManageFeed extends dcNsProcess
         }
 
         // display
-        dcPage::openModule(
+        Page::openModule(
             My::id(),
             (
                 $v->id && isset($post_filter) && !dcCore::app()->error->flag() ?
-                $post_filter->js(dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'feed', 'feed_id' => $v->id], '&') . '#entries') .
-                    dcPage::jsModuleLoad(My::id() . '/js/feed.js')
+                $post_filter->js(My::manageUrl(['part' => 'feed', 'feed_id' => $v->id], '&') . '#entries') .
+                    My::jsLoad('feed')
                 : ''
             ) .
-            dcPage::jsPageTabs() .
+            Page::jsPageTabs() .
             $v->next_headlink . "\n" . $v->prev_headlink
         );
 
         echo
-        dcPage::breadcrumb([
+        Page::breadcrumb([
             __('Plugins')                               => '',
-            My::name()                                  => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+            My::name()                                  => My::manageUrl(),
             ($v->id ? __('Edit feed') : __('New feed')) => '',
         ]) .
-        dcPage::notices() .
+        Notices::getNotices() .
         (new Text('h3', ($v->id ? sprintf(__('Edit feed "%s"'), Html::escapeHTML($v->name)) : __('New feed'))))->render();
 
         if ($v->can_view_page) {
@@ -232,7 +223,7 @@ class ManageFeed extends dcNsProcess
                 ->items([
                     (new Form('edit-entry-form'))
                         ->method('post')
-                        ->action(dcCore::app()->adminurl->get('admin.plugin.' . My::id()))
+                        ->action(My::manageUrl())
                         ->fields([
                             (new Div())
                                 ->class('two-cols')
@@ -379,19 +370,16 @@ class ManageFeed extends dcNsProcess
                                 ]),
                             (new Para())
                                 ->class('clear')
-                                ->items(array_merge(
-                                    dcCore::app()->adminurl->hiddenFormFields('admin.plugin.' . My::id(), [
+                                ->items([
+                                    (new Submit(['save']))
+                                        ->value(__('Save') . ' (s)')
+                                        ->accesskey('s'),
+                                    ... My::hiddenFields([
                                         'part'    => 'feed',
                                         'feed_id' => (string) $v->id,
                                         'action'  => 'savefeed',
                                     ]),
-                                    [
-                                        (new Submit(['save']))
-                                            ->value(__('Save') . ' (s)')
-                                            ->accesskey('s'),
-                                        dcCore::app()->formNonce(false),
-                                    ]
-                                )),
+                                ]),
                         ]),
                 ])
                 ->render();
@@ -403,7 +391,7 @@ class ManageFeed extends dcNsProcess
             # show posts filters
             $post_filter->display(
                 ['admin.plugin.' . My::id(),'#entries'],
-                dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . My::id(), [
+                My::manageUrl([
                     'part'    => 'feed',
                     'feed_id' => $v->id,
                 ])
@@ -417,10 +405,10 @@ class ManageFeed extends dcNsProcess
             # show posts
             $post_list->display(
                 $post_filter,
-                dcCore::app()->adminurl->get('admin.plugin.' . My::id(), $args, '&') . '#entries',
+                My::manageUrl($args, '&') . '#entries',
                 (new Form('form-entries'))
                     ->method('post')
-                    ->action(dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'feed']) . '#entries')
+                    ->action(My::manageUrl(['part' => 'feed']) . '#entries')
                     ->fields([
                         (new Text('', '%s')),
                         (new Div())
@@ -430,21 +418,17 @@ class ManageFeed extends dcNsProcess
                                     ->class('col checkboxes-helpers'),
                                 (new Para())
                                     ->class('col right')
-                                    ->items(array_merge(
-                                        dcCore::app()->adminurl->hiddenFormFields('admin.plugin.' . My::id(), $post_filter->values()),
-                                        [
-                                            (new Hidden('redir', dcCore::app()->adminurl->get('admin.plugin.' . My::id(), $post_filter->values()))),
-                                            (new Label(__('Selected entries action:'), Label::OUTSIDE_LABEL_BEFORE))
-                                                ->for('action'),
-                                            (new Select('action'))
-                                                ->items($posts_actions_page->getCombo()),
-                                            (new Submit('feed-action'))
-                                                ->value(__('ok')),
-                                            dcCore::app()->formNonce(false),
+                                    ->items([
+                                        (new Hidden('redir', My::manageUrl($post_filter->values()))),
+                                        (new Label(__('Selected entries action:'), Label::OUTSIDE_LABEL_BEFORE))
+                                            ->for('action'),
+                                        (new Select('action'))
+                                            ->items($posts_actions_page->getCombo()),
+                                        (new Submit('feed-action'))
+                                            ->value(__('ok')),
+                                        ... My::hiddenFields($post_filter->values()),
 
-                                        ]
-                                    )),
-
+                                    ]),
                             ]),
                     ])
                     ->render()
@@ -453,6 +437,6 @@ class ManageFeed extends dcNsProcess
             echo '</div>';
         }
 
-        dcPage::closeModule();
+        Page::closeModule();
     }
 }

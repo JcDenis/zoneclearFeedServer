@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use dcActions;
 use dcCore;
-use dcPage;
+use Dotclear\Core\Backend\Action\Actions;
+use Dotclear\Core\Backend\Page;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\Html\Form\{
     Link,
@@ -29,7 +29,7 @@ use Exception;
 /**
  * Backend feeds list actions handler.
  */
-class FeedsActions extends dcActions
+class FeedsActions extends Actions
 {
     public ZoneclearFeedServer $zcfs;
 
@@ -61,9 +61,9 @@ class FeedsActions extends dcActions
 
     public function beginPage(string $breadcrumb = '', string $head = ''): void
     {
-        dcPage::openModule(
+        Page::openModule(
             My::name(),
-            dcPage::jsLoad('js/_posts_actions.js') .
+            Page::jsLoad('js/_posts_actions.js') .
             $head
         );
         echo
@@ -78,14 +78,14 @@ class FeedsActions extends dcActions
 
     public function endPage(): void
     {
-        dcPage::closeModule();
+        Page::closeModule();
     }
 
     public function error(Exception $e): void
     {
         dcCore::app()->error->add($e->getMessage());
         $this->beginPage(
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 Html::escapeHTML((string) dcCore::app()->blog?->name) => '',
                 $this->getCallerTitle()                               => $this->getRedirection(true),
                 __('Feeds actions')                                   => '',

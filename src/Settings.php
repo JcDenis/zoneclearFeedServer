@@ -14,9 +14,6 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
-use Exception;
-
 /**
  * Module settings (type hinting).
  */
@@ -52,11 +49,7 @@ class Settings
      */
     protected function __construct()
     {
-        if (is_null(dcCore::app()->blog)) {
-            throw new Exception(__('Blog is not defined'));
-        }
-
-        $s = dcCore::app()->blog->settings->get(My::id());
+        $s = My::settings();
 
         $update_limit = is_numeric($s->get('update_limit')) ? (int) $s->get('update_limit') : 1;
 
@@ -101,7 +94,7 @@ class Settings
      */
     public function set(string $key, mixed $value): bool
     {
-        $s = dcCore::app()->blog?->settings->get(My::id());
+        $s = My::settings();
 
         if (!is_null($s) && property_exists($this, $key) && settype($value, gettype($this->{$key})) === true) {
             $s->drop($key);

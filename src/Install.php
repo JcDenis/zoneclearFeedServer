@@ -15,28 +15,23 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use dcCore;
-use dcNsProcess;
+use Dotclear\Core\Process;
 use Dotclear\Database\Structure;
 use Exception;
 
 /**
  * Module installation.
  */
-class Install extends dcNsProcess
+class Install extends Process
 {
     public static function init(): bool
     {
-        if (defined('DC_CONTEXT_ADMIN')) {
-            $version      = dcCore::app()->plugins->moduleInfo(My::id(), 'version');
-            static::$init = is_string($version) ? dcCore::app()->newVersion(My::id(), $version) : true;
-        }
-
-        return static::$init;
+        return self::status(My::checkContext(My::INSTALL));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 
@@ -75,10 +70,7 @@ class Install extends dcNsProcess
             (new Structure(dcCore::app()->con, dcCore::app()->prefix))->synchronize($s);
 
             // Settings
-            $s = dcCore::app()->blog?->settings->get(My::id());
-            if (is_null($s)) {
-                return false;
-            }
+            $s = My::settings();
             $s->put('active', false, 'boolean', 'Enable zoneclearBlogServer', false, true);
             $s->put('pub_active', false, 'boolean', 'Enable public page of list of feeds', false, true);
             $s->put('post_status_new', true, 'boolean', 'Enable auto publish new posts', false, true);

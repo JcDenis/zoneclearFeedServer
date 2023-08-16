@@ -15,9 +15,11 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use adminGenericListV2;
 use dcCore;
-use dcPager;
+use Dotclear\Core\Backend\Listing\{
+    Listing,
+    Pager
+};
 use Dotclear\Helper\Date;
 use Dotclear\Helper\Html\Form\{
     Checkbox,
@@ -31,7 +33,7 @@ use Dotclear\Helper\Html\Html;
 /**
  * Backend feed posts lists.
  */
-class PostsList extends adminGenericListV2
+class PostsList extends Listing
 {
     public function display(PostsFilter $filter, string $base_url, string $enclose_block = ''): void
     {
@@ -52,7 +54,7 @@ class PostsList extends adminGenericListV2
         $page            = is_numeric($filter->value('page')) ? (int) $filter->value('page') : 1;
         $nbpp            = is_numeric($filter->value('nb')) ? (int) $filter->value('nb') : 10;
         $count           = (int) $this->rs_count;
-        $pager           = new dcPager($page, $count, $nbpp, 10);
+        $pager           = new Pager($page, $count, $nbpp, 10);
         $pager->base_url = $base_url;
 
         $cols = new ArrayObject([
@@ -106,7 +108,7 @@ class PostsList extends adminGenericListV2
     {
         $cat_title = (new Text('', __('None')));
         if ($this->rs->cat_title
-            && dcCore::app()->auth?->check(dcCore::app()->auth->makePermissions([dcCore::app()->auth::PERMISSION_CATEGORIES]), dcCore::app()->blog?->id)
+            && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([dcCore::app()->auth::PERMISSION_CATEGORIES]), dcCore::app()->blog?->id)
         ) {
             $cat_title = (new Link())
                 ->href('category.php?id=' . $this->rs->cat_id)

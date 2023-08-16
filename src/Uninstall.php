@@ -15,24 +15,22 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use dcCore;
-use dcNsProcess;
+use Dotclear\Core\Process;
 use Dotclear\Plugin\Uninstaller\Uninstaller;
 
 /**
  * Plugin Uninstaller actions.
  */
-class Uninstall extends dcNsProcess
+class Uninstall extends Process
 {
     public static function init(): bool
     {
-        static::$init = defined('DC_CONTEXT_ADMIN');
-
-        return static::$init;
+        return self::status(My::checkContext(My::UNINSTALL));
     }
 
     public static function process(): bool
     {
-        if (!static::$init || !dcCore::app()->plugins->moduleExists('Uninstaller')) {
+        if (!self::status() || !dcCore::app()->plugins->moduleExists('Uninstaller')) {
             return false;
         }
 

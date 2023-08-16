@@ -15,10 +15,12 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use adminGenericFilterV2;
-use adminGenericListV2;
 use dcCore;
-use dcPager;
+use Dotclear\Core\Backend\Filter\Filters;
+use Dotclear\Core\Backend\Listing\{
+    Listing,
+    Pager
+};
 use Dotclear\Helper\Date;
 use Dotclear\Helper\Html\Form\{
     Checkbox,
@@ -32,9 +34,9 @@ use Dotclear\Helper\Html\Html;
 /**
  * Backend feeds list.
  */
-class FeedsList extends adminGenericListV2
+class FeedsList extends Listing
 {
-    public function display(adminGenericFilterV2 $filter, string $enclose_block = ''): void
+    public function display(Filters $filter, string $enclose_block = ''): void
     {
         if ($this->rs->isEmpty()) {
             echo
@@ -53,7 +55,7 @@ class FeedsList extends adminGenericListV2
         $page  = is_numeric($filter->value('page')) ? (int) $filter->value('page') : 1;
         $nbpp  = is_numeric($filter->value('nb')) ? (int) $filter->value('nb') : 10;
         $count = (int) $this->rs_count;
-        $pager = new dcPager($page, $count, $nbpp, 10);
+        $pager = new Pager($page, $count, $nbpp, 10);
 
         $cols = new ArrayObject([
             'title' => (new Text('th', __('Name')))
@@ -120,11 +122,11 @@ class FeedsList extends adminGenericListV2
             $shunk_feed = substr($shunk_feed, 0, 50) . '...' . substr($shunk_feed, -20);
         }
 
-        $url = dcCore::app()->adminurl?->get('admin.plugin.' . My::id(), ['part' => 'feed', 'feed_id' => $row->id]);
+        $url = My::manageUrl(['part' => 'feed', 'feed_id' => $row->id]);
         if (!is_string($url)) {
             $url = '';
         }
-        $tz = dcCore::app()->auth?->getInfo('user_tz');
+        $tz = dcCore::app()->auth->getInfo('user_tz');
         if (!is_string($tz)) {
             $tz = 'UTC';
         }

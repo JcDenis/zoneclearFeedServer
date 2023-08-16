@@ -15,19 +15,21 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use adminGenericFilterV2;
-use dcAdminCombos;
-use dcAdminFilter;
-use dcAdminFilters;
 use dcCore;
 use dcUtils;
+use Dotclear\Core\Backend\Combos;
+use Dotclear\Core\Backend\Filter\{
+    Filter,
+    Filters,
+    FiltersLibrary
+};
 use Dotclear\Helper\Html\Html;
 use Exception;
 
 /**
  * Backend feed posts list filters.
  */
-class PostsFilter extends adminGenericFilterV2
+class PostsFilter extends Filters
 {
     public function __construct()
     {
@@ -35,7 +37,7 @@ class PostsFilter extends adminGenericFilterV2
         parent::__construct('posts');
 
         $filters = new ArrayObject([
-            dcAdminFilters::getPageFilter(),
+            FiltersLibrary::getPageFilter(),
             $this->getPostUserFilter(),
             $this->getPostCategoriesFilter(),
             $this->getPostStatusFilter(),
@@ -53,7 +55,7 @@ class PostsFilter extends adminGenericFilterV2
     /**
      * Posts users select
      *
-     * @return null|dcAdminFilter
+     * @return null|Filter
      */
     public function getPostUserFilter()
     {
@@ -70,10 +72,10 @@ class PostsFilter extends adminGenericFilterV2
             return null;
         }
 
-        $combo = dcAdminCombos::getUsersCombo($users);
+        $combo = Combos::getUsersCombo($users);
         dcUtils::lexicalKeySort($combo);
 
-        return (new dcAdminFilter('user_id'))
+        return (new Filter('user_id'))
             ->param()
             ->title(__('Author:'))
             ->options(array_merge(
@@ -86,7 +88,7 @@ class PostsFilter extends adminGenericFilterV2
     /**
      * Posts categories select
      *
-     * @return null|dcAdminFilter
+     * @return null|Filter
      */
     public function getPostCategoriesFilter()
     {
@@ -116,7 +118,7 @@ class PostsFilter extends adminGenericFilterV2
             }
         }
 
-        return (new dcAdminFilter('cat_id'))
+        return (new Filter('cat_id'))
             ->param()
             ->title(__('Category:'))
             ->options($combo)
@@ -126,21 +128,21 @@ class PostsFilter extends adminGenericFilterV2
     /**
      * Posts status select
      */
-    public function getPostStatusFilter(): dcAdminFilter
+    public function getPostStatusFilter(): Filter
     {
-        return (new dcAdminFilter('status'))
+        return (new Filter('status'))
             ->param('post_status')
             ->title(__('Status:'))
             ->options(array_merge(
                 ['-' => ''],
-                dcAdminCombos::getPostStatusesCombo()
+                Combos::getPostStatusesCombo()
             ));
     }
 
     /**
      * Posts by month select
      *
-     * @return null|dcAdminFilter
+     * @return null|Filter
      */
     public function getPostMonthFilter()
     {
@@ -157,13 +159,13 @@ class PostsFilter extends adminGenericFilterV2
             return null;
         }
 
-        return (new dcAdminFilter('month'))
+        return (new Filter('month'))
             ->param('post_month', function ($f) { return substr($f[0], 4, 2); })
             ->param('post_year', function ($f) { return substr($f[0], 0, 4); })
             ->title(__('Month:'))
             ->options(array_merge(
                 ['-' => ''],
-                dcAdminCombos::getDatesCombo($dates)
+                Combos::getDatesCombo($dates)
             ));
     }
 }

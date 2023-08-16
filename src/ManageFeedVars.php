@@ -54,7 +54,7 @@ class ManageFeedVars
 
         $feed_headlink = '<link rel="%s" title="%s" href="' . dcCore::app()->admin->getPageURL() . '&amp;part=feed&amp;feed_id=%s" />';
         $feed_link     = '<a href="' . dcCore::app()->admin->getPageURL() . '&amp;part=feed&amp;feed_id=%s" title="%s">%s</a>';
-        $lang          = dcCore::app()->auth?->getInfo('user_lang');
+        $lang          = dcCore::app()->auth->getInfo('user_lang');
 
         // default values
         $feed_id       = 0;

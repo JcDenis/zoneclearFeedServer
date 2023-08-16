@@ -74,7 +74,7 @@ class UrlHandler extends dcUrlHandlers
 
             exit(1);
 
-        # Server js
+            # Server js
         } elseif ($args == '/zcfsupd.js' && 3 == $s->bhv_pub_upd) {
             dcCore::app()->tpl->setPath(dcCore::app()->tpl->getPath(), My::path() . '/default-templates');
             self::serveDocument(
@@ -84,13 +84,13 @@ class UrlHandler extends dcUrlHandlers
                 false
             );
 
-        # Server feeds description page
+            # Server feeds description page
         } elseif (in_array($args, ['', '/']) && $s->pub_active) {
             $theme = dcCore::app()->blog->settings->get('system')->get('theme');
             if (!is_string($theme)) {
                 self::p404();
             }
-            $tplset = dcCore::app()->themes->moduleInfo($theme, 'tplset');
+            $tplset = dcCore::app()->themes->getDefine($theme)->get('tplset');
             $path   = My::path() . '/default-templates/';
             if (!empty($tplset) && is_dir($path . $tplset)) {
                 dcCore::app()->tpl->setPath(dcCore::app()->tpl->getPath(), $path . $tplset);

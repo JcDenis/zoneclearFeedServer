@@ -17,7 +17,10 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 use ArrayObject;
 use dcCore;
 use dcMeta;
-use dcPage;
+use Dotclear\Core\Backend\{
+    Notices,
+    Page
+};
 use Dotclear\Database\Statement\DeleteStatement;
 use Dotclear\Helper\Html\Form\{
     Form,
@@ -93,7 +96,7 @@ class FeedsDefaultActions
             $ap->zcfs->enableFeed($id, $enable);
         }
 
-        dcPage::addSuccessNotice(sprintf(
+        Notices::addSuccessNotice(sprintf(
             $enable ?
                 __(
                     '%d feed has been successfully enabled.',
@@ -150,7 +153,7 @@ class FeedsDefaultActions
             }
         }
 
-        dcPage::addSuccessNotice(
+        Notices::addSuccessNotice(
             __('Entries have been successfully deleted.')
         );
         $ap->redirect(true);
@@ -173,7 +176,7 @@ class FeedsDefaultActions
             $ap->zcfs->deleteFeed($id);
         }
 
-        dcPage::addSuccessNotice(sprintf(
+        Notices::addSuccessNotice(sprintf(
             __(
                 '%d feed has been successfully deleted.',
                 '%d feeds have been successfully deleted.',
@@ -201,7 +204,7 @@ class FeedsDefaultActions
             $ap->zcfs->checkFeedsUpdate($id, true);
         }
 
-        dcPage::addSuccessNotice(sprintf(
+        Notices::addSuccessNotice(sprintf(
             __('%d feed has been successfully updated.', '%d feeds have been successfully updated.', count($ids)),
             count($ids)
         ));
@@ -229,7 +232,7 @@ class FeedsDefaultActions
             //$ap->zcfs->checkFeedsUpdate($id, true);
         }
 
-        dcPage::addSuccessNotice(sprintf(
+        Notices::addSuccessNotice(sprintf(
             __('Last update of %s feed successfully reseted.', 'Last update of %s feeds successfully reseted.', count($ids)),
             count($ids)
         ));
@@ -259,14 +262,14 @@ class FeedsDefaultActions
                 $ap->zcfs->updateFeed($id, $cur);
             }
 
-            dcPage::addSuccessNotice(sprintf(
+            Notices::addSuccessNotice(sprintf(
                 __('Category of %s feed successfully changed.', 'Category of %s feeds successfully changed.', count($ids)),
                 count($ids)
             ));
             $ap->redirect(true);
         } else {
             $ap->beginPage(
-                dcPage::breadcrumb([
+                Page::breadcrumb([
                     Html::escapeHTML((string) dcCore::app()->blog?->name) => '',
                     __('Feeds server')                                    => '',
                     $ap->getCallerTitle()                                 => $ap->getRedirection(true),
@@ -325,14 +328,14 @@ class FeedsDefaultActions
                 $ap->zcfs->updateFeed($id, $cur);
             }
 
-            dcPage::addSuccessNotice(sprintf(
+            Notices::addSuccessNotice(sprintf(
                 __('Update frequency of %s feed successfully changed.', 'Update frequency of %s feeds successfully changed.', count($ids)),
                 count($ids)
             ));
             $ap->redirect(true);
         } else {
             $ap->beginPage(
-                dcPage::breadcrumb(
+                Page::breadcrumb(
                     [
                         Html::escapeHTML((string) dcCore::app()->blog?->name) => '',
                         __('Feeds server')                                    => '',

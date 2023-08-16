@@ -14,27 +14,22 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcAdmin;
 use dcCore;
-use dcPage;
-use dcMenu;
-use dcNsProcess;
+use Dotclear\Core\Process;
 
 /**
  * Backend prepend.
  */
-class Backend extends dcNsProcess
+class Backend extends Process
 {
     public static function init(): bool
     {
-        static::$init = defined('DC_CONTEXT_ADMIN');
-
-        return static::$init;
+        return self::status(My::checkContext(My::BACKEND));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 
@@ -54,41 +49,18 @@ class Backend extends dcNsProcess
             'adminBlogPreferencesFormV2'    => [BackendBehaviors::class, 'adminBlogPreferencesFormV2'],
         ]);
 
-        // nullsafe
-        if (is_null(dcCore::app()->blog)) {
-            return false;
-        }
-
         // not active
-        if (!dcCore::app()->blog->settings->get(My::id())->get('active')
-            || '' == dcCore::app()->blog->settings->get(My::id())->get('user')
-        ) {
+        if (!My::settings()->get('active') || '' == My::settings()->get('user')) {
             return false;
-        }
-
-        // get user perm
-        $has_perm = dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-            dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
-        ]), dcCore::app()->blog->id);
-
-        // add sidebar menu icon
-        if ((dcCore::app()->menu[dcAdmin::MENU_PLUGINS] instanceof dcMenu)) {
-            dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
-                My::name(),
-                dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-                dcPage::getPF(My::id() . '/icon.svg'),
-                preg_match(
-                    '/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.' . My::id())) . '(&.*)?$/',
-                    $_SERVER['REQUEST_URI']
-                ),
-                $has_perm
-            );
         }
 
         // no perm
-        if (!$has_perm) {
+        if (!My::checkContext(My::MENU)) {
             return true;
         }
+
+        // sidebar menu
+        My::addBackendMenuItem();
 
         // behaviors that require user perm
         dcCore::app()->addBehaviors([

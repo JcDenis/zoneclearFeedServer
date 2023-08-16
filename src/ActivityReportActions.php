@@ -37,7 +37,7 @@ class ActivityReportActions
             __('Feed named "%s" point to "%s" has been updated by "%s"'),
             'zoneclearFeedServerAfterUpdateFeed',
             function (Cursor $cur, int $id): void {
-                $user = dcCore::app()->auth?->getInfo('user_cn');
+                $user = dcCore::app()->auth->getInfo('user_cn');
                 if (!is_string($user)) {
                     return;
                 }
@@ -64,7 +64,7 @@ class ActivityReportActions
             __('A new feed named "%s" point to "%s" was added by "%s"'),
             'zoneclearFeedServerAfterAddFeed',
             function (Cursor $cur, int $id): void {
-                $user = dcCore::app()->auth?->getInfo('user_cn');
+                $user = dcCore::app()->auth->getInfo('user_cn');
                 if (!is_string($user)
                     || !is_string($cur->getField('feed_name'))
                     || !is_string($cur->getField('feed_feed'))
@@ -115,7 +115,7 @@ class ActivityReportActions
                 }
                 $row = new FeedRow($rs);
 
-                $user = dcCore::app()->auth?->getInfo('user_cn');
+                $user = dcCore::app()->auth->getInfo('user_cn');
                 if (!is_string($user)) {
                     return;
                 }

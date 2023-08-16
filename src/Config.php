@@ -14,28 +14,28 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use adminModulesList;
 use dcCore;
-use dcPage;
-use dcNsProcess;
+use Dotclear\Core\Backend\{
+    Notices,
+    ModulesList,
+    Page
+};
+use Dotclear\Core\Process;
 use Exception;
 
 /**
  * Backend module configuration.
  */
-class Config extends dcNsProcess
+class Config extends Process
 {
     public static function init(): bool
     {
-        static::$init == defined('DC_CONTEXT_ADMIN')
-            && dcCore::app()->auth?->isSuperAdmin();
-
-        return static::$init;
+        return self::status(My::checkContext(My::CONFIG));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 
@@ -47,13 +47,13 @@ class Config extends dcNsProcess
         try {
             BackendBehaviors::adminBeforeBlogSettingsUpdate(null);
 
-            dcPage::addSuccessNotice(
+            Notices::addSuccessNotice(
                 __('Configuration has been successfully updated.')
             );
-            dcCore::app()->adminurl?->redirect('admin.plugins', [
+            dcCore::app()->admin->url->redirect('admin.plugins', [
                 'module' => My::id(),
                 'conf'   => '1',
-                'redir'  => !(dcCore::app()->admin->__get('list') instanceof adminModulesList) ? '' : dcCore::app()->admin->__get('list')->getRedir(),
+                'redir'  => !(dcCore::app()->admin->__get('list') instanceof ModulesList) ? '' : dcCore::app()->admin->__get('list')->getRedir(),
             ]);
         } catch (Exception $e) {
             dcCore::app()->error->add($e->getMessage());
@@ -64,12 +64,12 @@ class Config extends dcNsProcess
 
     public static function render(): void
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return;
         }
 
         BackendBehaviors::adminBlogPreferencesFormV2(null);
 
-        dcPage::helpBlock('zoneclearFeedServer');
+        Page::helpBlock('zoneclearFeedServer');
     }
 }

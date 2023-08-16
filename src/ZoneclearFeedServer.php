@@ -528,7 +528,7 @@ class ZoneclearFeedServer
                     }
                     $i++;
 
-                # Not updated since last visit
+                    # Not updated since last visit
                 } elseif (!$id
                     && '' != $feed->pubdate
                     && strtotime($feed->pubdate) < $row->upd_last
@@ -625,7 +625,7 @@ class ZoneclearFeedServer
                                     $is_new_published_entry = true;
                                 }
 
-                            # Update entry
+                                # Update entry
                             } else {
                                 $post_id = is_numeric($old_post->f('post_id')) ? (int) $old_post->f('post_id') : 0;
 
@@ -764,7 +764,7 @@ class ZoneclearFeedServer
             if (!dcCore::app()->auth->checkUser($this->settings->user)) {
                 throw new Exception('Unable to set user');
             }
-        # Disable
+            # Disable
         } else {
             // auth on branch My goes readonly
             //dcCore::app()->auth = null;
