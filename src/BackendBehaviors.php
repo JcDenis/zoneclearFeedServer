@@ -217,7 +217,7 @@ class BackendBehaviors
                         [(new Para())
                             ->items([
                                 (new Link())
-                                    ->href(My::managerUrl())
+                                    ->href(My::manageUrl())
                                     ->text(__('Configure feeds')),
                             ])] :
                         [],
