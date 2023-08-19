@@ -156,7 +156,7 @@ class ManageFeedVars
             $feed_feed     = !empty($_POST['feed_feed'])    && is_string($_POST['feed_feed']) ? $_POST['feed_feed'] : $feed_feed;
             $feed_lang     = !empty($_POST['feed_lang'])    && is_string($_POST['feed_lang']) ? $_POST['feed_lang'] : $feed_lang;
             $feed_tags     = !empty($_POST['feed_tags'])    && is_string($_POST['feed_tags']) ? $_POST['feed_tags'] : $feed_tags;
-            $feed_get_tags = empty($_POST['feed_get_tags']) ? $feed_get_tags : true;
+            $feed_get_tags = !empty($_POST['feed_get_tags']);
             $feed_cat_id   = !empty($_POST['feed_cat_id'])  && is_numeric($_POST['feed_cat_id']) ? (int) $_POST['feed_cat_id'] : $feed_cat_id;
             $feed_upd_int  = !empty($_POST['feed_upd_int']) && is_numeric($_POST['feed_upd_int']) ? (int) $_POST['feed_upd_int'] : $feed_upd_int;
             $feed_status   = empty($_POST['feed_status']) ? $feed_status : 1;
@@ -172,7 +172,7 @@ class ManageFeedVars
         $this->feed     = $feed_feed;
         $this->lang     = $feed_lang;
         $this->tags     = $feed_tags;
-        $this->get_tags = $feed_get_tags;
+        $this->get_tags = (bool) $feed_get_tags;
         $this->cat_id   = $feed_cat_id;
         $this->status   = $feed_status;
         $this->upd_int  = $feed_upd_int;
@@ -218,7 +218,7 @@ class ManageFeedVars
         $cur->setField('feed_feed', $this->feed);
         $cur->setField('feed_lang', $this->lang);
         $cur->setField('feed_tags', $this->tags);
-        $cur->setField('feed_get_tags', $this->get_tags);
+        $cur->setField('feed_get_tags', (int) $this->get_tags);
         $cur->setField('cat_id', $this->cat_id);
         $cur->setField('feed_status', $this->status);
         $cur->setField('feed_upd_int', $this->upd_int);
