@@ -45,8 +45,6 @@ class Backend extends Process
             'UninstallerCleanersConstruct' => function ($uninstaller_stack) {
                 UninstallCleaner::init($uninstaller_stack);
             },
-            'adminBeforeBlogSettingsUpdate' => [BackendBehaviors::class, 'adminBeforeBlogSettingsUpdate'],
-            'adminBlogPreferencesFormV2'    => [BackendBehaviors::class, 'adminBlogPreferencesFormV2'],
         ]);
 
         // not active
