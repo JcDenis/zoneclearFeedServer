@@ -60,7 +60,9 @@ class Config extends Process
 
             // write settings
             foreach ($s->dump() as $key => $value) {
-                if (is_bool($value)) {
+                if (is_array($value) && empty($_POST[My::id() . $key])) {
+                    $s->set($key, []);
+                } elseif (is_bool($value)) {
                     $s->set($key, !empty($_POST[My::id() . $key]));
                 } else {
                     $s->set($key, $_POST[My::id() . $key] ?: $value);
