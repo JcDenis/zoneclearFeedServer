@@ -97,8 +97,7 @@ class Settings
         $s = My::settings();
 
         if (!is_null($s) && property_exists($this, $key) && settype($value, gettype($this->{$key})) === true) {
-            $s->drop($key);
-            $s->put($key, $value, gettype($this->{$key}), '', true, true);
+            $s->put($key, $value, gettype($this->{$key}));
 
             return true;
         }
