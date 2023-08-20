@@ -1,3 +1,11 @@
+zoneclearFeedServer 2023.08.20
+===========================================================
+* Require Dotclear 2.27
+* Require PHP 8.1
+* Change settings to super admin only
+* Fix get feed tags
+* Fix per blog settings
+
 zoneclearFeedServer 2023.08.16
 ===========================================================
 * Require Dotclear 2.27
