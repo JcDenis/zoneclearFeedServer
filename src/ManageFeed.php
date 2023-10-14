@@ -1,20 +1,10 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\Action\ActionsPosts;
 use Dotclear\Core\Backend\{
     Notices,
@@ -38,7 +28,11 @@ use Dotclear\Helper\L10n;
 use Exception;
 
 /**
- * Backend feed and feed posts manage page.
+ * @brief       zoneclearFeedServer backend feeds posts manage class.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class ManageFeed extends Process
 {
@@ -70,26 +64,26 @@ class ManageFeed extends Process
                 $testfeed_params['sql'] = 'AND feed_id <> ' . $v->id . ' ';
             }
             if ($z->getFeeds($testfeed_params, true)->f(0)) {
-                dcCore::app()->error->add(__('Record with same feed URL already exists.'));
+                App::error()->add(__('Record with same feed URL already exists.'));
             }
             if (empty($v->name)) {
-                dcCore::app()->error->add(__('You must provide a name.'));
+                App::error()->add(__('You must provide a name.'));
             }
             if (empty($v->owner)) {
-                dcCore::app()->error->add(__('You must provide an owner.'));
+                App::error()->add(__('You must provide an owner.'));
             }
             if (!$z::validateURL($v->url)) {
-                dcCore::app()->error->add(__('You must provide valid site URL.'));
+                App::error()->add(__('You must provide valid site URL.'));
             }
             if (!$z::validateURL($v->feed)) {
-                dcCore::app()->error->add(__('You must provide valid feed URL.'));
+                App::error()->add(__('You must provide valid feed URL.'));
             }
-            if (null !== $v->cat_id && !dcCore::app()->blog?->getCategory($v->cat_id)) {
-                dcCore::app()->error->add(__('You must provide valid category.'));
+            if (null !== $v->cat_id && !App::blog()->getCategory($v->cat_id)) {
+                App::error()->add(__('You must provide valid category.'));
             }
 
             // check failed
-            if (dcCore::app()->error->flag()) {
+            if (App::error()->flag()) {
                 return true;
             }
 
@@ -103,7 +97,7 @@ class ManageFeed extends Process
                 Notices::addSuccessNotice(__('Feed successfully created.'));
                 My::redirect(['part' => 'feed', 'feed_id' => $id]);
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
 
                 return true;
             }
@@ -158,13 +152,13 @@ class ManageFeed extends Process
                 'user_id'    => 'P.user_id', ];
 
             # --BEHAVIOR-- adminPostsSortbyLexCombo
-            dcCore::app()->callBehavior('adminPostsSortbyLexCombo', [& $sortby_lex]);
+            App::behavior()->callBehavior('adminPostsSortbyLexCombo', [& $sortby_lex]);
 
             $params['no_content'] = true;
             $params['feed_id']    = $v->id;
             $params['order']      = (
                 array_key_exists($sortby, $sortby_lex) ?
-                dcCore::app()->con->lexFields($sortby_lex[$sortby]) :
+                App::con()->lexFields($sortby_lex[$sortby]) :
                 $sortby
             ) . ' ' . $order;
 
@@ -174,7 +168,7 @@ class ManageFeed extends Process
                 $counter   = $z->getPostsByFeed($params, true);
                 $post_list = new PostsList($posts, $counter->f(0));
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
         }
 
@@ -182,7 +176,7 @@ class ManageFeed extends Process
         Page::openModule(
             My::id(),
             (
-                $v->id && isset($post_filter) && !dcCore::app()->error->flag() ?
+                $v->id && isset($post_filter) && !App::error()->flag() ?
                 $post_filter->js(My::manageUrl(['part' => 'feed', 'feed_id' => $v->id], '&') . '#entries') .
                     My::jsLoad('feed')
                 : ''
@@ -385,7 +379,7 @@ class ManageFeed extends Process
                 ->render();
         }
 
-        if ($v->id && $v->can_view_page && isset($post_filter) && isset($post_list) && isset($posts_actions_page) && !dcCore::app()->error->flag()) {
+        if ($v->id && $v->can_view_page && isset($post_filter) && isset($post_list) && isset($posts_actions_page) && !App::error()->flag()) {
             echo '<div class="multi-part" title="' . __('Entries') . '" id="entries">';
 
             # show posts filters

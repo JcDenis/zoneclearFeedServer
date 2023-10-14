@@ -1,29 +1,23 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Helper\Html\Html;
 use Dotclear\Plugin\widgets\WidgetsStack;
 use Dotclear\Plugin\widgets\WidgetsElement;
 
 /**
- * Widgets.
+ * @brief       zoneclearFeedServer widgets.
+ * @ingroup     zoneclearFeedServer
  *
  * A widget to list feeds source.
  * A widget to list feeds statistics.
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Widgets
 {
@@ -36,7 +30,7 @@ class Widgets
             ->create(
                 'zcfssource',
                 __('Feeds server: sources'),
-                [self::class, 'publicSource'],
+                self::publicSource(...),
                 null,
                 __('List sources of feeds')
             )
@@ -85,7 +79,7 @@ class Widgets
             ->create(
                 'zcfsnumber',
                 __('Feeds server: numbers'),
-                [self::class, 'publicNumber'],
+                self::publicNumber(...),
                 null,
                 __('Show some numbers about feeds')
             )
@@ -140,7 +134,7 @@ class Widgets
 
         if ($w->__get('offline')
             || !$s->active
-            || !$w->checkHomeOnly(dcCore::app()->url->type)
+            || !$w->checkHomeOnly(App::url()->type)
         ) {
             return '';
         }
@@ -173,7 +167,7 @@ class Widgets
         if ($w->__get('pagelink') && $s->pub_active) {
             $pub = sprintf(
                 '<p><strong><a href="%s">%s</a></strong></p>',
-                dcCore::app()->blog?->url . dcCore::app()->url->getBase('zoneclearFeedsPage'),
+                App::blog()->url() . App::url()->getBase('zoneclearFeedsPage'),
                 Html::escapeHTML(is_string($w->__get('pagelink')) ? $w->__get('pagelink') : '')
             );
         }
@@ -199,7 +193,7 @@ class Widgets
 
         if ($w->__get('offline')
             || !$s->active
-            || !$w->checkHomeOnly(dcCore::app()->url->type)
+            || !$w->checkHomeOnly(App::url()->type)
         ) {
             return '';
         }
@@ -221,7 +215,7 @@ class Widgets
             if ($s->pub_active) {
                 $text = sprintf(
                     '<a href="%s">%s</a>',
-                    dcCore::app()->blog?->url . dcCore::app()->url->getBase('zoneclearFeedsPage'),
+                    App::blog()->url() . App::url()->getBase('zoneclearFeedsPage'),
                     $text
                 );
             }

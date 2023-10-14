@@ -1,21 +1,10 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
-use dcNamespace;
+use Dotclear\App;
 use Dotclear\Database\Statement\{
     SelectStatement,
     UpdateStatement
@@ -23,13 +12,17 @@ use Dotclear\Database\Statement\{
 use Exception;
 
 /**
- * Module versions upgrades.
+ * @brief       zoneclearFeedServer upgrade class.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Upgrade
 {
     public static function preUpgrade(): void
     {
-        $current = dcCore::app()->getVersion(My::id());
+        $current = App::version()->getVersion(My::id());
         if (!is_string($current) || empty($current)) {
             return;
         }
@@ -59,7 +52,7 @@ class Upgrade
             'zoneclearFeedServer_post_title_redir' => 'post_title_redir',
         ];
 
-        $cur = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
+        $cur = App::blogWorkspace()->openBlogWorkspaceCursor();
         foreach ($setting_ids as $old => $new) {
             $cur->clean();
             $cur->setField('setting_id', $new);
@@ -69,13 +62,13 @@ class Upgrade
             $sql
                 ->where('setting_id = ' . $sql->quote($old))
                 ->and('setting_ns = ' . $sql->quote('zoneclearFeedServer'))
-                ->update();
+                ->update($cur);
         }
 
         // use json rather than serialise for settings array
         $sql    = new SelectStatement();
         $record = $sql
-            ->from(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME)
+            ->from(App::con()->prefix() . App::blogWorkspace()::NS_TABLE_NAME)
             ->where('setting_ns = ' . $sql->quote(My::id()))
             ->select();
 
@@ -88,7 +81,7 @@ class Upgrade
             'post_title_redir' => ['feed'],
         ];
 
-        $cur = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
+        $cur = App::blogWorkspace()->openBlogWorkspaceCursor();
         while ($record->fetch()) {
             foreach ($setting_values as $key => $default) {
                 try {
@@ -105,7 +98,7 @@ class Upgrade
                     ->where('setting_id = ' . $sql->quote($key))
                     ->and('setting_ns = ' . $sql->quote($record->f('setting_ns')))
                     ->and('blog_id ' . (null === $record->f('blog_id') ? 'IS NULL ' : ('= ' . $sql->quote($record->f('blog_id')))))
-                    ->update();
+                    ->update($cur);
             }
         }
     }
@@ -115,7 +108,7 @@ class Upgrade
         // change settings type of json string to array
         $sql = new UpdateStatement();
         $sql
-            ->ref(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME)
+            ->ref(App::con()->prefix() . App::blogWorkspace()::NS_TABLE_NAME)
             ->column('setting_type')
             ->value('array')
             ->where('setting_id ' . $sql->in([

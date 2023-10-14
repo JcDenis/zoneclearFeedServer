@@ -1,26 +1,20 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 use Dotclear\Database\Structure;
 use Exception;
 
 /**
- * Module installation.
+ * @brief       zoneclearFeedServer install class.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Install extends Process
 {
@@ -40,7 +34,7 @@ class Install extends Process
             Upgrade::preUpgrade();
 
             // Tables
-            $s = new Structure(dcCore::app()->con, dcCore::app()->prefix);
+            $s = new Structure(App::con(), App::con()->prefix());
             $s->__get(My::TABLE_NAME)
                 ->field('feed_id', 'bigint', 0, false)
                 ->field('feed_creadt', 'timestamp', 0, false, 'now()')
@@ -67,7 +61,7 @@ class Install extends Process
                 ->index('idx_zcfs_type', 'btree', 'feed_type')
                 ->index('idx_zcfs_blog', 'btree', 'blog_id');
 
-            (new Structure(dcCore::app()->con, dcCore::app()->prefix))->synchronize($s);
+            (new Structure(App::con(), App::con()->prefix()))->synchronize($s);
 
             // Settings
             $s = My::settings();
@@ -84,7 +78,7 @@ class Install extends Process
 
             return true;
         } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+            App::error()->add($e->getMessage());
 
             return false;
         }

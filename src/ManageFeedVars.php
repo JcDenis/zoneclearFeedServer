@@ -1,24 +1,18 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Helper\Html\Html;
 
 /**
- * Backend feed manage page vars (type hinting).
+ * @brief       zoneclearFeedServer backend vars definition.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class ManageFeedVars
 {
@@ -52,9 +46,9 @@ class ManageFeedVars
     {
         $z = ZoneclearFeedServer::instance();
 
-        $feed_headlink = '<link rel="%s" title="%s" href="' . dcCore::app()->admin->getPageURL() . '&amp;part=feed&amp;feed_id=%s" />';
-        $feed_link     = '<a href="' . dcCore::app()->admin->getPageURL() . '&amp;part=feed&amp;feed_id=%s" title="%s">%s</a>';
-        $lang          = dcCore::app()->auth->getInfo('user_lang');
+        $feed_headlink = '<link rel="%s" title="%s" href="' . App::backend()->getPageURL() . '&amp;part=feed&amp;feed_id=%s" />';
+        $feed_link     = '<a href="' . App::backend()->getPageURL() . '&amp;part=feed&amp;feed_id=%s" title="%s">%s</a>';
+        $lang          = App::auth()->getInfo('user_lang');
 
         // default values
         $feed_id       = 0;
@@ -82,7 +76,7 @@ class ManageFeedVars
             $feed = $z->getFeeds(['feed_id' => $_REQUEST['feed_id']]);
 
             if ($feed->isEmpty()) {
-                dcCore::app()->error->add(__('This feed does not exist.'));
+                Ap::error()->add(__('This feed does not exist.'));
                 $can_view_page = false;
             } else {
                 $row           = new FeedRow($feed);
@@ -224,7 +218,7 @@ class ManageFeedVars
         $cur->setField('feed_upd_int', $this->upd_int);
 
         # --BEHAVIOR-- adminBeforeZoneclearFeedServerFeedSave - Cursor, int
-        dcCore::app()->callBehavior('adminBeforeZoneclearFeedServerFeedSave', $cur, $id);
+        App::behavior()->callBehavior('adminBeforeZoneclearFeedServerFeedSave', $cur, $id);
 
         if (!$id) {
             // create feed
@@ -235,7 +229,7 @@ class ManageFeedVars
         }
 
         # --BEHAVIOR-- adminAfterZoneclearFeedServerFeedSave - Cursor - int
-        dcCore::app()->callBehavior('adminAfterZoneclearFeedServerFeedSave', $cur, $id);
+        App::behavior()->callBehavior('adminAfterZoneclearFeedServerFeedSave', $cur, $id);
 
         return $id;
     }

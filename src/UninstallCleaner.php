@@ -1,21 +1,10 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
-use dcMeta;
+use Dotclear\App;
 use Dotclear\Database\Statement\{
     DeleteStatement,
     SelectStatement
@@ -29,9 +18,11 @@ use Dotclear\Plugin\Uninstaller\{
 };
 
 /**
- * Plugin Uninstaller Cleaner object.
+ * @brief       zoneclearFeedServer uninstall cleaner.
+ * @ingroup     zoneclearFeedServer
  *
- * This add special action for feed posts metadata.
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class UninstallCleaner extends CleanerParent
 {
@@ -66,7 +57,7 @@ class UninstallCleaner extends CleanerParent
     public function values(): array
     {
         $sql = new SelectStatement();
-        $sql->from(dcCore::app()->prefix . dcMeta::META_TABLE_NAME)
+        $sql->from(App::con()->prefix() . App::meta()::META_TABLE_NAME)
             ->columns([
                 $sql->as($sql->count('*'), 'counter'),
             ])
@@ -92,7 +83,7 @@ class UninstallCleaner extends CleanerParent
     {
         if ($action == 'delete_all') {
             $sql = new DeleteStatement();
-            $sql->from(dcCore::app()->prefix . dcMeta::META_TABLE_NAME)
+            $sql->from(App::con()->prefix() . App::meta()::META_TABLE_NAME)
                 ->where($sql->like('meta_type', My::META_PREFIX . '%'))
                 ->delete();
 

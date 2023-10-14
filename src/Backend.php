@@ -1,24 +1,18 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 
 /**
- * Backend prepend.
+ * @brief       zoneclearFeedServer backend class.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Backend extends Process
 {
@@ -34,13 +28,13 @@ class Backend extends Process
         }
 
         // behaviors that will be always loaded
-        dcCore::app()->addBehaviors([
+        App::behavior()->addBehaviors([
             // Allways take care to delete related info about feed post in meta table
             'adminBeforePostDelete' => function (int $post_id): void {
                 ZoneclearFeedServer::instance()::deletePostsMeta($post_id);
             },
             // widgets registration
-            'initWidgets' => [Widgets::class, 'init'],
+            'initWidgets' => Widgets::init(...),
             // add Uninstaller cleaner for special direct action
             'UninstallerCleanersConstruct' => function ($uninstaller_stack) {
                 UninstallCleaner::init($uninstaller_stack);
@@ -61,14 +55,14 @@ class Backend extends Process
         My::addBackendMenuItem();
 
         // behaviors that require user perm
-        dcCore::app()->addBehaviors([
-            'adminDashboardFavoritesV2' => [BackendBehaviors::class, 'adminDashboardFavoritesV2'],
-            'adminColumnsListsV2'       => [BackendBehaviors::class, 'adminColumnsListsV2'],
-            'adminFiltersListsV2'       => [BackendBehaviors::class, 'adminFiltersListsV2'],
-            'adminPostListHeaderV2'     => [BackendBehaviors::class, 'adminPostListHeaderV2'],
-            'adminPostListValueV2'      => [BackendBehaviors::class, 'adminPostListValueV2'],
-            'adminPostHeaders'          => [BackendBehaviors::class, 'adminPostHeaders'],
-            'adminPostFormItems'        => [BackendBehaviors::class, 'adminPostFormItems'],
+        App::behavior()->addBehaviors([
+            'adminDashboardFavoritesV2' => BackendBehaviors::adminDashboardFavoritesV2(...),
+            'adminColumnsListsV2'       => BackendBehaviors::adminColumnsListsV2(...),
+            'adminFiltersListsV2'       => BackendBehaviors::adminFiltersListsV2(...),
+            'adminPostListHeaderV2'     => BackendBehaviors::adminPostListHeaderV2(...),
+            'adminPostListValueV2'      => BackendBehaviors::adminPostListValueV2(...),
+            'adminPostHeaders'          => BackendBehaviors::adminPostHeaders(...),
+            'adminPostFormItems'        => BackendBehaviors::adminPostFormItems(...),
         ]);
 
         return true;

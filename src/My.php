@@ -1,15 +1,5 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
@@ -17,17 +7,33 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 use Dotclear\Module\MyPlugin;
 
 /**
- * This module definitions.
+ * @brief       zoneclearFeedServer My helper.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class My extends MyPlugin
 {
-    /** @var    string  This module database table name */
-    public const TABLE_NAME = \initZoneclearFeedServer::TABLE_NAME;
+    /**
+     * This module database table name.
+     *
+     * @var     string  TABLE_NAME
+     */
+    public const TABLE_NAME = 'zc_feed';
 
-    /** @var    string  This module meta prefix */
+    /**
+     * This module meta prefix.
+     *
+     * @var     string  META_PREFIX
+     */
     public const META_PREFIX = 'zoneclearfeed_';
 
-    /** @var    array<int,string>   This module template blocks */
+    /**
+     * This module template blocks.
+     *
+     * @var     array<int,string>   TPL_BLOCKS
+     */
     public const TPL_BLOCKS = [
         'Feeds',
         'FeedsFooter',
@@ -35,7 +41,11 @@ class My extends MyPlugin
         'FeedIf',
     ];
 
-    /** @var    array<int,string>   This module template values */
+    /**
+     * This module template values.
+     *
+     * @var     array<int,string>   TPL_VALUES
+     */
     public const TPL_VALUES = [
         'FeedsCount',
         'FeedsEntriesCount',
@@ -55,8 +65,5 @@ class My extends MyPlugin
         'FeedFeedURL',
     ];
 
-    public static function checkCustomContext(int $context): ?bool
-    {
-        return $context == My::BACKEND ? defined('DC_CONTEXT_ADMIN') : null;
-    }
+    // Use default permissions
 }

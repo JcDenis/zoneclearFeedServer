@@ -1,20 +1,10 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Database\Cursor;
 use Dotclear\Plugin\activityReport\{
     Action,
@@ -23,7 +13,13 @@ use Dotclear\Plugin\activityReport\{
 };
 
 /**
+ * @brief       zoneclearFeedServer activityReport class.
+ * @ingroup     zoneclearFeedServer
+ *
  * Add feeds actions to the plugin activity report.
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class ActivityReportActions
 {
@@ -37,7 +33,7 @@ class ActivityReportActions
             __('Feed named "%s" point to "%s" has been updated by "%s"'),
             'zoneclearFeedServerAfterUpdateFeed',
             function (Cursor $cur, int $id): void {
-                $user = dcCore::app()->auth->getInfo('user_cn');
+                $user = App::auth()->getInfo('user_cn');
                 if (!is_string($user)) {
                     return;
                 }
@@ -64,7 +60,7 @@ class ActivityReportActions
             __('A new feed named "%s" point to "%s" was added by "%s"'),
             'zoneclearFeedServerAfterAddFeed',
             function (Cursor $cur, int $id): void {
-                $user = dcCore::app()->auth->getInfo('user_cn');
+                $user = App::auth()->getInfo('user_cn');
                 if (!is_string($user)
                     || !is_string($cur->getField('feed_name'))
                     || !is_string($cur->getField('feed_feed'))
@@ -115,7 +111,7 @@ class ActivityReportActions
                 }
                 $row = new FeedRow($rs);
 
-                $user = dcCore::app()->auth->getInfo('user_cn');
+                $user = App::auth()->getInfo('user_cn');
                 if (!is_string($user)) {
                     return;
                 }

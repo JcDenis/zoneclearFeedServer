@@ -14,12 +14,16 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Helper\Html\Html;
 use Exception;
 
 /**
- * Various combo list.
+ * @brief       zoneclearFeedServer backend combo helper.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Combo
 {
@@ -122,7 +126,7 @@ class Combo
         $combo = ['-' => ''];
 
         try {
-            $categories = dcCore::app()->blog?->getCategories(['post_type' => 'post']);
+            $categories = App::blog()->getCategories(['post_type' => 'post']);
             if (!is_null($categories)) {
                 while ($categories->fetch()) {
                     $level     = is_numeric($categories->f('level')) ? (int) $categories->f('level') : 1;

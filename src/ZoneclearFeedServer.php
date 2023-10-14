@@ -1,26 +1,11 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use dcAuth;
-use dcBlog;
-use dcCategories;
-use dcCore;
-use dcMeta;
-use dcUtils;
+use Dotclear\App;
 use Dotclear\Database\{
     Cursor,
     MetaRecord
@@ -44,29 +29,61 @@ use Dotclear\Helper\Text;
 use Exception;
 
 /**
- * Main module class.
+ * @brief       zoneclearFeedServer main class.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class ZoneclearFeedServer
 {
-    /** @var    int     Net HTTP feed reader timeout */
+    /**
+     * .
+     *
+     * @var     int     NET_HTTP_TIMEOUT
+     */
     public const NET_HTTP_TIMEOUT = 5;
 
-    /** @var    string  Net HTTP feed reader agent */
+    /**
+     * Net HTTP feed reader agent.
+     *
+     * @var     string  NET_HTTP_AGENT
+     */
     public const NET_HTTP_AGENT = 'zoneclearFeedServer - http://zoneclear.org';
 
-    /** @var    int     Net HTTP feed reader max redirect */
+    /**
+     * Net HTTP feed reader max redirect.
+     *
+     * @var     int NET_HTTP_MAX_REDIRECT
+     */
     public const NET_HTTP_MAX_REDIRECT = 2;
 
-    /** @var    ZoneclearFeedServer     Self instance */
+    /**
+     * Self instance.
+     *
+     * @var     ZoneclearFeedServer     $instance
+     */
     private static $instance;
 
-    /** @var    Settings    The settings instance */
+    /**
+     * .
+     *
+     * @var     Settings    $settings
+     */
     public readonly Settings $settings;
 
-    /** @var null|string  $lock   File lock for update */
+    /**
+     * File lock for update.
+     *
+     * @var     null|string     $lock
+     */
     private static $lock = null;
 
-    /** @var null|string  $user   Affiliate user ID */
+    /**
+     * Affiliate user ID.
+     *
+     * @var     null|string     $user
+     */
     private $user = null;
 
     /**
@@ -98,7 +115,7 @@ class ZoneclearFeedServer
      */
     public function openCursor(): Cursor
     {
-        return dcCore::app()->con->openCursor(dcCore::app()->prefix . My::TABLE_NAME);
+        return App::con()->openCursor(App::con()->prefix() . My::TABLE_NAME);
     }
 
     /**
@@ -109,7 +126,7 @@ class ZoneclearFeedServer
      */
     public function updateFeed(int $id, Cursor $cur): void
     {
-        dcCore::app()->con->writeLock(dcCore::app()->prefix . My::TABLE_NAME);
+        App::con()->writeLock(App::con()->prefix() . My::TABLE_NAME);
 
         try {
             if ($id < 1) {
@@ -121,18 +138,18 @@ class ZoneclearFeedServer
             $cur->update(sprintf(
                 "WHERE feed_id = %s AND blog_id = '%s' ",
                 $id,
-                dcCore::app()->con->escapeStr((string) dcCore::app()->blog?->id)
+                App::con()->escapeStr(App::blog()->id())
             ));
-            dcCore::app()->con->unlock();
+            App::con()->unlock();
             $this->trigger();
         } catch (Exception $e) {
-            dcCore::app()->con->unlock();
+            App::con()->unlock();
 
             throw $e;
         }
 
         # --BEHAVIOR-- zoneclearFeedServerAfterUpdateFeed -- Cursor, int
-        dcCore::app()->callBehavior('zoneclearFeedServerAfterUpdateFeed', $cur, $id);
+        App::behavior()->callBehavior('zoneclearFeedServerAfterUpdateFeed', $cur, $id);
     }
 
     /**
@@ -144,20 +161,20 @@ class ZoneclearFeedServer
      */
     public function addFeed(Cursor $cur): int
     {
-        dcCore::app()->con->writeLock(dcCore::app()->prefix . My::TABLE_NAME);
+        App::con()->writeLock(App::con()->prefix() . My::TABLE_NAME);
 
         try {
             $cur->setField('feed_id', $this->getNextId());
-            $cur->setField('blog_id', dcCore::app()->con->escapeStr((string) dcCore::app()->blog?->id));
+            $cur->setField('blog_id', App::con()->escapeStr(App::blog()->id()));
             $cur->setField('feed_creadt', date('Y-m-d H:i:s'));
 
             $this->getFeedCursor($cur);
 
             $cur->insert();
-            dcCore::app()->con->unlock();
+            App::con()->unlock();
             $this->trigger();
         } catch (Exception $e) {
-            dcCore::app()->con->unlock();
+            App::con()->unlock();
 
             throw $e;
         }
@@ -165,7 +182,7 @@ class ZoneclearFeedServer
         $id = is_numeric($cur->getField('feed_id')) ? (int) $cur->getField('feed_id') : 0;
 
         # --BEHAVIOR-- zoneclearFeedServerAfterAddFeed -- Cursor, int
-        dcCore::app()->callBehavior('zoneclearFeedServerAfterAddFeed', $cur, $id);
+        App::behavior()->callBehavior('zoneclearFeedServerAfterAddFeed', $cur, $id);
 
         return $id;
     }
@@ -193,7 +210,7 @@ class ZoneclearFeedServer
             }
 
             $cur = $this->openCursor();
-            dcCore::app()->con->writeLock(dcCore::app()->prefix . My::TABLE_NAME);
+            App::con()->writeLock(App::con()->prefix() . My::TABLE_NAME);
 
             $cur->setField('feed_upddt', date('Y-m-d H:i:s'));
             $cur->setField('feed_status', (int) $enable);
@@ -204,18 +221,18 @@ class ZoneclearFeedServer
             $cur->update(sprintf(
                 "WHERE feed_id = %s AND blog_id = '%s' ",
                 $id,
-                dcCore::app()->con->escapeStr((string) dcCore::app()->blog?->id)
+                App::con()->escapeStr(App::blog()->id())
             ));
-            dcCore::app()->con->unlock();
+            App::con()->unlock();
             $this->trigger();
         } catch (Exception $e) {
-            dcCore::app()->con->unlock();
+            App::con()->unlock();
 
             throw $e;
         }
 
         # --BEHAVIOR-- zoneclearFeedServerAfterEnableFeed -- int, bool, int
-        dcCore::app()->callBehavior('zoneclearFeedServerAfterEnableFeed', $id, $enable, $time);
+        App::behavior()->callBehavior('zoneclearFeedServerAfterEnableFeed', $id, $enable, $time);
     }
 
     #
@@ -231,12 +248,12 @@ class ZoneclearFeedServer
         }
 
         # --BEHAVIOR-- zoneclearFeedServerBeforeDeleteFeed -- int
-        dcCore::app()->callBehavior('zoneclearFeedServerBeforeDeleteFeed', $id);
+        App::behavior()->callBehavior('zoneclearFeedServerBeforeDeleteFeed', $id);
 
         $sql = new DeleteStatement();
-        $sql->from(dcCore::app()->prefix . My::TABLE_NAME)
+        $sql->from(App::con()->prefix() . My::TABLE_NAME)
             ->where('feed_id ' . $sql->in($id))
-            ->and('blog_id = ' . $sql->quote((string) dcCore::app()->blog?->id))
+            ->and('blog_id = ' . $sql->quote(App::blog()->id()))
             ->delete();
 
         $this->trigger();
@@ -253,7 +270,7 @@ class ZoneclearFeedServer
     public static function deletePostsMeta(?int $id): void
     {
         $sql = new DeleteStatement();
-        $sql->from(dcCore::app()->prefix . dcMeta::META_TABLE_NAME)
+        $sql->from(App::con()->prefix() . App::meta()::META_TABLE_NAME)
             ->where('meta_type ' . $sql->in([
                 My::META_PREFIX . 'url',
                 My::META_PREFIX . 'author',
@@ -287,18 +304,18 @@ class ZoneclearFeedServer
         $sql->join(
             (new JoinStatement())
                    ->left()
-                   ->from(dcCore::app()->prefix . dcMeta::META_TABLE_NAME . ' F')
+                   ->from(App::con()->prefix() . App::meta()::META_TABLE_NAME . ' F')
                    ->on('P.post_id = F.post_id')
                    ->statement()
         );
 
-        $params['sql'] = "AND P.blog_id = '" . dcCore::app()->con->escapeStr((string) dcCore::app()->blog?->id) . "' " .
+        $params['sql'] = "AND P.blog_id = '" . App::con()->escapeStr(App::blog()->id()) . "' " .
         "AND F.meta_type = '" . My::META_PREFIX . "id' " .
-        "AND F.meta_id = '" . dcCore::app()->con->escapeStr((string) $params['feed_id']) . "' ";
+        "AND F.meta_id = '" . App::con()->escapeStr((string) $params['feed_id']) . "' ";
 
         unset($params['feed_id']);
 
-        $rs = dcCore::app()->blog?->getPosts($params, $count_only, $sql);
+        $rs = App::blog()->getPosts($params, $count_only, $sql);
 
         return is_null($rs) ? MetaRecord::newFromArray([]) : $rs;
     }
@@ -332,17 +349,17 @@ class ZoneclearFeedServer
             'C.cat_title, C.cat_url, C.cat_desc ';
         }
 
-        $strReq .= 'FROM ' . dcCore::app()->prefix . My::TABLE_NAME . ' Z ' .
-        'LEFT OUTER JOIN ' . dcCore::app()->prefix . dcCategories::CATEGORY_TABLE_NAME . ' C ON Z.cat_id = C.cat_id ';
+        $strReq .= 'FROM ' . App::con()->prefix() . My::TABLE_NAME . ' Z ' .
+        'LEFT OUTER JOIN ' . App::con()->prefix() . App::categories()::CATEGORY_TABLE_NAME . ' C ON Z.cat_id = C.cat_id ';
 
         if (!empty($params['from']) && is_string($params['from'])) {
             $strReq .= $params['from'] . ' ';
         }
 
-        $strReq .= "WHERE Z.blog_id = '" . dcCore::app()->con->escapeStr((string) dcCore::app()->blog?->id) . "' ";
+        $strReq .= "WHERE Z.blog_id = '" . App::con()->escapeStr(App::blog()->id()) . "' ";
 
         if (isset($params['feed_type']) && is_string($params['feed_type'])) {
-            $strReq .= "AND Z.feed_type = '" . dcCore::app()->con->escapeStr((string) $params['feed_type']) . "' ";
+            $strReq .= "AND Z.feed_type = '" . App::con()->escapeStr((string) $params['feed_type']) . "' ";
         } else {
             $strReq .= "AND Z.feed_type = 'feed' ";
         }
@@ -353,21 +370,21 @@ class ZoneclearFeedServer
             } elseif (is_numeric($params['feed_id'])) {
                 $params['feed_id'] = [(int) $params['feed_id']];
             }
-            $strReq .= 'AND Z.feed_id ' . dcCore::app()->con->in($params['feed_id']);
+            $strReq .= 'AND Z.feed_id ' . App::con()->in($params['feed_id']);
         }
 
         if (isset($params['feed_feed']) && is_string($params['feed_feed'])) {
-            $strReq .= "AND Z.feed_feed = '" . dcCore::app()->con->escapeStr((string) $params['feed_feed']) . "' ";
+            $strReq .= "AND Z.feed_feed = '" . App::con()->escapeStr((string) $params['feed_feed']) . "' ";
         }
         if (isset($params['feed_url']) && is_string($params['feed_url'])) {
-            $strReq .= "AND Z.feed_url = '" . dcCore::app()->con->escapeStr((string) $params['feed_url']) . "' ";
+            $strReq .= "AND Z.feed_url = '" . App::con()->escapeStr((string) $params['feed_url']) . "' ";
         }
         if (isset($params['feed_status'])) {
             $strReq .= 'AND Z.feed_status = ' . ((int) $params['feed_status']) . ' ';
         }
 
         if (!empty($params['q']) && is_string($params['q'])) {
-            $q = dcCore::app()->con->escapeStr((string) str_replace('*', '%', strtolower($params['q'])));
+            $q = App::con()->escapeStr((string) str_replace('*', '%', strtolower($params['q'])));
             $strReq .= "AND LOWER(Z.feed_name) LIKE '" . $q . "' ";
         }
 
@@ -377,7 +394,7 @@ class ZoneclearFeedServer
 
         if (!$count_only) {
             if (!empty($params['order']) && is_string($params['order'])) {
-                $strReq .= 'ORDER BY ' . dcCore::app()->con->escapeStr((string) $params['order']) . ' ';
+                $strReq .= 'ORDER BY ' . App::con()->escapeStr((string) $params['order']) . ' ';
             } else {
                 $strReq .= 'ORDER BY Z.feed_upddt DESC ';
             }
@@ -388,11 +405,11 @@ class ZoneclearFeedServer
                 $params['limit'] = (int) $params['limit'];
             }
             if (is_int($params['limit']) || is_array($params['limit'])) {
-                $strReq .= dcCore::app()->con->limit($params['limit']);
+                $strReq .= App::con()->limit($params['limit']);
             }
         }
 
-        return new MetaRecord(dcCore::app()->con->select($strReq));
+        return new MetaRecord(App::con()->select($strReq));
     }
 
     /**
@@ -405,7 +422,7 @@ class ZoneclearFeedServer
         $sql = new SelectStatement();
         $rs  = $sql
             ->column($sql->max('feed_id'))
-            ->from(dcCore::app()->prefix . My::TABLE_NAME)
+            ->from(App::con()->prefix() . My::TABLE_NAME)
             ->select();
 
         return (int) $rs?->f(0) + 1;
@@ -420,14 +437,14 @@ class ZoneclearFeedServer
     {
         try {
             # Cache writable ?
-            if (!is_writable(DC_TPL_CACHE)) {
+            if (!is_writable(App::config()->cacheRoot())) {
                 throw new Exception("Can't write in cache fodler");
             }
             # Set file path
-            $f_md5 = md5((string) dcCore::app()->blog?->id);
+            $f_md5 = md5(App::blog()->id());
             $file  = sprintf(
                 '%s/%s/%s/%s/%s.txt',
-                DC_TPL_CACHE,
+                App::config()->cacheRoot(),
                 My::id(),
                 substr($f_md5, 0, 2),
                 substr($f_md5, 2, 2),
@@ -480,7 +497,7 @@ class ZoneclearFeedServer
             return false;
         }
 
-        $tz = dcCore::app()->blog?->settings->get('system')->get('blog_timezone');
+        $tz = App::blog()->settings()->get('system')->get('blog_timezone');
         Date::setTZ(is_string($tz) ? $tz : 'UTC');
         $time = time();
 
@@ -500,8 +517,8 @@ class ZoneclearFeedServer
 
         $i = 0;
 
-        $cur_post = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcBlog::POST_TABLE_NAME);
-        $cur_meta = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcMeta::META_TABLE_NAME);
+        $cur_post = App::blog()->openPostCursor();
+        $cur_meta = App::meta()->openMetaCursor();
 
         while ($f->fetch()) {
             $row = new FeedRow($f);
@@ -540,7 +557,7 @@ class ZoneclearFeedServer
                     # Set update time of this feed
                     $this->enableFeed($row->id, (bool) $row->status, $time);
 
-                    dcCore::app()->con->begin();
+                    App::con()->begin();
 
                     foreach ($feed->items as $item) {
                         $item_TS = $item->TS ? $item->TS : $time;
@@ -555,7 +572,7 @@ class ZoneclearFeedServer
                             continue;
                         }
 
-                        $item_link              = dcCore::app()->con->escapeStr((string) $item_link);
+                        $item_link              = App::con()->escapeStr((string) $item_link);
                         $is_new_published_entry = false;
 
                         # Not updated since last visit
@@ -576,15 +593,15 @@ class ZoneclearFeedServer
                                 'P.post_id',
                                 'P.post_status',
                             ])
-                            ->from($sql->as(dcCore::app()->prefix . dcBlog::POST_TABLE_NAME, 'P'))
+                            ->from($sql->as(App::con()->prefix() . App::blog()::POST_TABLE_NAME, 'P'))
                             ->join(
                                 (new JoinStatement())
                                     ->inner()
-                                    ->from($sql->as(dcCore::app()->prefix . dcMeta::META_TABLE_NAME, 'M'))
+                                    ->from($sql->as(App::con()->prefix() . App::meta()::META_TABLE_NAME, 'M'))
                                     ->on('P.post_id = M.post_id')
                                     ->statement()
                             )
-                            ->where('blog_id = ' . $sql->quote((string) dcCore::app()->blog?->id))
+                            ->where('blog_id = ' . $sql->quote(App::blog()->id()))
                             ->and("meta_type = '" . My::META_PREFIX . "url'")
                             ->and('meta_id = ' . $sql->quote($item_link))
                             ->select();
@@ -609,14 +626,14 @@ class ZoneclearFeedServer
                             # Create entry
                             if ($old_post->isEmpty()) {
                                 # Post
-                                $cur_post->setField('user_id', dcCore::app()->auth->userID());
+                                $cur_post->setField('user_id', App::auth()->userID());
                                 $cur_post->setField('post_format', 'xhtml');
-                                $cur_post->setField('post_status', $s->post_status_new);
+                                $cur_post->setField('post_status', $s->post_status_new ? App::blog()::POST_PUBLISHED : App::blog()::POST_UNPUBLISHED);
                                 $cur_post->setField('post_open_comment', 0);
                                 $cur_post->setField('post_open_tb', 0);
 
-                                $post_id = dcCore::app()->auth->sudo(
-                                    [dcCore::app()->blog, 'addPost'],
+                                $post_id = App::auth()->sudo(
+                                    App::blog()->addPost(...),
                                     $cur_post
                                 );
 
@@ -629,22 +646,22 @@ class ZoneclearFeedServer
                             } else {
                                 $post_id = is_numeric($old_post->f('post_id')) ? (int) $old_post->f('post_id') : 0;
 
-                                dcCore::app()->auth->sudo(
-                                    [dcCore::app()->blog, 'updPost'],
+                                App::auth()->sudo(
+                                    App::blog()->updPost(...),
                                     $post_id,
                                     $cur_post
                                 );
 
                                 # Quick delete old meta
                                 $sql = new DeleteStatement();
-                                $sql->from(dcCore::app()->prefix . dcMeta::META_TABLE_NAME)
+                                $sql->from(App::con()->prefix() . App::meta()::META_TABLE_NAME)
                                     ->where('post_id = ' . $post_id)
                                     ->and($sql->like('meta_type', My::META_PREFIX . '%'))
                                     ->delete();
 
                                 # Delete old tags
-                                dcCore::app()->auth->sudo(
-                                    [dcCore::app()->meta, 'delPostMeta'],
+                                App::auth()->sudo(
+                                    App::meta()->delPostMeta(...),
                                     $post_id,
                                     'tag'
                                 );
@@ -683,11 +700,11 @@ class ZoneclearFeedServer
                             $cur_meta->insert();
 
                             # Add new tags
-                            $tags = dcCore::app()->meta->splitMetaValues($row->tags);
+                            $tags = App::meta()->splitMetaValues($row->tags);
                             if ($row->get_tags) {
                                 # Some feed subjects contains more than one tag
                                 foreach ($item->subject as $subjects) {
-                                    $tmp  = dcCore::app()->meta->splitMetaValues($subjects);
+                                    $tmp  = App::meta()->splitMetaValues($subjects);
                                     $tags = array_merge($tags, $tmp);
                                 }
                                 $tags = array_unique($tags);
@@ -709,33 +726,33 @@ class ZoneclearFeedServer
                                 }
                                 if (!in_array($tag, $formated_tags)) {
                                     $formated_tags[] = $tag;
-                                    dcCore::app()->auth->sudo(
-                                        [dcCore::app()->meta, 'delPostMeta'],
+                                    App::auth()->sudo(
+                                        App::meta()->delPostMeta(...),
                                         $post_id,
                                         'tag',
-                                        dcMeta::sanitizeMetaID($tag)
+                                        App::meta()::sanitizeMetaID($tag)
                                     );
-                                    dcCore::app()->auth->sudo(
-                                        [dcCore::app()->meta, 'setPostMeta'],
+                                    App::auth()->sudo(
+                                        App::meta()->setPostMeta(...),
                                         $post_id,
                                         'tag',
-                                        dcMeta::sanitizeMetaID($tag)
+                                        App::meta()::sanitizeMetaID($tag)
                                     );
                                 }
                             }
                         } catch (Exception $e) {
-                            dcCore::app()->con->rollback();
+                            App::con()->rollback();
                             $this->enableUser(false);
                             $this->unlockUpdate();
 
                             throw $e;
                         }
                     }
-                    dcCore::app()->con->commit();
+                    App::con()->commit();
                 }
 
                 # --BEHAVIOR-- zoneclearFeedServerAfterCheckFeedUpdate -- FeedRow
-                dcCore::app()->callBehavior('zoneclearFeedServerAfterCheckFeedUpdate', $row);
+                App::behavior()->callBehavior('zoneclearFeedServerAfterCheckFeedUpdate', $row);
             }
         }
         if ($enabled) {
@@ -756,21 +773,18 @@ class ZoneclearFeedServer
         # Enable
         if ($enable) {
             // backup current user
-            if (!is_null(dcCore::app()->auth->userID()) && !is_string(dcCore::app()->auth->userID())) {
+            if (!is_null(App::auth()->userID()) && !is_string(App::auth()->userID())) {
                 throw new Exception('Unable to backup user');
             }
-            $this->user = dcCore::app()->auth->userID();
+            $this->user = App::auth()->userID();
             // set zcfs posts user
-            if (!dcCore::app()->auth->checkUser($this->settings->user)) {
+            if (!App::auth()->checkUser($this->settings->user)) {
                 throw new Exception('Unable to set user');
             }
             # Disable
         } else {
-            // auth on branch My goes readonly
-            //dcCore::app()->auth = null;
-            //dcCore::app()->auth = new dcAuth();
             // restore current user
-            dcCore::app()->auth->checkUser($this->user ?? '');
+            App::auth()->checkUser($this->user ?? '');
         }
     }
 
@@ -785,7 +799,7 @@ class ZoneclearFeedServer
     {
         try {
             $feed_reader = new Reader();
-            $feed_reader->setCacheDir(DC_TPL_CACHE);
+            $feed_reader->setCacheDir(App::config()->cacheRoot());
             $feed_reader->setTimeout(self::NET_HTTP_TIMEOUT);
             $feed_reader->setMaxRedirects(self::NET_HTTP_MAX_REDIRECT);
             $feed_reader->setUserAgent(self::NET_HTTP_AGENT);
@@ -801,7 +815,7 @@ class ZoneclearFeedServer
      */
     private function trigger(): void
     {
-        dcCore::app()->blog?->triggerBlog();
+        App::blog()->triggerBlog();
     }
 
     /**
@@ -864,7 +878,7 @@ class ZoneclearFeedServer
         # Get super admins
         $sql = new SelectStatement();
         $rs  = $sql
-            ->from(dcCore::app()->prefix . dcAuth::USER_TABLE_NAME)
+            ->from(App::con()->prefix() . App::auth()::USER_TABLE_NAME)
             ->columns([
                 'user_id',
                 'user_super',
@@ -878,7 +892,7 @@ class ZoneclearFeedServer
 
         if (!is_null($rs) && !$rs->isEmpty()) {
             while ($rs->fetch()) {
-                $user_cn = dcUtils::getUserCN(
+                $user_cn = App::users()->getUserCN(
                     $rs->f('user_id'),
                     $rs->f('user_name'),
                     $rs->f('user_firstname'),
@@ -898,22 +912,22 @@ class ZoneclearFeedServer
                 'U.user_firstname',
                 'U.user_displayname',
             ])
-            ->from($sql->as(dcCore::app()->prefix . dcAuth::USER_TABLE_NAME, 'U'))
+            ->from($sql->as(App::con()->prefix() . App::auth()::USER_TABLE_NAME, 'U'))
             ->join(
                 (new JoinStatement())
                     ->left()
-                    ->from($sql->as(dcCore::app()->prefix . dcAuth::PERMISSIONS_TABLE_NAME, 'P'))
+                    ->from($sql->as(App::con()->prefix() . App::auth()::PERMISSIONS_TABLE_NAME, 'P'))
                     ->on('U.user_id = P.user_id')
                     ->statement()
             )
             ->where('U.user_status = 1')
-            ->and('P.blog_id = ' . $sql->quote((string) dcCore::app()->blog?->id))
+            ->and('P.blog_id = ' . $sql->quote(App::blog()->id()))
             ->and($sql->like('P.permissions', '%|admin|%'))
             ->select();
 
         if (!is_null($rs) && !$rs->isEmpty()) {
             while ($rs->fetch()) {
-                $user_cn = dcUtils::getUserCN(
+                $user_cn = App::users()->getUserCN(
                     $rs->f('user_id'),
                     $rs->f('user_name'),
                     $rs->f('user_firstname'),
@@ -943,7 +957,7 @@ class ZoneclearFeedServer
         ]);
 
         # --BEHAVIOR-- zoneclearFeedServerPublicUrlTypes -- ArrayObject
-        dcCore::app()->callBehavior('zoneclearFeedServerPublicUrlTypes', $types);
+        App::behavior()->callBehavior('zoneclearFeedServerPublicUrlTypes', $types);
 
         return $types->getArrayCopy();
     }

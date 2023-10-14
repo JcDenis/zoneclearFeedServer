@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\{
     Notices,
     ModulesList,
@@ -34,7 +34,11 @@ use Dotclear\Helper\Html\Form\{
 use Exception;
 
 /**
- * Backend module configuration.
+ * @brief       zoneclearFeedServer config class.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Config extends Process
 {
@@ -72,13 +76,13 @@ class Config extends Process
             Notices::addSuccessNotice(
                 __('Configuration has been successfully updated.')
             );
-            dcCore::app()->admin->url->redirect('admin.plugins', [
+            App::bakcend()->url()->redirect('admin.plugins', [
                 'module' => My::id(),
                 'conf'   => '1',
-                'redir'  => !(dcCore::app()->admin->__get('list') instanceof ModulesList) ? '' : dcCore::app()->admin->__get('list')->getRedir(),
+                'redir'  => !(App::backend()->__get('list') instanceof ModulesList) ? '' : App::backend()->__get('list')->getRedir(),
             ]);
         } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+            App::error()->add($e->getMessage());
         }
 
         return true;
@@ -94,7 +98,7 @@ class Config extends Process
         $s = $z->settings;
 
         $msg = [];
-        if (!is_writable(DC_TPL_CACHE)) {
+        if (!is_writable(App::config()->cacheRoot())) {
             $msg[] = (new Para())
                 ->class('error')
                 ->text(__('Dotclear cache is not writable or not well configured!'));
@@ -105,7 +109,7 @@ class Config extends Process
                     (new Link())
                         ->class('onblog_link outgoing')
                         ->text(__('View the public list of feeds') . ' <img alt="" src="images/outgoing-link.svg">')
-                        ->href(dcCore::app()->blog->url . dcCore::app()->url->getBase('zoneclearFeedsPage')),
+                        ->href(App::blog()->url() . App::url()->getBase('zoneclearFeedsPage')),
                 ]);
         }
 

@@ -5,6 +5,8 @@
 # By Olivier Meunier and contributors
 # Licensed under the GPL version 2.0 license
 
+use Dotclear\App;
+
 $opts = getopt('d:c:b:u:h');
 
 function zchelp(string|int $status = 0): void
@@ -69,18 +71,18 @@ unset($blog_id);
 require $dc_root . '/inc/prepend.php';
 unset($dc_root);
 
-dcCore::app()->setBlog(is_string(DC_BLOG_ID) ? DC_BLOG_ID : '');
-if (is_null(dcCore::app()->blog) || dcCore::app()->blog->id == null) {
+App::blog()->loadFromBlog(is_string(DC_BLOG_ID) ? DC_BLOG_ID : '');
+if (!App::blog()->isDefined() || '' == App::blog()->id()) {
     fwrite(STDERR, "Blog is not defined\n");
     exit(1);
 }
 
-if (!isset($opts['u']) || !dcCore::app()->auth->checkUser(is_string($opts['u']) ? $opts['u'] : '')) {
+if (!isset($opts['u']) || !App::auth()->checkUser(is_string($opts['u']) ? $opts['u'] : '')) {
     fwrite(STDERR, "Unable to set user\n");
     exit(1);
 }
 
-dcCore::app()->plugins->loadModules(DC_PLUGINS_ROOT);
+App::plugins()->loadModules(DC_PLUGINS_ROOT);
 
 try {
     $zc = Dotclear\Plugin\zoneclearFeedServer\ZoneclearFeedServer::instance();

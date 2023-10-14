@@ -1,21 +1,11 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\Listing\{
     Listing,
     Pager
@@ -31,7 +21,11 @@ use Dotclear\Helper\Html\Form\{
 use Dotclear\Helper\Html\Html;
 
 /**
- * Backend feed posts lists.
+ * @brief       zoneclearFeedServer backend feed posts lists.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class PostsList extends Listing
 {
@@ -108,7 +102,7 @@ class PostsList extends Listing
     {
         $cat_title = (new Text('', __('None')));
         if ($this->rs->cat_title
-            && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([dcCore::app()->auth::PERMISSION_CATEGORIES]), dcCore::app()->blog?->id)
+            && App::auth()->check(App::auth()->makePermissions([App::auth()::PERMISSION_CATEGORIES]), App::blog()->id())
         ) {
             $cat_title = (new Link())
                 ->href('category.php?id=' . $this->rs->cat_id)
@@ -155,7 +149,7 @@ class PostsList extends Listing
                 ->class('maximal')
                 ->items([
                     (new Link())
-                        ->href(dcCore::app()->getPostAdminURL($this->rs->post_type, $this->rs->post_id))
+                        ->href(App::postTypes()->getPostAdminURL($this->rs->post_type, $this->rs->post_id))
                         ->title(Html::escapeHTML($this->rs->getURL()))
                         ->text(Html::escapeHTML(trim(Html::clean($this->rs->post_title)))),
                 ]),

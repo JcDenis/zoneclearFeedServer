@@ -1,30 +1,26 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use context;
-use dcCore;
-use rsExtPost;
-use rsExtPostPublic;
+use Dotclear\App;
+use Dotclear\Core\Frontend\Ctx;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\Html\Html;
+use Dotclear\Schema\Extension\Post;
+use Dotclear\Schema\Extension\PostPublic;
 
 /**
+ * @brief       zoneclearFeedServer posts record extension.
+ * @ingroup     zoneclearFeedServer
+ *
  * Posts record extension to integrate feed info.
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-class RsExtPosts extends rsExtPost
+class RsExtPosts extends Post
 {
     /** @var    array<string,mixed>     $brother_extensions     Stack posts record extensions */
     public static array $brother_extensions = [];
@@ -39,7 +35,7 @@ class RsExtPosts extends rsExtPost
      */
     public static function zcFeed(MetaRecord $rs, string $info): ?string
     {
-        $meta = dcCore::app()->meta->getMetadata([
+        $meta = App::meta()->getMetadata([
             'post_id'   => $rs->f('post_id'),
             'meta_type' => My::META_PREFIX . $info,
             'limit'     => 1,
@@ -61,10 +57,10 @@ class RsExtPosts extends rsExtPost
         $ext = static::$brother_extensions;
         if (isset($ext[$type]) && is_callable($ext[$type])) {
             $func = $ext[$type];
-        } elseif (is_callable([rsExtPostPublic::class, $type])) {
-            $func = [rsExtPostPublic::class, $type];
-        } elseif (is_callable([rsExtPost::class, $type])) {
-            $func = [rsExtPost::class, $type];
+        } elseif (is_callable([PostPublic::class, $type])) {
+            $func = [PostPublic::class, $type];
+        } elseif (is_callable([Post::class, $type])) {
+            $func = [Post::class, $type];
         } else {
             return '';
         }
@@ -118,7 +114,7 @@ class RsExtPosts extends rsExtPost
     {
         $url  = $rs->__call('zcFeed', ['url']);
         $site = $rs->__call('zcFeed', ['site']);
-        $full = in_array(dcCore::app()->url->type, ZoneclearFeedServer::instance()->settings->post_title_redir);
+        $full = in_array(App::url()->type, ZoneclearFeedServer::instance()->settings->post_title_redir);
 
         return is_string($site) && is_string($url) && $full ?
             ZoneclearFeedServer::instance()::absoluteURL($site, $url) :
@@ -129,7 +125,7 @@ class RsExtPosts extends rsExtPost
      * Get post content from post to feed.
      *
      * @param   MetaRecord  $rs             The record instance
-     * @param   mixed       $absolute_urls  Serve absolute URL (type "mixed" from rsExtPost)
+     * @param   mixed       $absolute_urls  Serve absolute URL (type "mixed" from Post)
      *
      * @return  string  The post content
      */
@@ -140,14 +136,14 @@ class RsExtPosts extends rsExtPost
         $content  = self::zcFeedBrother('getContent', [&$rs, $absolute_urls]);
 
         if (is_string($url) && is_string($sitename) && $rs->f('post_type') == 'post') {
-            if (in_array(dcCore::app()->url->type, ZoneclearFeedServer::instance()->settings->post_full_tpl)) {
+            if (in_array(App::url()->type, ZoneclearFeedServer::instance()->settings->post_full_tpl)) {
                 return $content . sprintf(
                     '<p class="zoneclear-original"><em>%s</em></p>',
                     sprintf(__('Original post on <a href="%s">%s</a>'), $url, $sitename)
                 );
             }
-            $content = context::remove_html($content);
-            $content = context::cut_string($content, 350);
+            $content = Ctx::remove_html($content);
+            $content = Ctx::cut_string($content, 350);
             $content = Html::escapeHTML($content);
 
             return sprintf(

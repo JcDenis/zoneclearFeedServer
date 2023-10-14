@@ -1,22 +1,10 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use dcCore;
-use dcMeta;
 use Dotclear\Core\Backend\{
     Notices,
     Page
@@ -35,7 +23,11 @@ use Dotclear\Helper\Html\Html;
 use Exception;
 
 /**
- * Backend feeds list default actions.
+ * @brief       zoneclearFeedServer feeds list default actions.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class FeedsDefaultActions
 {
@@ -46,35 +38,35 @@ class FeedsDefaultActions
     {
         $ap->addAction(
             [__('Change category') => 'changecat'],
-            [self::class, 'doChangeCategory']
+            self::doChangeCategory(...)
         );
         $ap->addAction(
             [__('Change update interval') => 'changeint'],
-            [self::class, 'doChangeInterval']
+            self::doChangeInterval(...)
         );
         $ap->addAction(
             [__('Disable feed update') => 'disablefeed'],
-            [self::class, 'doEnableFeed']
+            self::doEnableFeed(...)
         );
         $ap->addAction(
             [__('Enable feed update') => 'enablefeed'],
-            [self::class, 'doEnableFeed']
+            self::doEnableFeed(...)
         );
         $ap->addAction(
             [__('Reset last update') => 'resetupdlast'],
-            [self::class, 'doResetUpdate']
+            self::doResetUpdate(...)
         );
         $ap->addAction(
             [__('Update (check) feed') => 'updatefeed'],
-            [self::class, 'doUpdateFeed']
+            self::doUpdateFeed(...)
         );
         $ap->addAction(
             [__('Delete related posts') => 'deletepost'],
-            [self::class, 'doDeletePost']
+            self::doDeletePost(...)
         );
         $ap->addAction(
             [__('Delete feed (without related posts)') => 'deletefeed'],
-            [self::class, 'doDeleteFeed']
+            self::doDeleteFeed(...)
         );
     }
 
@@ -142,10 +134,10 @@ class FeedsDefaultActions
 
             while ($posts->fetch()) {
                 if (is_numeric($posts->f('post_id'))) {
-                    dcCore::app()->blog?->delPost((int) $posts->f('post_id'));
+                    App::blog()->delPost((int) $posts->f('post_id'));
                     $sql = new DeleteStatement();
                     $sql
-                        ->from(dcCore::app()->prefix . dcMeta::META_TABLE_NAME)
+                        ->from(App::con()->prefix() . App::meta()::META_TABLE_NAME)
                         ->where('post_id = ' . $posts->f('post_id'))
                         ->and('meta_type ' . $sql->in($types))
                         ->delete();
@@ -270,10 +262,10 @@ class FeedsDefaultActions
         } else {
             $ap->beginPage(
                 Page::breadcrumb([
-                    Html::escapeHTML((string) dcCore::app()->blog?->name) => '',
-                    __('Feeds server')                                    => '',
-                    $ap->getCallerTitle()                                 => $ap->getRedirection(true),
-                    __('Change category for this selection')              => '',
+                    Html::escapeHTML(App::blog()->name())    => '',
+                    __('Feeds server')                       => '',
+                    $ap->getCallerTitle()                    => $ap->getRedirection(true),
+                    __('Change category for this selection') => '',
                 ])
             );
 
@@ -294,7 +286,7 @@ class FeedsDefaultActions
                                 (new Submit('do-action'))
                                     ->value(__('Save')),
                                 (new Hidden(['action'], 'changecat')),
-                                dcCore::app()->formNonce(false),
+                                App::nonce()->formNonce(),
                             ]
                         )),
 
@@ -337,10 +329,10 @@ class FeedsDefaultActions
             $ap->beginPage(
                 Page::breadcrumb(
                     [
-                        Html::escapeHTML((string) dcCore::app()->blog?->name) => '',
-                        __('Feeds server')                                    => '',
-                        $ap->getCallerTitle()                                 => $ap->getRedirection(true),
-                        __('Change update frequency for this selection')      => '',
+                        Html::escapeHTML(App::blog()->name())            => '',
+                        __('Feeds server')                               => '',
+                        $ap->getCallerTitle()                            => $ap->getRedirection(true),
+                        __('Change update frequency for this selection') => '',
                     ]
                 )
             );
@@ -362,7 +354,7 @@ class FeedsDefaultActions
                                 (new Submit('do-action'))
                                     ->value(__('Save')),
                                 (new Hidden(['action'], 'changeint')),
-                                dcCore::app()->formNonce(false),
+                                App::nonce()->formNonce(),
                             ]
                         )),
 

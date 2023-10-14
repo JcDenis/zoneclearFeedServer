@@ -1,21 +1,11 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\Action\Actions;
 use Dotclear\Core\Backend\Page;
 use Dotclear\Database\MetaRecord;
@@ -27,7 +17,11 @@ use Dotclear\Helper\Html\Html;
 use Exception;
 
 /**
- * Backend feeds list actions handler.
+ * @brief       zoneclearFeedServer feeds list actions.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class FeedsActions extends Actions
 {
@@ -56,7 +50,7 @@ class FeedsActions extends Actions
         FeedsDefaultActions::addDefaultFeedsActions($this);
 
         # --BEHAVIOR-- zoneclearFeedServerAddFeedsActions - FeedsActions
-        dcCore::app()->callBehavior('zoneclearFeedServerAddFeedsActions', $this);
+        App::behavior()->callBehavior('zoneclearFeedServerAddFeedsActions', $this);
     }
 
     public function beginPage(string $breadcrumb = '', string $head = ''): void
@@ -83,12 +77,12 @@ class FeedsActions extends Actions
 
     public function error(Exception $e): void
     {
-        dcCore::app()->error->add($e->getMessage());
+        App::error()->add($e->getMessage());
         $this->beginPage(
             Page::breadcrumb([
-                Html::escapeHTML((string) dcCore::app()->blog?->name) => '',
-                $this->getCallerTitle()                               => $this->getRedirection(true),
-                __('Feeds actions')                                   => '',
+                Html::escapeHTML(App::blog()->name()) => '',
+                $this->getCallerTitle()               => $this->getRedirection(true),
+                __('Feeds actions')                   => '',
             ])
         );
         $this->endPage();

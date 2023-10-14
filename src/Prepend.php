@@ -1,24 +1,18 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 
 /**
- * Module prepend.
+ * @brief       zoneclearFeedServer prepend class.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Prepend extends Process
 {
@@ -34,11 +28,11 @@ class Prepend extends Process
         }
 
         // public url for page of description of the flux
-        dcCore::app()->url->register(
+        App::url()->register(
             'zoneclearFeedsPage',
             'zcfeeds',
             '^zcfeeds(.*?)$',
-            [UrlHandler::class, 'zoneclearFeedsPage']
+            UrlHandler::zoneclearFeedsPage(...)
         );
 
         // report zoneclearFeedServer activities

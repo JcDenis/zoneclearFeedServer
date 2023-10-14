@@ -1,35 +1,31 @@
 <?php
 /**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
+ * @file
+ * @brief       The plugin zoneclearFeedServer definition
+ * @ingroup     zoneclearFeedServer
  *
- * @package Dotclear
- * @subpackage Plugin
+ * @defgroup    zoneclearFeedServer Plugin zoneclearFeedServer.
  *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
+ * Mix your blog with a feeds planet.
  *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ * @author      Jean-Christian Denis (author)
+ * @author      Pierre Van Glabeke
+ * @author      BG
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return null;
-}
+declare(strict_types=1);
 
 $this->registerModule(
     'Feeds server',
     'Mix your blog with a feeds planet',
     'Jean-Christian Denis, BG, Pierre Van Glabeke',
-    '2023.08.20',
+    '2023.10.14',
     [
-        'requires' => [
-            ['php', '8.1'],
-            ['core', '2.27'],
-        ],
-        'permissions' => dcCore::app()->auth->makePermissions([
-            dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
-        ]),
-        'type'       => 'plugin',
-        'support'    => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/issues',
-        'details'    => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/src/branch/master/README.md',
-        'repository' => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/raw/branch/master/dcstore.xml',
+        'requires'    => [['core', '2.28']],
+        'permissions' => 'My',
+        'type'        => 'plugin',
+        'support'     => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/issues',
+        'details'     => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/src/branch/master/README.md',
+        'repository'  => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/raw/branch/master/dcstore.xml',
     ]
 );

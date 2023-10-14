@@ -1,22 +1,11 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use dcCore;
-use dcUtils;
+use Dotclear\App;
 use Dotclear\Core\Backend\Combos;
 use Dotclear\Core\Backend\Filter\{
     Filter,
@@ -27,7 +16,11 @@ use Dotclear\Helper\Html\Html;
 use Exception;
 
 /**
- * Backend feed posts list filters.
+ * @brief       zoneclearFeedServer backend feeds posts list filter.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class PostsFilter extends Filters
 {
@@ -45,7 +38,7 @@ class PostsFilter extends Filters
         ]);
 
         # --BEHAVIOR-- zcfsPostFilter
-        dcCore::app()->callBehavior('zcfsPostFilter', $filters);
+        App::behavior()->callBehavior('zcfsPostFilter', $filters);
 
         $filters = $filters->getArrayCopy();
 
@@ -62,18 +55,18 @@ class PostsFilter extends Filters
         $users = null;
 
         try {
-            $users = dcCore::app()->blog?->getPostsUsers();
+            $users = App::blog()->getPostsUsers();
             if (is_null($users) || $users->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+            App::error()->add($e->getMessage());
 
             return null;
         }
 
         $combo = Combos::getUsersCombo($users);
-        dcUtils::lexicalKeySort($combo);
+        App::lexical()->lexicalKeySort($combo);
 
         return (new Filter('user_id'))
             ->param()
@@ -95,12 +88,12 @@ class PostsFilter extends Filters
         $categories = null;
 
         try {
-            $categories = dcCore::app()->blog?->getCategories();
+            $categories = App::blog()->getCategories();
             if (is_null($categories) || $categories->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+            App::error()->add($e->getMessage());
 
             return null;
         }
@@ -149,12 +142,12 @@ class PostsFilter extends Filters
         $dates = null;
 
         try {
-            $dates = dcCore::app()->blog?->getDates(['type' => 'month']);
+            $dates = App::blog()->getDates(['type' => 'month']);
             if (is_null($dates) || $dates->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+            App::error()->add($e->getMessage());
 
             return null;
         }

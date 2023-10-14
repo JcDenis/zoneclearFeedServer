@@ -1,21 +1,11 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\Filter\Filters;
 use Dotclear\Core\Backend\Listing\{
     Listing,
@@ -32,7 +22,11 @@ use Dotclear\Helper\Html\Form\{
 use Dotclear\Helper\Html\Html;
 
 /**
- * Backend feeds list.
+ * @brief       zoneclearFeedServer backend feeds list.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class FeedsList extends Listing
 {
@@ -126,7 +120,7 @@ class FeedsList extends Listing
         if (!is_string($url)) {
             $url = '';
         }
-        $tz = dcCore::app()->auth->getInfo('user_tz');
+        $tz = App::auth()->getInfo('user_tz');
         if (!is_string($tz)) {
             $tz = 'UTC';
         }

@@ -1,21 +1,11 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\Favorites;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\Html\Form\{
@@ -27,7 +17,11 @@ use Dotclear\Helper\Html\Form\{
 use Dotclear\Helper\Html\Html;
 
 /**
- * Backend behaviors.
+ * @brief       zoneclearFeedServer backend behaviors class.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class BackendBehaviors
 {
@@ -41,9 +35,9 @@ class BackendBehaviors
             'url'         => My::manageUrl(),
             'small-icon'  => My::icons(),
             'large-icon'  => My::icons(),
-            'permissions' => dcCore::app()->auth->makePermissions([
-                dcCore::app()->auth::PERMISSION_USAGE,
-                dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
+            'permissions' => App::auth()->makePermissions([
+                App::auth()::PERMISSION_USAGE,
+                App::auth()::PERMISSION_CONTENT_ADMIN,
             ]),
             // update user dashboard favorites icon with nb of updated feeds
             'dashboard_cb' => function (ArrayObject $fav): void {
@@ -123,7 +117,7 @@ class BackendBehaviors
      */
     public static function adminPostListValueV2(MetaRecord $rs, ArrayObject $cols): void
     {
-        $rs_meta = dcCore::app()->meta->getMetadata(['post_id' => $rs->f('post_id'), 'meta_type' => My::META_PREFIX . 'id']);
+        $rs_meta = App::meta()->getMetadata(['post_id' => $rs->f('post_id'), 'meta_type' => My::META_PREFIX . 'id']);
         if ($rs_meta->isEmpty()) {
             $item = (new Text('', '-'));
         } else {
@@ -150,7 +144,7 @@ class BackendBehaviors
     public static function adminPostFormItems(ArrayObject $main_items, ArrayObject $sidebar_items, ?MetaRecord $post): void
     {
         // nullsafe
-        if (is_null(dcCore::app()->blog)) {
+        if (!App::blog()->isDefined()) {
             return;
         }
 
@@ -159,7 +153,7 @@ class BackendBehaviors
             return;
         }
 
-        $url = dcCore::app()->meta->getMetadata([
+        $url = App::meta()->getMetadata([
             'post_id'   => $post->f('post_id'),
             'meta_type' => My::META_PREFIX . 'url',
             'limit'     => 1,
@@ -169,21 +163,21 @@ class BackendBehaviors
             return;
         }
 
-        $author = dcCore::app()->meta->getMetadata([
+        $author = App::meta()->getMetadata([
             'post_id'   => $post->f('post_id'),
             'meta_type' => My::META_PREFIX . 'author',
             'limit'     => 1,
         ]);
         $author = $author->isEmpty() ? '' : $author->f('meta_id');
 
-        $site = dcCore::app()->meta->getMetadata([
+        $site = App::meta()->getMetadata([
             'post_id'   => $post->f('post_id'),
             'meta_type' => My::META_PREFIX . 'site',
             'limit'     => 1,
         ]);
         $site = $site->isEmpty() ? '' : $site->f('meta_id');
 
-        $sitename = dcCore::app()->meta->getMetadata([
+        $sitename = App::meta()->getMetadata([
             'post_id'   => $post->f('post_id'),
             'meta_type' => My::META_PREFIX . 'sitename',
             'limit'     => 1,
@@ -191,11 +185,11 @@ class BackendBehaviors
         $sitename = $sitename->isEmpty() ? '' : $sitename->f('meta_id');
 
         $edit = (new Text('', ''));
-        if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-            dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
-        ]), dcCore::app()->blog->id)
+        if (App::auth()->check(App::auth()->makePermissions([
+            App::auth()::PERMISSION_CONTENT_ADMIN,
+        ]), App::blog()->id())
         ) {
-            $fid = dcCore::app()->meta->getMetadata([
+            $fid = App::meta()->getMetadata([
                 'post_id'   => $post->f('post_id'),
                 'meta_type' => My::META_PREFIX . 'id',
                 'limit'     => 1,

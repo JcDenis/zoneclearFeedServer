@@ -17,7 +17,11 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 use Dotclear\Database\MetaRecord;
 
 /**
- * Feed meta record row type hinting.
+ * @brief       zoneclearFeedServer feed meta record row.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class FeedRow
 {

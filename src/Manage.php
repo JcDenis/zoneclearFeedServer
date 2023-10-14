@@ -1,20 +1,10 @@
 <?php
-/**
- * @brief zoneclearFeedServer, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis, BG, Pierre Van Glabeke
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\Filter\{
     Filters,
     FiltersLibrary
@@ -37,7 +27,11 @@ use Dotclear\Helper\Html\Form\{
 use Exception;
 
 /**
- * Backend feeds list manage page.
+ * @brief       zoneclearFeedServer backend feeds manage class.
+ * @ingroup     zoneclearFeedServer
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Manage extends Process
 {
@@ -64,7 +58,7 @@ class Manage extends Process
 
         // not configured
         if (!$s->active || !$s->user) {
-            dcCore::app()->error->add(__('Module is not wel configured'));
+            App::error()->add(__('Module is not wel configured'));
 
             return true;
         }
@@ -131,13 +125,13 @@ class Manage extends Process
             $feeds_counter = $z->getFeeds($params, true)->f(0);
             $feeds_list    = new FeedsList($feeds, $feeds_counter);
         } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+            App::error()->add($e->getMessage());
         }
 
         Page::openModule(
             My::id(),
             (
-                isset($feeds_list) && !dcCore::app()->error->flag() ?
+                isset($feeds_list) && !App::error()->flag() ?
                 $feeds_filter->js(My::manageUrl(['part' => 'feeds'], '&')) .
                     My::jsLoad('feeds')
                 : ''
