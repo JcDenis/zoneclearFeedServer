@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use Dotclear\App;
+use Dotclear\Core\Process;
 use Dotclear\Database\Cursor;
 use Dotclear\Plugin\activityReport\{
     Action,
@@ -13,7 +14,7 @@ use Dotclear\Plugin\activityReport\{
 };
 
 /**
- * @brief       zoneclearFeedServer activityReport class.
+ * @brief       zoneclearFeedServer plugin activityReport class.
  * @ingroup     zoneclearFeedServer
  *
  * Add feeds actions to the plugin activity report.
@@ -21,10 +22,19 @@ use Dotclear\Plugin\activityReport\{
  * @author      Jean-Christian Denis
  * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-class ActivityReportActions
+class ActivityReportAction extends Process
 {
-    public static function init(): void
+    public static function init(): bool
     {
+        return self::status(true);
+    }
+
+    public static function process(): bool
+    {
+        if (!self::status()) {
+            return false;
+        }
+
         $group = new Group(My::id(), My::name());
 
         $group->add(new Action(
@@ -141,5 +151,7 @@ class ActivityReportActions
         ));
 
         ActivityReport::instance()->groups->add($group);
+
+        return true;
     }
 }

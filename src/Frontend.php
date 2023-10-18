@@ -43,7 +43,7 @@ class Frontend extends Process
                 return $context == 'zoneclearFeedsPage' ? __('List of feeds') : '';
             },
             // widgets registration
-            'initWidgets' => [Widgets::class, 'init'],
+            'initWidgets' => Widgets::init(...),
         ]);
 
         // Register template blocks

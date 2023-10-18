@@ -1,3 +1,9 @@
+zoneclearFeedServer 2023.10.18
+===========================================================
+* Require Dotclear 2.28
+* Require PHP 8.1
+* Upgrade plugin activityReport
+
 zoneclearFeedServer 2023.10.14
 ===========================================================
 * Require Dotclear 2.28

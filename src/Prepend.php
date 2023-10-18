@@ -35,11 +35,6 @@ class Prepend extends Process
             UrlHandler::zoneclearFeedsPage(...)
         );
 
-        // report zoneclearFeedServer activities
-        if (defined('ACTIVITY_REPORT') && ACTIVITY_REPORT == 3) {
-            ActivityReportActions::init();
-        }
-
         return true;
     }
 }
