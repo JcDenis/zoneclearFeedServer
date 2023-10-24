@@ -235,7 +235,7 @@ class ManageFeed extends Process
                                                     (new Input('feed_name'))
                                                         ->class('maximal')
                                                         ->size(60)
-                                                        ->maxlenght(255)
+                                                        ->maxlength(255)
                                                         ->value($v->name),
                                                 ]),
                                             // feed_owner
@@ -247,7 +247,7 @@ class ManageFeed extends Process
                                                     (new Input('feed_owner'))
                                                         ->class('maximal')
                                                         ->size(60)
-                                                        ->maxlenght(255)
+                                                        ->maxlength(255)
                                                         ->value($v->owner),
                                                 ]),
                                             // feed_url
@@ -259,7 +259,7 @@ class ManageFeed extends Process
                                                     (new Input('feed_url'))
                                                         ->class('maximal')
                                                         ->size(60)
-                                                        ->maxlenght(255)
+                                                        ->maxlength(255)
                                                         ->value($v->url),
                                                 ]),
                                             // feed_feed
@@ -271,7 +271,7 @@ class ManageFeed extends Process
                                                     (new Input('feed_feed'))
                                                         ->class('maximal')
                                                         ->size(60)
-                                                        ->maxlenght(255)
+                                                        ->maxlength(255)
                                                         ->value($v->feed),
                                                 ]),
                                             // feed_desc
@@ -282,7 +282,7 @@ class ManageFeed extends Process
                                                     (new Input('feed_desc'))
                                                         ->class('maximal')
                                                         ->size(60)
-                                                        ->maxlenght(255)
+                                                        ->maxlength(255)
                                                         ->value($v->desc),
                                                 ]),
                                             // feed_tags
@@ -293,7 +293,7 @@ class ManageFeed extends Process
                                                     (new Input('feed_tags'))
                                                         ->class('maximal')
                                                         ->size(60)
-                                                        ->maxlenght(255)
+                                                        ->maxlength(255)
                                                         ->value($v->tags),
                                                 ]),
                                             // feed_tweeter
@@ -304,7 +304,7 @@ class ManageFeed extends Process
                                                     (new Input('feed_tweeter'))
                                                         ->class('maximal')
                                                         ->size(60)
-                                                        ->maxlenght(255)
+                                                        ->maxlength(255)
                                                         ->value($v->tweeter),
                                                 ]),
                                         ]),
