@@ -76,7 +76,7 @@ class ManageFeedVars
             $feed = $z->getFeeds(['feed_id' => $_REQUEST['feed_id']]);
 
             if ($feed->isEmpty()) {
-                Ap::error()->add(__('This feed does not exist.'));
+                App::error()->add(__('This feed does not exist.'));
                 $can_view_page = false;
             } else {
                 $row           = new FeedRow($feed);

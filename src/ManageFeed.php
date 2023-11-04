@@ -417,7 +417,7 @@ class ManageFeed extends Process
                                         (new Label(__('Selected entries action:'), Label::OUTSIDE_LABEL_BEFORE))
                                             ->for('action'),
                                         (new Select('action'))
-                                            ->items($posts_actions_page->getCombo()),
+                                            ->items($posts_actions_page->getCombo() ?? []),
                                         (new Submit('feed-action'))
                                             ->value(__('ok')),
                                         ... My::hiddenFields($post_filter->values()),

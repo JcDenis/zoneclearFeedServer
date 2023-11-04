@@ -30,10 +30,10 @@ class Settings
 
     public readonly int $tag_case;
 
-    /** @var    array<int,string> */
+    /** @var    array<int, string> */
     public readonly array $post_full_tpl;
 
-    /** @var    array<int,string> */
+    /** @var    array<int, string> */
     public readonly array $post_title_redir;
 
     public readonly string $user;
@@ -90,7 +90,7 @@ class Settings
     {
         $s = My::settings();
 
-        if (!is_null($s) && property_exists($this, $key) && settype($value, gettype($this->{$key})) === true) {
+        if (property_exists($this, $key) && settype($value, gettype($this->{$key})) === true) {
             $s->put($key, $value, gettype($this->{$key}));
 
             return true;

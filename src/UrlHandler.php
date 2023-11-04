@@ -70,7 +70,7 @@ class UrlHandler extends Url
 
             # Server js
         } elseif ($args == '/zcfsupd.js' && 3 == $s->bhv_pub_upd) {
-            App::frontend()->template()->setPath(App::frontend()->template()->getPath(), My::path() . '/default-templates');
+            App::frontend()->template()->appendPath(My::path() . '/default-templates');
             self::serveDocument(
                 'zcfsupd.js',
                 'text/javascript',
@@ -84,13 +84,11 @@ class UrlHandler extends Url
             if (!is_string($theme)) {
                 self::p404();
             }
-            $tplset = App::themes()->getDefine($theme)->get('tplset');
-            $path   = My::path() . '/default-templates/';
-            if (!empty($tplset) && is_dir($path . $tplset)) {
-                App::frontend()->template()->setPath(App::frontend()->template()->getPath(), $path . $tplset);
-            } else {
-                App::frontend()->template()->setPath(App::frontend()->template()->getPath(), $path . App::config()->defaultTplset());
+            $tplset = App::themes()->getDefine(App::blog()->settings()->get('system')->get('theme'))->get('tplset');
+            if (empty($tplset) || !is_dir(implode(DIRECTORY_SEPARATOR, [My::path(), 'default-templates', $tplset]))) {
+                $tplset = App::config()->defaultTplset();
             }
+            App::frontend()->template()->appendPath(implode(DIRECTORY_SEPARATOR, [My::path(), 'default-templates', $tplset]));
             self::serveDocument('zcfeeds.html');
         }
         # Unknow

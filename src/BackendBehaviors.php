@@ -55,6 +55,8 @@ class BackendBehaviors
 
     /**
      * Lists columns user preference.
+     *
+     * @param   ArrayObject<string, mixed>  $cols
      */
     public static function adminColumnsListsV2(ArrayObject $cols): void
     {
@@ -83,6 +85,8 @@ class BackendBehaviors
 
     /**
      * Lists filter.
+     *
+     * @param   ArrayObject<string, mixed>  $sorts
      */
     public static function adminFiltersListsV2(ArrayObject $sorts): void
     {
@@ -106,14 +110,18 @@ class BackendBehaviors
 
     /**
      * Add head column to posts list.
+     *
+     * @param   ArrayObject<string, mixed>  $cols
      */
     public static function adminPostListHeaderV2(MetaRecord $rs, ArrayObject $cols): void
     {
-        $cols['feed'] = (new Para(null, 'th'))->text(__('Feed'))->extra('scope="col"')->render();
+        $cols['feed'] = (new Text('th', __('Feed')))->extra('scope="col"')->render();
     }
 
     /**
      * Add body column to posts list.
+     *
+     * @param   ArrayObject<string, mixed>  $cols
      */
     public static function adminPostListValueV2(MetaRecord $rs, ArrayObject $cols): void
     {
@@ -140,6 +148,9 @@ class BackendBehaviors
 
     /**
      * Add info about feed on post page sidebar.
+     *
+     * @param   ArrayObject<string, mixed>  $main_items
+     * @param   ArrayObject<string, mixed>  $sidebar_items
      */
     public static function adminPostFormItems(ArrayObject $main_items, ArrayObject $sidebar_items, ?MetaRecord $post): void
     {

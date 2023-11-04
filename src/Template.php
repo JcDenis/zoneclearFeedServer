@@ -19,6 +19,9 @@ use Dotclear\Helper\L10n;
  */
 class Template
 {
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function Feeds(ArrayObject $a, string $c): string
     {
         $lastn = -1;
@@ -84,6 +87,9 @@ class Template
         'App::frontend()->context()->feeds = null; App::frontend()->context()->feeds_params = null; ?>';
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedIf(ArrayObject $a, string $c): string
     {
         $if = [];
@@ -144,6 +150,9 @@ class Template
             '<?php if(' . implode(' ' . $operator . ' ', $if) . ') : ?>' . $c . '<?php endif; ?>';
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedIfFirst(ArrayObject $a): string
     {
         $ret = Html::escapeHTML(isset($a['return']) && is_string($a['return']) ? $a['return'] : 'first');
@@ -153,6 +162,9 @@ class Template
         "echo '" . addslashes($ret) . "'; } ?>";
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedIfOdd(ArrayObject $a): string
     {
         $ret = Html::escapeHTML(isset($a['return']) && is_string($a['return']) ? $a['return'] : 'odd');
@@ -162,41 +174,65 @@ class Template
         "echo '" . addslashes($ret) . "'; } ?>";
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedDesc(ArrayObject $a): string
     {
         return self::getValue($a, 'App::frontend()->context()->feeds->feed_desc');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedOwner(ArrayObject $a): string
     {
         return self::getValue($a, 'App::frontend()->context()->feeds->feed_owner');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedCategory(ArrayObject $a): string
     {
         return self::getValue($a, 'App::frontend()->context()->feeds->cat_title');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedCategoryID(ArrayObject $a): string
     {
         return self::getValue($a, 'App::frontend()->context()->feeds->cat_id');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedCategoryURL(ArrayObject $a): string
     {
         return self::getValue($a, 'App::blog()->url().App::url()->getBase(\'category\').\'/\'.Html::sanitizeURL(App::frontend()->context()->feeds->cat_url)');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedCategoryShortURL(ArrayObject $a): string
     {
         return self::getValue($a, 'App::frontend()->context()->feeds->cat_url');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedID(ArrayObject $a): string
     {
         return self::getValue($a, 'App::frontend()->context()->feeds->feed_id');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedLang(ArrayObject $a): string
     {
         return empty($a['full']) ?
@@ -208,31 +244,49 @@ class Template
             '<?php ; } unset($langs); ?>';
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedName(ArrayObject $a): string
     {
         return self::getValue($a, 'App::frontend()->context()->feeds->feed_name');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedSiteURL(ArrayObject $a): string
     {
         return self::getValue($a, 'App::frontend()->context()->feeds->feed_url');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedFeedURL(ArrayObject $a): string
     {
         return self::getValue($a, 'App::frontend()->context()->feeds->feed_feed');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedsHeader(ArrayObject $a, string $c): string
     {
         return '<?php if (App::frontend()->context()->feeds->isStart()) : ?>' . $c . '<?php endif; ?>';
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedsFooter(ArrayObject $a, string $c): string
     {
         return '<?php if (App::frontend()->context()->feeds->isEnd()) : ?>' . $c . '<?php endif; ?>';
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedsCount(ArrayObject $a): string
     {
         $none = isset($a['none']) && is_string($a['none']) ? addslashes($a['none']) : 'no sources';
@@ -250,6 +304,9 @@ class Template
         '} unset($fcount); ?>';
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedsEntriesCount(ArrayObject $a): string
     {
         $none = isset($a['none']) && is_string($a['none']) ? addslashes($a['none']) : 'no entries';
@@ -274,6 +331,9 @@ class Template
         '} unset($allfeeds,$fcount); ?>';
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     public static function FeedEntriesCount(ArrayObject $a): string
     {
         $none = isset($a['none']) && is_string($a['none']) ? addslashes($a['none']) : 'no entries';
@@ -292,8 +352,11 @@ class Template
         '} unset($fcount); ?>';
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>   $a
+     */
     protected static function getValue(ArrayObject $a, string $v): string
     {
-        return '<?php echo ' . sprintf(App::fontend()->template()->getFilters($a), $v) . '; ?>';
+        return '<?php echo ' . sprintf(App::frontend()->template()->getFilters($a), $v) . '; ?>';
     }
 }

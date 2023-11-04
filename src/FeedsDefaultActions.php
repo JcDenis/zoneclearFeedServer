@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
+use Dotclear\App;
 use Dotclear\Core\Backend\{
     Notices,
     Page
@@ -72,6 +73,8 @@ class FeedsDefaultActions
 
     /**
      * Enable / disable feeds.
+     *
+     * @param   ArrayObject<string, mixed>  $post
      */
     public static function doEnableFeed(FeedsActions $ap, ArrayObject $post): void
     {
@@ -85,7 +88,7 @@ class FeedsDefaultActions
         }
 
         foreach ($ids as $id) {
-            $ap->zcfs->enableFeed($id, $enable);
+            $ap->zcfs->enableFeed((int) $id, $enable);
         }
 
         Notices::addSuccessNotice(sprintf(
@@ -108,6 +111,8 @@ class FeedsDefaultActions
 
     /**
      * Delete feeds posts.
+     *
+     * @param   ArrayObject<string, mixed>  $post
      */
     public static function doDeletePost(FeedsActions $ap, ArrayObject $post): void
     {
@@ -153,6 +158,8 @@ class FeedsDefaultActions
 
     /**
      * Delete feeds.
+     *
+     * @param   ArrayObject<string, mixed>  $post
      */
     public static function doDeleteFeed(FeedsActions $ap, ArrayObject $post): void
     {
@@ -165,7 +172,7 @@ class FeedsDefaultActions
         }
 
         foreach ($ids as $id) {
-            $ap->zcfs->deleteFeed($id);
+            $ap->zcfs->deleteFeed((int) $id);
         }
 
         Notices::addSuccessNotice(sprintf(
@@ -181,6 +188,8 @@ class FeedsDefaultActions
 
     /**
      * Update feeds properties.
+     *
+     * @param   ArrayObject<string, mixed>  $post
      */
     public static function doUpdateFeed(FeedsActions $ap, ArrayObject $post): void
     {
@@ -193,7 +202,7 @@ class FeedsDefaultActions
         }
 
         foreach ($ids as $id) {
-            $ap->zcfs->checkFeedsUpdate($id, true);
+            $ap->zcfs->checkFeedsUpdate((int) $id, true);
         }
 
         Notices::addSuccessNotice(sprintf(
@@ -205,6 +214,8 @@ class FeedsDefaultActions
 
     /**
      * Reset feeds update timer.
+     *
+     * @param   ArrayObject<string, mixed>  $post
      */
     public static function doResetUpdate(FeedsActions $ap, ArrayObject $post): void
     {
@@ -220,7 +231,7 @@ class FeedsDefaultActions
         foreach ($ids as $id) {
             $cur->clean();
             $cur->setField('feed_upd_last', 0);
-            $ap->zcfs->updateFeed($id, $cur);
+            $ap->zcfs->updateFeed((int) $id, $cur);
             //$ap->zcfs->checkFeedsUpdate($id, true);
         }
 
@@ -233,6 +244,8 @@ class FeedsDefaultActions
 
     /**
      * Change feeds categories.
+     *
+     * @param   ArrayObject<string, mixed>  $post
      */
     public static function doChangeCategory(FeedsActions $ap, ArrayObject $post): void
     {
@@ -251,7 +264,7 @@ class FeedsDefaultActions
             foreach ($ids as $id) {
                 $cur->clean();
                 $cur->setField('cat_id', $cat_id == 0 ? null : $cat_id);
-                $ap->zcfs->updateFeed($id, $cur);
+                $ap->zcfs->updateFeed((int) $id, $cur);
             }
 
             Notices::addSuccessNotice(sprintf(
@@ -299,6 +312,8 @@ class FeedsDefaultActions
 
     /**
      * Change feeds update interval.
+     *
+     * @param   ArrayObject<string, mixed>  $post
      */
     public static function doChangeInterval(FeedsActions $ap, ArrayObject $post): void
     {
@@ -317,7 +332,7 @@ class FeedsDefaultActions
             foreach ($ids as $id) {
                 $cur->clean();
                 $cur->setField('feed_upd_int', $upd_int);
-                $ap->zcfs->updateFeed($id, $cur);
+                $ap->zcfs->updateFeed((int) $id, $cur);
             }
 
             Notices::addSuccessNotice(sprintf(

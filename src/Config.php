@@ -76,7 +76,7 @@ class Config extends Process
             Notices::addSuccessNotice(
                 __('Configuration has been successfully updated.')
             );
-            App::bakcend()->url()->redirect('admin.plugins', [
+            App::backend()->url()->redirect('admin.plugins', [
                 'module' => My::id(),
                 'conf'   => '1',
                 'redir'  => !(App::backend()->__get('list') instanceof ModulesList) ? '' : App::backend()->__get('list')->getRedir(),
@@ -99,9 +99,8 @@ class Config extends Process
 
         $msg = [];
         if (!is_writable(App::config()->cacheRoot())) {
-            $msg[] = (new Para())
-                ->class('error')
-                ->text(__('Dotclear cache is not writable or not well configured!'));
+            $msg[] = (new Text('p', __('Dotclear cache is not writable or not well configured!')))
+                ->class('error');
         }
         if ($s->pub_active) {
             $msg[] = (new Para())

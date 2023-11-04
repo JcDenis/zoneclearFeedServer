@@ -56,7 +56,7 @@ class PostsFilter extends Filters
 
         try {
             $users = App::blog()->getPostsUsers();
-            if (is_null($users) || $users->isEmpty()) {
+            if ($users->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {
@@ -89,7 +89,7 @@ class PostsFilter extends Filters
 
         try {
             $categories = App::blog()->getCategories();
-            if (is_null($categories) || $categories->isEmpty()) {
+            if ($categories->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {
@@ -143,7 +143,7 @@ class PostsFilter extends Filters
 
         try {
             $dates = App::blog()->getDates(['type' => 'month']);
-            if (is_null($dates) || $dates->isEmpty()) {
+            if ($dates->isEmpty()) {
                 return null;
             }
         } catch (Exception $e) {

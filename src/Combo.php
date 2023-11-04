@@ -28,7 +28,7 @@ use Exception;
 class Combo
 {
     /**
-     * @return  array<string,string>
+     * @return  array<string, string>
      */
     public static function feedsSortby(): array
     {
@@ -42,7 +42,7 @@ class Combo
     }
 
     /**
-     * @return  array<string,string>
+     * @return  array<string, string>
      */
     public static function postsSortby(): array
     {
@@ -56,7 +56,7 @@ class Combo
     }
 
     /**
-     * @return  array<string,string>
+     * @return  array<string, string>
      */
     public static function feedsStatus(): array
     {
@@ -67,7 +67,7 @@ class Combo
     }
 
     /**
-     * @return  array<string,int>
+     * @return  array<string, int>
      */
     public static function postsStatus(): array
     {
@@ -78,7 +78,7 @@ class Combo
     }
 
     /**
-     * @return  array<string,int>
+     * @return  array<string, int>
      */
     public static function updateInterval(): array
     {
@@ -93,7 +93,7 @@ class Combo
     }
 
     /**
-     * @return  array<string,int>
+     * @return  array<string, int>
      */
     public static function tagCase(): array
     {
@@ -106,7 +106,7 @@ class Combo
     }
 
     /**
-     * @return  array<string,int>
+     * @return  array<string, int>
      */
     public static function pubUpdate(): array
     {
@@ -119,7 +119,7 @@ class Combo
     }
 
     /**
-     * @return  array<string,string>
+     * @return  array<string, string>
      */
     public static function postCategories(): array
     {
@@ -127,17 +127,16 @@ class Combo
 
         try {
             $categories = App::blog()->getCategories(['post_type' => 'post']);
-            if (!is_null($categories)) {
-                while ($categories->fetch()) {
-                    $level     = is_numeric($categories->f('level')) ? (int) $categories->f('level') : 1;
-                    $cat_title = is_string($categories->f('cat_title')) ? $categories->f('cat_title') : '';
-                    $cat_id    = is_numeric($categories->f('cat_id')) ? (string) $categories->f('cat_id') : '';
 
-                    $combo[
-                        str_repeat('&nbsp;&nbsp;', $level - 1) .
-                        '&bull; ' . Html::escapeHTML($cat_title)
-                    ] = $cat_id;
-                }
+            while ($categories->fetch()) {
+                $level     = is_numeric($categories->f('level')) ? (int) $categories->f('level') : 1;
+                $cat_title = is_string($categories->f('cat_title')) ? $categories->f('cat_title') : '';
+                $cat_id    = is_numeric($categories->f('cat_id')) ? (string) $categories->f('cat_id') : '';
+
+                $combo[
+                    str_repeat('&nbsp;&nbsp;', $level - 1) .
+                    '&bull; ' . Html::escapeHTML($cat_title)
+                ] = $cat_id;
             }
         } catch (Exception $e) {
         }

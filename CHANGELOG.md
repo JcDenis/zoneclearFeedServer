@@ -1,3 +1,9 @@
+zoneclearFeedServer 2023.11.04
+===========================================================
+* Require Dotclear 2.28
+* Require PHP 8.1
+* Code review (phpstan)
+
 zoneclearFeedServer 2023.10.18
 ===========================================================
 * Require Dotclear 2.28

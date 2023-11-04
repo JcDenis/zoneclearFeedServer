@@ -38,7 +38,7 @@ use Exception;
 class ZoneclearFeedServer
 {
     /**
-     * .
+     * Net HTTP timeout.
      *
      * @var     int     NET_HTTP_TIMEOUT
      */
@@ -66,7 +66,7 @@ class ZoneclearFeedServer
     private static $instance;
 
     /**
-     * .
+     * Settings.
      *
      * @var     Settings    $settings
      */
@@ -289,8 +289,8 @@ class ZoneclearFeedServer
     /**
      * Get related posts.
      *
-     * @param   array<string,int|string|array>  $params         The query params
-     * @param   bool                            $count_only     Return only result count
+     * @param   array<string, mixed>    $params         The query params
+     * @param   bool                    $count_only     Return only result count
      *
      * @return  MetaRecord  The record instance
      */
@@ -315,16 +315,14 @@ class ZoneclearFeedServer
 
         unset($params['feed_id']);
 
-        $rs = App::blog()->getPosts($params, $count_only, $sql);
-
-        return is_null($rs) ? MetaRecord::newFromArray([]) : $rs;
+        return App::blog()->getPosts($params, $count_only, $sql);
     }
 
     /**
      * Get feed record.
      *
-     * @param   array<string,int|string|array>  $params         The query params
-     * @param   bool                            $count_only     Return only result count
+     * @param   array<string, mixed>    $params         The query params
+     * @param   bool                    $count_only     Return only result count
      *
      * @return  MetaRecord  The record instance
      */
@@ -773,7 +771,7 @@ class ZoneclearFeedServer
         # Enable
         if ($enable) {
             // backup current user
-            if (!is_null(App::auth()->userID()) && !is_string(App::auth()->userID())) {
+            if (!App::auth()->userID()) {
                 throw new Exception('Unable to backup user');
             }
             $this->user = App::auth()->userID();

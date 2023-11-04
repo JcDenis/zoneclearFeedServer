@@ -182,7 +182,7 @@ class Manage extends Process
                                         (new Label(__('Selected feeds action:'), Label::OUTSIDE_LABEL_BEFORE))
                                             ->for('action'),
                                         (new Select('action'))
-                                            ->items($feeds_actions_page->getCombo()),
+                                            ->items($feeds_actions_page->getCombo() ?? []),
                                         (new Submit('feeds-action'))
                                             ->value(__('ok')),
                                         ... My::hiddenFields($feeds_filter->values(true)),
