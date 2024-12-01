@@ -1,0 +1,142 @@
+name: Release package
+on: 
+  push:
+  workflow_dispatch:
+
+env:
+  DC_TYPE: plugin
+  DC_MIN: 2.32
+
+# required to set secrets in
+# https://github.com/xxx/xxx/settings/secrets/actions
+# TELEGRAM_ID, TELEGRAM_TOKEN
+
+jobs:
+  check_release:
+    if: (contains(github.event.head_commit.message, 'release') || (github.event_name != 'push'))
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.dotclear.outputs.version }}
+      dcmin: ${{ steps.dotclear.outputs.dcmin }}
+      exists: ${{ steps.repository.outputs.release-exists }}
+    steps:
+      - name: Checkout repository master branch
+        uses: actions/checkout@master
+
+      # Parser from https://github.com/franck-paul
+      - name: Run PHP code
+        id: dotclear
+        shell: php {0}
+        run: |
+          <?php
+          $version = '';
+          $dcmin = '${{ env.DC_MIN }}';
+          $df = file_get_contents('./_define.php');
+          if (preg_match('/registerModule\((.*?),(.*?)[\'\"],(.*?)[\'\"],(.*?)[\'\"](.*?)[\'\"](.*?)(,.*)\)/s',$df,$matches)) {
+            if (isset($matches[5])) {
+              $version = $matches[5];
+              if (isset($matches[7])) {
+                $str = $matches[7];
+                if (preg_match('/\[(.*?)[\'\"]core[\'\"](.*?),(.*?)[\'\"](.*?)[\'\"](.*?)\]/s',$str,$submatches)) {
+                  $dcmin = $submatches[4];
+                }
+              }
+            }
+          }
+          file_put_contents(getenv('GITHUB_OUTPUT'), "version=$version\n", FILE_APPEND);
+          file_put_contents(getenv('GITHUB_OUTPUT'), "dcmin=$dcmin\n", FILE_APPEND);
+
+      - name: Check repository releases
+        id: repository
+        uses: insightsengineering/release-existence-action@v1.0.0
+        with:
+          release-tag: 'v${{ steps.dotclear.outputs.version }}'
+
+  do_release:
+    needs: check_release
+    if: needs.check_release.outputs.exists == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository master branch
+        uses: actions/checkout@master
+
+      - name: Get repository name
+        id: repository
+        uses: MariachiBear/get-repo-name-action@v1.1.0
+        with:
+          with-owner: 'false'
+
+      - name: Get download URL
+        id: download
+        run: |
+          fulltag=${{ github.ref_name }}
+          echo download-url="https://github.com/${{ github.repository }}/releases/download/v${{ needs.check_release.outputs.version }}/${{ env.DC_TYPE }}-${{ steps.repository.outputs.repository-name }}.zip" >> $GITHUB_OUTPUT
+
+      # Parser from https://github.com/franck-paul
+      - name: Read dcstore
+        id: readstore
+        shell: php {0}
+        run: |
+          <?php
+          if (file_exists('dcstore.xml')) {
+            $ds = file_get_contents('dcstore.xml');
+            if ($ds) {
+              $ds = preg_replace('/<version>(.*?)<\/version>/s',"<version>${{ needs.check_release.outputs.version }}</version>",$ds);
+              $ds = preg_replace('/<file>(.*?)<\/file>/s',"<file>${{ steps.download.outputs.download-url }}</file>",$ds);
+              $ds = preg_replace('/<da:dcmin>(.*?)<\/da:dcmin>/s',"<da:dcmin>${{ needs.check_release.outputs.dcmin }}</da:dcmin>",$ds);
+              if ($ds) {
+                file_put_contents('dcstore.xml',$ds);
+              }
+            }
+          }
+
+      - name: Write dcstore
+        id: writestore
+        shell: bash
+        run: |
+          test=$(git diff --name-only -- dcstore.xml)
+          if [[ "$test" != "" ]]; then
+            echo "dcstore.xml modified, need to be commit"
+            git config user.name "${{ github.actor }}"
+            git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+            git add dcstore.xml
+            git commit -m "Update dcstore.xml"
+            git push
+          else
+            echo "dcstore.xml not modified"
+          fi
+
+      - name: Create archive
+        id: writearchive
+        uses: thedoctor0/zip-release@0.7.6
+        with:
+          type: 'zip'
+          directory: ..
+          path: '${{ steps.repository.outputs.repository-name }}'
+          filename: '${{ env.DC_TYPE }}-${{ steps.repository.outputs.repository-name }}.zip'
+          exclusions: '*.git* /*node_modules/* .editorconfig'
+    
+      - name: Create release with archive
+        id: writerelease
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          artifacts: '../${{ env.DC_TYPE }}-${{ steps.repository.outputs.repository-name }}.zip'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit: master
+          draft: false
+          prerelease: false
+          generateReleaseNotes: true
+          name: ${{ steps.repository.outputs.repository-name }} ${{ needs.check_release.outputs.version }}
+          tag: 'v${{ needs.check_release.outputs.version }}'
+    
+      - name: Send Telegram Message Ok
+        uses: appleboy/telegram-action@v1.0.0
+        with:
+          to: ${{ secrets.TELEGRAM_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            __Github workflow run__
+            - Trigger: ${{ github.event_name }} 
+            - Release: ${{ steps.repository.outputs.repository-name }} ${{ needs.check_release.outputs.version }} 
+            - Download URL: ${{ steps.download.outputs.download-url }} 
