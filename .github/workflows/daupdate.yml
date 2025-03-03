@@ -1,0 +1,134 @@
+name: Dotaddict repository update
+
+on:
+  schedule:
+  - cron: '30 3 * * *'
+  workflow_dispatch:
+
+env:
+  DC_TYPE: plugin
+  DA_URL: https://repo.dotclear.watch/console/api/v1
+
+# required to set secrets in
+# https://github.com/xxx/xxx/settings/secrets/actions
+# DA_USERNAME, DA_PASSWORD, TELEGRAM_ID, TELEGRAM_TOKEN
+
+jobs:
+  da_update:
+    name: daupdate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository master branch
+        uses: actions/checkout@master
+
+      - name: Get repository name
+        id: repository
+        uses: MariachiBear/get-repo-name-action@v1.1.0
+        with:
+          with-owner: 'false'
+
+      - name: Get repository latest release
+        id: release
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          repository: ${{ github.repository }}
+
+      - name: Check and update DA repository
+        id: dialog
+        shell: php {0}
+        run: |
+          <?php
+          // parse variables
+          $type = '${{ env.DC_TYPE }}';
+          $owner = '${{ github.repository }}';
+          $module = '${{ steps.repository.outputs.repository-name }}';
+          $version = substr('${{ steps.release.outputs.release }}',1);
+          $zip_url = 'https://github.com/'.$owner.'/releases/download/v'.$version.'/'.$type.'-'.$module.'.zip';
+          file_put_contents(getenv('GITHUB_OUTPUT'), "version=$version\n", FILE_APPEND);
+          file_put_contents(getenv('GITHUB_OUTPUT'), "module=$module\n", FILE_APPEND);
+
+          // authenticate to DA
+          $ch = curl_init();
+          curl_setopt_array($ch, [
+            CURLOPT_URL => '${{ env.DA_URL }}/auth',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query([
+              'username' => '${{ secrets.DA_USERNAME }}',
+              'password' => '${{ secrets.DA_PASSWORD }}',
+            ]),
+          ]);
+          $rsp = json_decode((string) curl_exec($ch), true);
+          curl_close ($ch);
+          if (!is_array($rsp) || !isset($rsp['token'])) {
+            file_put_contents(getenv('GITHUB_OUTPUT'), "message=Failed to get token\n", FILE_APPEND);
+            return;
+          }
+          $token = $rsp['token'];
+
+          // Check latest contribution
+          $ch = curl_init();
+          curl_setopt_array($ch, [
+            CURLOPT_URL => '${{ env.DA_URL }}/mine/${{ env.DC_TYPE }}',
+            CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $token],
+            CURLOPT_HEADER => false,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => [],
+          ]);
+          $rsp = json_decode((string) curl_exec($ch), true);
+          curl_close($ch);
+          if (!is_array($rsp) || !isset($rsp[$module])) {
+            file_put_contents(getenv('GITHUB_OUTPUT'), "message=Failed to get latest contribution\n", FILE_APPEND);
+            return;
+          } elseif ($rsp[$module]['version'] == $version) {
+            file_put_contents(getenv('GITHUB_OUTPUT'), "message=This contribution is up to date\n", FILE_APPEND);
+            return;
+          } elseif ($rsp[$module]['status'] != 'approved') {
+            file_put_contents(getenv('GITHUB_OUTPUT'), "message=A contribution is waiting for approval\n", FILE_APPEND);
+            return;
+          }
+
+          // Get zip content
+          $ch = curl_init();
+          curl_setopt_array($ch, [
+            CURLOPT_URL => $zip_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true, 
+          ]);
+          $zip_cnt = chunk_split(base64_encode((string) curl_exec($ch)));
+          curl_close ($ch);
+          if (strlen($zip_cnt) < 16) {
+            file_put_contents(getenv('GITHUB_OUTPUT'), "message=Failed to get zip content\n", FILE_APPEND);
+            return;
+          }
+
+          // Update DA
+          $ch = curl_init();
+          curl_setopt_array($ch, [
+            CURLOPT_URL => '${{ env.DA_URL }}/update/${{ env.DC_TYPE }}',
+            CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $token],
+            CURLOPT_HEADER => false,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => ['zip' => $zip_cnt],
+          ]);
+          $rsp = json_decode((string) curl_exec($ch), true);
+          curl_close($ch);
+          if (is_array($rsp) && isset($rsp['message'])) {
+            file_put_contents(getenv('GITHUB_OUTPUT'), "message=" . $rsp['message'] . "\n", FILE_APPEND);
+          }
+
+      - name: summary
+        run: echo '${{ steps.dialog.outputs.module }} ${{ steps.dialog.outputs.version }} = ${{ steps.dialog.outputs.message }}' >> $GITHUB_STEP_SUMMARY
+
+      - name: Send Telegram Message Ok
+        uses: appleboy/telegram-action@v1.0.0
+        with:
+          to: ${{ secrets.TELEGRAM_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            __Dotaddict contribution update__
+            - Module: ${{ steps.dialog.outputs.module }} ${{ steps.dialog.outputs.version }} 
+            - Response: ${{ steps.dialog.outputs.message }}

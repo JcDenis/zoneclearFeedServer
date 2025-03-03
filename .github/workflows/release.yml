@@ -5,7 +5,7 @@ on:
 
 env:
   DC_TYPE: plugin
-  DC_MIN: 2.32
+  DC_MIN: 2.33
 
 # required to set secrets in
 # https://github.com/xxx/xxx/settings/secrets/actions
@@ -13,7 +13,7 @@ env:
 
 jobs:
   check_release:
-    if: (contains(github.event.head_commit.message, 'release') || (github.event_name != 'push'))
+    if: (startsWith(github.event.head_commit.message, 'release ') || (github.event_name != 'push'))
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.dotclear.outputs.version }}
@@ -29,22 +29,15 @@ jobs:
         shell: php {0}
         run: |
           <?php
-          $version = '';
+          $version = substr('${{ github.event.head_commit.message }}', 8);
           $dcmin = '${{ env.DC_MIN }}';
           $df = file_get_contents('./_define.php');
           if (preg_match('/registerModule\((.*?),(.*?)[\'\"],(.*?)[\'\"],(.*?)[\'\"](.*?)[\'\"](.*?)(,.*)\)/s',$df,$matches)) {
-            if (isset($matches[5])) {
-              $version = $matches[5];
-              if (isset($matches[7])) {
-                $str = $matches[7];
-                if (preg_match('/\[(.*?)[\'\"]core[\'\"](.*?),(.*?)[\'\"](.*?)[\'\"](.*?)\]/s',$str,$submatches)) {
-                  $dcmin = $submatches[4];
-                }
-              }
+            if (isset($matches[7]) && preg_match('/\[(.*?)[\'\"]core[\'\"](.*?),(.*?)[\'\"](.*?)[\'\"](.*?)\]/s',$matches[7],$submatches)) {
+              $dcmin = $submatches[4];
             }
           }
-          file_put_contents(getenv('GITHUB_OUTPUT'), "version=$version\n", FILE_APPEND);
-          file_put_contents(getenv('GITHUB_OUTPUT'), "dcmin=$dcmin\n", FILE_APPEND);
+          file_put_contents(getenv('GITHUB_OUTPUT'), "version=$version\ndcmin=$dcmin\n", FILE_APPEND);
 
       - name: Check repository releases
         id: repository
@@ -66,6 +59,16 @@ jobs:
         with:
           with-owner: 'false'
 
+      - name: Import GPG key
+        id: import-gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.BOT_GPG_KEY }}
+          passphrase: ${{ secrets.BOT_GPG_PASS }}
+          git_config_global: true
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Get download URL
         id: download
         run: |
@@ -73,16 +76,29 @@ jobs:
           echo download-url="https://github.com/${{ github.repository }}/releases/download/v${{ needs.check_release.outputs.version }}/${{ env.DC_TYPE }}-${{ steps.repository.outputs.repository-name }}.zip" >> $GITHUB_OUTPUT
 
       # Parser from https://github.com/franck-paul
-      - name: Read dcstore
-        id: readstore
+      - name: Update version and date
+        id: updatefiles
         shell: php {0}
         run: |
           <?php
+          $version = '${{ needs.check_release.outputs.version }}';
+          $date = date('c');
+          if (file_exists('_define.php')) {
+            $ds = file_get_contents('_define.php');
+            if ($ds) {
+              $ds = preg_replace('/^(.*registerModule\(.*?,.*?[\'\"],.*?[\'\"],.*?)([\'\"].*?[\'\"])(.*?,.*\).*)$/s',"$1'".$version."'$3",$ds);
+              $ds = preg_replace('/(\'date\'\s+=>\s)(\'.*?\')/s',"$1'".$date."'",$ds);
+              if ($ds) {
+                file_put_contents('_define.php',$ds);
+              }
+            }
+          }
           if (file_exists('dcstore.xml')) {
             $ds = file_get_contents('dcstore.xml');
             if ($ds) {
-              $ds = preg_replace('/<version>(.*?)<\/version>/s',"<version>${{ needs.check_release.outputs.version }}</version>",$ds);
+              $ds = preg_replace('/<version>(.*?)<\/version>/s',"<version>".$version."</version>",$ds);
               $ds = preg_replace('/<file>(.*?)<\/file>/s',"<file>${{ steps.download.outputs.download-url }}</file>",$ds);
+              $ds = preg_replace('/<date>(.*?)<\/date>/s',"<date>".$date."</date>",$ds);
               $ds = preg_replace('/<da:dcmin>(.*?)<\/da:dcmin>/s',"<da:dcmin>${{ needs.check_release.outputs.dcmin }}</da:dcmin>",$ds);
               if ($ds) {
                 file_put_contents('dcstore.xml',$ds);
@@ -90,17 +106,24 @@ jobs:
             }
           }
 
-      - name: Write dcstore
-        id: writestore
+      - name: Write files
+        id: writefiles
         shell: bash
         run: |
+          test=$(git diff --name-only -- _define.php)
+          if [[ "$test" != "" ]]; then
+            echo "_define.php modified, need to be commit"
+            git add _define.php
+            git commit -S -m "Update _define.php for release"
+            git push
+          else
+            echo "_define.php not modified"
+          fi
           test=$(git diff --name-only -- dcstore.xml)
           if [[ "$test" != "" ]]; then
             echo "dcstore.xml modified, need to be commit"
-            git config user.name "${{ github.actor }}"
-            git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
             git add dcstore.xml
-            git commit -m "Update dcstore.xml"
+            git commit -S -m "Update dcstore.xml for release"
             git push
           else
             echo "dcstore.xml not modified"
