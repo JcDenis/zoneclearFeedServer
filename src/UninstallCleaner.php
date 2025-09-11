@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use Dotclear\App;
-use Dotclear\Database\Statement\{
-    DeleteStatement,
-    SelectStatement
-};
-use Dotclear\Plugin\Uninstaller\{
-    ActionDescriptor,
-    CleanerDescriptor,
-    CleanerParent,
-    CleanersStack,
-    ValueDescriptor
-};
+use Dotclear\Database\Statement\DeleteStatement;
+use Dotclear\Database\Statement\SelectStatement;
+use Dotclear\Plugin\Uninstaller\ActionDescriptor;
+use Dotclear\Plugin\Uninstaller\CleanerDescriptor;
+use Dotclear\Plugin\Uninstaller\CleanerParent;
+use Dotclear\Plugin\Uninstaller\CleanersStack;
+use Dotclear\Plugin\Uninstaller\ValueDescriptor;
 
 /**
  * @brief       zoneclearFeedServer uninstall cleaner.
@@ -57,7 +53,7 @@ class UninstallCleaner extends CleanerParent
     public function values(): array
     {
         $sql = new SelectStatement();
-        $sql->from(App::con()->prefix() . App::meta()::META_TABLE_NAME)
+        $sql->from(App::db()->con()->prefix() . App::meta()::META_TABLE_NAME)
             ->columns([
                 $sql->as($sql->count('*'), 'counter'),
             ])
@@ -83,7 +79,7 @@ class UninstallCleaner extends CleanerParent
     {
         if ($action == 'delete_all') {
             $sql = new DeleteStatement();
-            $sql->from(App::con()->prefix() . App::meta()::META_TABLE_NAME)
+            $sql->from(App::db()->con()->prefix() . App::meta()::META_TABLE_NAME)
                 ->where($sql->like('meta_type', My::META_PREFIX . '%'))
                 ->delete();
 

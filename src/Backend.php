@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use Dotclear\App;
-use Dotclear\Core\Process;
+use Dotclear\Helper\Process\TraitProcess;
 
 /**
  * @brief       zoneclearFeedServer backend class.
@@ -14,8 +14,10 @@ use Dotclear\Core\Process;
  * @author      Jean-Christian Denis
  * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-class Backend extends Process
+class Backend
 {
+    use TraitProcess;
+
     public static function init(): bool
     {
         return self::status(My::checkContext(My::BACKEND));

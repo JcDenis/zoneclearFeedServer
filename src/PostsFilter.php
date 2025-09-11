@@ -7,11 +7,9 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 use ArrayObject;
 use Dotclear\App;
 use Dotclear\Core\Backend\Combos;
-use Dotclear\Core\Backend\Filter\{
-    Filter,
-    Filters,
-    FiltersLibrary
-};
+use Dotclear\Helper\Stack\Filter;
+use Dotclear\Core\Backend\Filter\Filters;
+use Dotclear\Core\Backend\Filter\FiltersLibrary;
 use Dotclear\Helper\Html\Html;
 use Exception;
 

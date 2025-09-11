@@ -6,25 +6,17 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
 use Dotclear\App;
-use Dotclear\Database\{
-    Cursor,
-    MetaRecord
-};
-use Dotclear\Database\Statement\{
-    DeleteStatement,
-    JoinStatement,
-    SelectStatement
-};
+use Dotclear\Database\Cursor;
+use Dotclear\Database\MetaRecord;
+use Dotclear\Database\Statement\DeleteStatement;
+use Dotclear\Database\Statement\JoinStatement;
+use Dotclear\Database\Statement\SelectStatement;
 use Dotclear\Helper\Date;
-use Dotclear\Helper\File\{
-    Files,
-    Path
-};
+use Dotclear\Helper\File\Files;
+use Dotclear\Helper\File\Path;
 use Dotclear\Helper\Html\Html;
-use Dotclear\Helper\Network\Feed\{
-    Parser,
-    Reader
-};
+use Dotclear\Helper\Network\Feed\Parser;
+use Dotclear\Helper\Network\Feed\Reader;
 use Dotclear\Helper\Text;
 use Exception;
 
@@ -115,7 +107,7 @@ class ZoneclearFeedServer
      */
     public function openCursor(): Cursor
     {
-        return App::con()->openCursor(App::con()->prefix() . My::TABLE_NAME);
+        return App::db()->con()->openCursor(App::db()->con()->prefix() . My::TABLE_NAME);
     }
 
     /**
@@ -126,7 +118,7 @@ class ZoneclearFeedServer
      */
     public function updateFeed(int $id, Cursor $cur): void
     {
-        App::con()->writeLock(App::con()->prefix() . My::TABLE_NAME);
+        App::db()->con()->writeLock(App::db()->con()->prefix() . My::TABLE_NAME);
 
         try {
             if ($id < 1) {
@@ -138,12 +130,12 @@ class ZoneclearFeedServer
             $cur->update(sprintf(
                 "WHERE feed_id = %s AND blog_id = '%s' ",
                 $id,
-                App::con()->escapeStr(App::blog()->id())
+                App::db()->con()->escapeStr(App::blog()->id())
             ));
-            App::con()->unlock();
+            App::db()->con()->unlock();
             $this->trigger();
         } catch (Exception $e) {
-            App::con()->unlock();
+            App::db()->con()->unlock();
 
             throw $e;
         }
@@ -161,20 +153,20 @@ class ZoneclearFeedServer
      */
     public function addFeed(Cursor $cur): int
     {
-        App::con()->writeLock(App::con()->prefix() . My::TABLE_NAME);
+        App::db()->con()->writeLock(App::db()->con()->prefix() . My::TABLE_NAME);
 
         try {
             $cur->setField('feed_id', $this->getNextId());
-            $cur->setField('blog_id', App::con()->escapeStr(App::blog()->id()));
+            $cur->setField('blog_id', App::db()->con()->escapeStr(App::blog()->id()));
             $cur->setField('feed_creadt', date('Y-m-d H:i:s'));
 
             $this->getFeedCursor($cur);
 
             $cur->insert();
-            App::con()->unlock();
+            App::db()->con()->unlock();
             $this->trigger();
         } catch (Exception $e) {
-            App::con()->unlock();
+            App::db()->con()->unlock();
 
             throw $e;
         }
@@ -210,7 +202,7 @@ class ZoneclearFeedServer
             }
 
             $cur = $this->openCursor();
-            App::con()->writeLock(App::con()->prefix() . My::TABLE_NAME);
+            App::db()->con()->writeLock(App::db()->con()->prefix() . My::TABLE_NAME);
 
             $cur->setField('feed_upddt', date('Y-m-d H:i:s'));
             $cur->setField('feed_status', (int) $enable);
@@ -221,12 +213,12 @@ class ZoneclearFeedServer
             $cur->update(sprintf(
                 "WHERE feed_id = %s AND blog_id = '%s' ",
                 $id,
-                App::con()->escapeStr(App::blog()->id())
+                App::db()->con()->escapeStr(App::blog()->id())
             ));
-            App::con()->unlock();
+            App::db()->con()->unlock();
             $this->trigger();
         } catch (Exception $e) {
-            App::con()->unlock();
+            App::db()->con()->unlock();
 
             throw $e;
         }
@@ -251,7 +243,7 @@ class ZoneclearFeedServer
         App::behavior()->callBehavior('zoneclearFeedServerBeforeDeleteFeed', $id);
 
         $sql = new DeleteStatement();
-        $sql->from(App::con()->prefix() . My::TABLE_NAME)
+        $sql->from(App::db()->con()->prefix() . My::TABLE_NAME)
             ->where('feed_id ' . $sql->in($id))
             ->and('blog_id = ' . $sql->quote(App::blog()->id()))
             ->delete();
@@ -270,7 +262,7 @@ class ZoneclearFeedServer
     public static function deletePostsMeta(?int $id): void
     {
         $sql = new DeleteStatement();
-        $sql->from(App::con()->prefix() . App::meta()::META_TABLE_NAME)
+        $sql->from(App::db()->con()->prefix() . App::meta()::META_TABLE_NAME)
             ->where('meta_type ' . $sql->in([
                 My::META_PREFIX . 'url',
                 My::META_PREFIX . 'author',
@@ -304,14 +296,14 @@ class ZoneclearFeedServer
         $sql->join(
             (new JoinStatement())
                    ->left()
-                   ->from(App::con()->prefix() . App::meta()::META_TABLE_NAME . ' F')
+                   ->from(App::db()->con()->prefix() . App::meta()::META_TABLE_NAME . ' F')
                    ->on('P.post_id = F.post_id')
                    ->statement()
         );
 
-        $params['sql'] = "AND P.blog_id = '" . App::con()->escapeStr(App::blog()->id()) . "' " .
+        $params['sql'] = "AND P.blog_id = '" . App::db()->con()->escapeStr(App::blog()->id()) . "' " .
         "AND F.meta_type = '" . My::META_PREFIX . "id' " .
-        "AND F.meta_id = '" . App::con()->escapeStr((string) $params['feed_id']) . "' ";
+        "AND F.meta_id = '" . App::db()->con()->escapeStr((string) $params['feed_id']) . "' ";
 
         unset($params['feed_id']);
 
@@ -347,17 +339,17 @@ class ZoneclearFeedServer
             'C.cat_title, C.cat_url, C.cat_desc ';
         }
 
-        $strReq .= 'FROM ' . App::con()->prefix() . My::TABLE_NAME . ' Z ' .
-        'LEFT OUTER JOIN ' . App::con()->prefix() . App::categories()::CATEGORY_TABLE_NAME . ' C ON Z.cat_id = C.cat_id ';
+        $strReq .= 'FROM ' . App::db()->con()->prefix() . My::TABLE_NAME . ' Z ' .
+        'LEFT OUTER JOIN ' . App::db()->con()->prefix() . App::categories()::CATEGORY_TABLE_NAME . ' C ON Z.cat_id = C.cat_id ';
 
         if (!empty($params['from']) && is_string($params['from'])) {
             $strReq .= $params['from'] . ' ';
         }
 
-        $strReq .= "WHERE Z.blog_id = '" . App::con()->escapeStr(App::blog()->id()) . "' ";
+        $strReq .= "WHERE Z.blog_id = '" . App::db()->con()->escapeStr(App::blog()->id()) . "' ";
 
         if (isset($params['feed_type']) && is_string($params['feed_type'])) {
-            $strReq .= "AND Z.feed_type = '" . App::con()->escapeStr((string) $params['feed_type']) . "' ";
+            $strReq .= "AND Z.feed_type = '" . App::db()->con()->escapeStr((string) $params['feed_type']) . "' ";
         } else {
             $strReq .= "AND Z.feed_type = 'feed' ";
         }
@@ -368,21 +360,21 @@ class ZoneclearFeedServer
             } elseif (is_numeric($params['feed_id'])) {
                 $params['feed_id'] = [(int) $params['feed_id']];
             }
-            $strReq .= 'AND Z.feed_id ' . App::con()->in($params['feed_id']);
+            $strReq .= 'AND Z.feed_id ' . App::db()->con()->in($params['feed_id']);
         }
 
         if (isset($params['feed_feed']) && is_string($params['feed_feed'])) {
-            $strReq .= "AND Z.feed_feed = '" . App::con()->escapeStr((string) $params['feed_feed']) . "' ";
+            $strReq .= "AND Z.feed_feed = '" . App::db()->con()->escapeStr((string) $params['feed_feed']) . "' ";
         }
         if (isset($params['feed_url']) && is_string($params['feed_url'])) {
-            $strReq .= "AND Z.feed_url = '" . App::con()->escapeStr((string) $params['feed_url']) . "' ";
+            $strReq .= "AND Z.feed_url = '" . App::db()->con()->escapeStr((string) $params['feed_url']) . "' ";
         }
         if (isset($params['feed_status'])) {
             $strReq .= 'AND Z.feed_status = ' . ((int) $params['feed_status']) . ' ';
         }
 
         if (!empty($params['q']) && is_string($params['q'])) {
-            $q = App::con()->escapeStr((string) str_replace('*', '%', strtolower($params['q'])));
+            $q = App::db()->con()->escapeStr((string) str_replace('*', '%', strtolower($params['q'])));
             $strReq .= "AND LOWER(Z.feed_name) LIKE '" . $q . "' ";
         }
 
@@ -392,7 +384,7 @@ class ZoneclearFeedServer
 
         if (!$count_only) {
             if (!empty($params['order']) && is_string($params['order'])) {
-                $strReq .= 'ORDER BY ' . App::con()->escapeStr((string) $params['order']) . ' ';
+                $strReq .= 'ORDER BY ' . App::db()->con()->escapeStr((string) $params['order']) . ' ';
             } else {
                 $strReq .= 'ORDER BY Z.feed_upddt DESC ';
             }
@@ -403,11 +395,11 @@ class ZoneclearFeedServer
                 $params['limit'] = (int) $params['limit'];
             }
             if (is_int($params['limit']) || is_array($params['limit'])) {
-                $strReq .= App::con()->limit($params['limit']);
+                $strReq .= App::db()->con()->limit($params['limit']);
             }
         }
 
-        return new MetaRecord(App::con()->select($strReq));
+        return new MetaRecord(App::db()->con()->select($strReq));
     }
 
     /**
@@ -420,7 +412,7 @@ class ZoneclearFeedServer
         $sql = new SelectStatement();
         $rs  = $sql
             ->column($sql->max('feed_id'))
-            ->from(App::con()->prefix() . My::TABLE_NAME)
+            ->from(App::db()->con()->prefix() . My::TABLE_NAME)
             ->select();
 
         return (int) $rs?->f(0) + 1;
@@ -555,7 +547,7 @@ class ZoneclearFeedServer
                     # Set update time of this feed
                     $this->enableFeed($row->id, (bool) $row->status, $time);
 
-                    App::con()->begin();
+                    App::db()->con()->begin();
 
                     foreach ($feed->items as $item) {
                         $item_TS = $item->TS ? $item->TS : $time;
@@ -570,7 +562,7 @@ class ZoneclearFeedServer
                             continue;
                         }
 
-                        $item_link              = App::con()->escapeStr((string) $item_link);
+                        $item_link              = App::db()->con()->escapeStr((string) $item_link);
                         $is_new_published_entry = false;
 
                         # Not updated since last visit
@@ -591,11 +583,11 @@ class ZoneclearFeedServer
                                 'P.post_id',
                                 'P.post_status',
                             ])
-                            ->from($sql->as(App::con()->prefix() . App::blog()::POST_TABLE_NAME, 'P'))
+                            ->from($sql->as(App::db()->con()->prefix() . App::blog()::POST_TABLE_NAME, 'P'))
                             ->join(
                                 (new JoinStatement())
                                     ->inner()
-                                    ->from($sql->as(App::con()->prefix() . App::meta()::META_TABLE_NAME, 'M'))
+                                    ->from($sql->as(App::db()->con()->prefix() . App::meta()::META_TABLE_NAME, 'M'))
                                     ->on('P.post_id = M.post_id')
                                     ->statement()
                             )
@@ -652,7 +644,7 @@ class ZoneclearFeedServer
 
                                 # Quick delete old meta
                                 $sql = new DeleteStatement();
-                                $sql->from(App::con()->prefix() . App::meta()::META_TABLE_NAME)
+                                $sql->from(App::db()->con()->prefix() . App::meta()::META_TABLE_NAME)
                                     ->where('post_id = ' . $post_id)
                                     ->and($sql->like('meta_type', My::META_PREFIX . '%'))
                                     ->delete();
@@ -739,14 +731,14 @@ class ZoneclearFeedServer
                                 }
                             }
                         } catch (Exception $e) {
-                            App::con()->rollback();
+                            App::db()->con()->rollback();
                             $this->enableUser(false);
                             $this->unlockUpdate();
 
                             throw $e;
                         }
                     }
-                    App::con()->commit();
+                    App::db()->con()->commit();
                 }
 
                 # --BEHAVIOR-- zoneclearFeedServerAfterCheckFeedUpdate -- FeedRow
@@ -876,7 +868,7 @@ class ZoneclearFeedServer
         # Get super admins
         $sql = new SelectStatement();
         $rs  = $sql
-            ->from(App::con()->prefix() . App::auth()::USER_TABLE_NAME)
+            ->from(App::db()->con()->prefix() . App::auth()::USER_TABLE_NAME)
             ->columns([
                 'user_id',
                 'user_super',
@@ -910,11 +902,11 @@ class ZoneclearFeedServer
                 'U.user_firstname',
                 'U.user_displayname',
             ])
-            ->from($sql->as(App::con()->prefix() . App::auth()::USER_TABLE_NAME, 'U'))
+            ->from($sql->as(App::db()->con()->prefix() . App::auth()::USER_TABLE_NAME, 'U'))
             ->join(
                 (new JoinStatement())
                     ->left()
-                    ->from($sql->as(App::con()->prefix() . App::auth()::PERMISSIONS_TABLE_NAME, 'P'))
+                    ->from($sql->as(App::db()->con()->prefix() . App::auth()::PERMISSIONS_TABLE_NAME, 'P'))
                     ->on('U.user_id = P.user_id')
                     ->statement()
             )

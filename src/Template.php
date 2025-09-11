@@ -6,7 +6,6 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
 use Dotclear\App;
-use Dotclear\Core\Frontend\Tpl;
 use Dotclear\Helper\Html\Html;
 use Dotclear\Helper\L10n;
 
@@ -94,7 +93,7 @@ class Template
     {
         $if = [];
 
-        $operator = isset($a['operator']) && is_string($a['operator']) ? Tpl::getOperator($a['operator']) : '&&';
+        $operator = isset($a['operator']) && is_string($a['operator']) ? App::frontend()->template()::getOperator($a['operator']) : '&&';
 
         if (isset($a['type']) && is_string($a['type'])) {
             $type = trim($a['type']);

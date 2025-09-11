@@ -6,20 +6,16 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
 use Dotclear\App;
-use Dotclear\Core\Backend\{
-    Notices,
-    Page
-};
+use Dotclear\Core\Backend\Notices;
+use Dotclear\Core\Backend\Page;
 use Dotclear\Database\Statement\DeleteStatement;
-use Dotclear\Helper\Html\Form\{
-    Form,
-    Hidden,
-    Label,
-    Para,
-    Select,
-    Submit,
-    Text
-};
+use Dotclear\Helper\Html\Form\Form;
+use Dotclear\Helper\Html\Form\Hidden;
+use Dotclear\Helper\Html\Form\Label;
+use Dotclear\Helper\Html\Form\Para;
+use Dotclear\Helper\Html\Form\Select;
+use Dotclear\Helper\Html\Form\Submit;
+use Dotclear\Helper\Html\Form\Text;
 use Dotclear\Helper\Html\Html;
 use Exception;
 
@@ -142,7 +138,7 @@ class FeedsDefaultActions
                     App::blog()->delPost((int) $posts->f('post_id'));
                     $sql = new DeleteStatement();
                     $sql
-                        ->from(App::con()->prefix() . App::meta()::META_TABLE_NAME)
+                        ->from(App::db()->con()->prefix() . App::meta()::META_TABLE_NAME)
                         ->where('post_id = ' . $posts->f('post_id'))
                         ->and('meta_type ' . $sql->in($types))
                         ->delete();

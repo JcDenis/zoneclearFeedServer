@@ -6,18 +6,14 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use ArrayObject;
 use Dotclear\App;
-use Dotclear\Core\Backend\Listing\{
-    Listing,
-    Pager
-};
+use Dotclear\Core\Backend\Listing\Listing;
+use Dotclear\Core\Backend\Listing\Pager;
 use Dotclear\Helper\Date;
-use Dotclear\Helper\Html\Form\{
-    Checkbox,
-    Div,
-    Link,
-    Para,
-    Text
-};
+use Dotclear\Helper\Html\Form\Checkbox;
+use Dotclear\Helper\Html\Form\Div;
+use Dotclear\Helper\Html\Form\Link;
+use Dotclear\Helper\Html\Form\Para;
+use Dotclear\Helper\Html\Form\Text;
 use Dotclear\Helper\Html\Html;
 
 /**

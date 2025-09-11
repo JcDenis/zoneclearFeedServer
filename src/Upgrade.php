@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use Dotclear\App;
-use Dotclear\Database\Statement\{
-    SelectStatement,
-    UpdateStatement
-};
+use Dotclear\Database\Statement\SelectStatement;
+use Dotclear\Database\Statement\UpdateStatement;
 use Exception;
 
 /**
@@ -68,7 +66,7 @@ class Upgrade
         // use json rather than serialise for settings array
         $sql    = new SelectStatement();
         $record = $sql
-            ->from(App::con()->prefix() . App::blogWorkspace()::NS_TABLE_NAME)
+            ->from(App::db()->con()->prefix() . App::blogWorkspace()::NS_TABLE_NAME)
             ->where('setting_ns = ' . $sql->quote(My::id()))
             ->select();
 
@@ -108,7 +106,7 @@ class Upgrade
         // change settings type of json string to array
         $sql = new UpdateStatement();
         $sql
-            ->ref(App::con()->prefix() . App::blogWorkspace()::NS_TABLE_NAME)
+            ->ref(App::db()->con()->prefix() . App::blogWorkspace()::NS_TABLE_NAME)
             ->column('setting_type')
             ->value('array')
             ->where('setting_id ' . $sql->in([

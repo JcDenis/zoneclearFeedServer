@@ -9,10 +9,8 @@ use Dotclear\App;
 use Dotclear\Core\Backend\Action\Actions;
 use Dotclear\Core\Backend\Page;
 use Dotclear\Database\MetaRecord;
-use Dotclear\Helper\Html\Form\{
-    Link,
-    Para
-};
+use Dotclear\Helper\Html\Form\Link;
+use Dotclear\Helper\Html\Form\Para;
 use Dotclear\Helper\Html\Html;
 use Exception;
 
