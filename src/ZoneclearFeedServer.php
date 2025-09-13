@@ -55,7 +55,7 @@ class ZoneclearFeedServer
      *
      * @var     ZoneclearFeedServer     $instance
      */
-    private static $instance;
+    private static ZoneclearFeedServer $instance;
 
     /**
      * Settings.
@@ -93,7 +93,7 @@ class ZoneclearFeedServer
      */
     public static function instance(): ZoneclearFeedServer
     {
-        if (!(self::$instance instanceof ZoneclearFeedServer)) {
+        if (!isset(self::$instance)) {
             self::$instance = new ZoneclearFeedServer();
         }
 

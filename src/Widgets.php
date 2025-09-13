@@ -132,7 +132,7 @@ class Widgets
         $z = ZoneclearFeedServer::instance();
         $s = $z->settings;
 
-        if ($w->__get('offline')
+        if ($w->get('offline')
             || !$s->active
             || !$w->checkHomeOnly(App::url()->type)
         ) {
@@ -140,10 +140,10 @@ class Widgets
         }
 
         $p          = [];
-        $p['order'] = ($w->__get('sortby') && in_array($w->__get('sortby'), ['feed_upd_last', 'lowername', 'feed_creadt'])) ?
-            $w->__get('sortby') . ' ' : 'feed_upd_last ';
-        $p['order'] .= $w->__get('sort') == 'desc' ? 'DESC' : 'ASC';
-        $p['limit']       = is_numeric($w->__get('limit')) ? abs((int) $w->__get('limit')) : 10;
+        $p['order'] = ($w->get('sortby') && in_array($w->get('sortby'), ['feed_upd_last', 'lowername', 'feed_creadt'])) ?
+            $w->get('sortby') . ' ' : 'feed_upd_last ';
+        $p['order'] .= $w->get('sort') == 'desc' ? 'DESC' : 'ASC';
+        $p['limit']       = is_numeric($w->get('limit')) ? abs((int) $w->get('limit')) : 10;
         $p['feed_status'] = 1;
 
         $rs = $z->getFeeds($p);
@@ -164,19 +164,19 @@ class Widgets
             $i++;
         }
         $pub = '';
-        if ($w->__get('pagelink') && $s->pub_active) {
+        if ($w->get('pagelink') && $s->pub_active) {
             $pub = sprintf(
                 '<p><strong><a href="%s">%s</a></strong></p>',
                 App::blog()->url() . App::url()->getBase('zoneclearFeedsPage'),
-                Html::escapeHTML(is_string($w->__get('pagelink')) ? $w->__get('pagelink') : '')
+                Html::escapeHTML(is_string($w->get('pagelink')) ? $w->get('pagelink') : '')
             );
         }
 
         return $w->renderDiv(
-            (bool) $w->__get('content_only'),
-            'zoneclear-sources ' . $w->__get('class'),
+            (bool) $w->get('content_only'),
+            'zoneclear-sources ' . $w->get('class'),
             '',
-            ($w->__get('title') ? $w->renderTitle(Html::escapeHTML(is_string($w->__get('title')) ? $w->__get('title') : '')) : '') .
+            ($w->get('title') ? $w->renderTitle(Html::escapeHTML(is_string($w->get('title')) ? $w->get('title') : '')) : '') .
             sprintf('<ul>%s</ul>', implode('', $lines)) . $pub
         );
     }
@@ -191,7 +191,7 @@ class Widgets
         $z = ZoneclearFeedServer::instance();
         $s = $z->settings;
 
-        if ($w->__get('offline')
+        if ($w->get('offline')
             || !$s->active
             || !$w->checkHomeOnly(App::url()->type)
         ) {
@@ -201,10 +201,10 @@ class Widgets
         $content = '';
 
         # Feed
-        if ($w->__get('feed_show')) {
-            $title = ($w->__get('feed_title') ? sprintf(
+        if ($w->get('feed_show')) {
+            $title = ($w->get('feed_title') ? sprintf(
                 '<strong>%s</strong> ',
-                Html::escapeHTML(is_string($w->__get('feed_title')) ? $w->__get('feed_title') : '')
+                Html::escapeHTML(is_string($w->get('feed_title')) ? $w->get('feed_title') : '')
             ) : '');
 
             $count = $z->getFeeds([], true)->f(0);
@@ -224,7 +224,7 @@ class Widgets
         }
 
         # Entry
-        if ($w->__get('entry_show')) {
+        if ($w->get('entry_show')) {
             $count = 0;
             $feeds = $z->getFeeds();
 
@@ -236,9 +236,9 @@ class Widgets
                     $count += $c;
                 }
             }
-            $title = ($w->__get('entry_title') ? sprintf(
+            $title = ($w->get('entry_title') ? sprintf(
                 '<strong>%s</strong> ',
-                Html::escapeHTML(is_string($w->__get('entry_title')) ? $w->__get('entry_title') : '')
+                Html::escapeHTML(is_string($w->get('entry_title')) ? $w->get('entry_title') : '')
             ) : '');
 
             $text = $count ? sprintf(__('one entry', '%d entries', $count), $count) : __('no entries');
@@ -252,10 +252,10 @@ class Widgets
 
         # Display
         return $w->renderDiv(
-            (bool) $w->__get('content_only'),
-            'zoneclear-number ' . $w->__get('class'),
+            (bool) $w->get('content_only'),
+            'zoneclear-number ' . $w->get('class'),
             '',
-            ($w->__get('title') ? $w->renderTitle(Html::escapeHTML(is_string($w->__get('title')) ? $w->__get('title') : '')) : '') .
+            ($w->get('title') ? $w->renderTitle(Html::escapeHTML(is_string($w->get('title')) ? $w->get('title') : '')) : '') .
             sprintf('<ul>%s</ul>', $content)
         );
     }

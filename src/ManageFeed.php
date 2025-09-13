@@ -76,7 +76,7 @@ class ManageFeed
             if (!$z::validateURL($v->feed)) {
                 App::error()->add(__('You must provide valid feed URL.'));
             }
-            if (null !== $v->cat_id && !App::blog()->getCategory($v->cat_id)) {
+            if (App::blog()->getCategory($v->cat_id)->isEmpty()) {
                 App::error()->add(__('You must provide valid category.'));
             }
 
@@ -337,7 +337,7 @@ class ManageFeed
                                                         ->for('feed_upd_int'),
                                                     (new Select('feed_upd_int'))
                                                         ->class('maximal')
-                                                        ->items(Combo::updateInterval())
+                                                        ->items(array_map(fn ($v): string => (string) $v, Combo::updateInterval()))
                                                         ->default((string) $v->upd_int),
                                                 ]),
                                             // feed_lang

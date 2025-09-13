@@ -158,7 +158,7 @@ class Config
                                         (new Label(__('Status of new posts:'), Label::OUTSIDE_LABEL_BEFORE))
                                             ->for(My::id() . 'post_status_new'),
                                         (new Select(My::id() . 'post_status_new'))
-                                            ->items(Combo::postsStatus())
+                                            ->items(array_map(fn ($v):string => (string) $v, Combo::postsStatus()))
                                             ->default((string) $s->post_status_new),
                                     ]),
                                 (new Para())
@@ -174,7 +174,7 @@ class Config
                                         (new Label(__('How to transform imported tags:'), Label::OUTSIDE_LABEL_BEFORE))
                                             ->for(My::id() . 'tag_case'),
                                         (new Select(My::id() . 'tag_case'))
-                                            ->items(Combo::tagCase())
+                                            ->items(array_map(fn ($v):string => (string) $v, Combo::tagCase()))
                                             ->default((string) $s->tag_case),
                                     ]),
                             ]),
@@ -186,7 +186,7 @@ class Config
                                         (new Label(__('Update feeds on public side:'), Label::OUTSIDE_LABEL_BEFORE))
                                             ->for(My::id() . 'bhv_pub_upd'),
                                         (new Select(My::id() . 'bhv_pub_upd'))
-                                            ->items(Combo::pubUpdate())
+                                            ->items(array_map(fn ($v):string => (string) $v, Combo::pubUpdate()))
                                             ->default((string) $s->bhv_pub_upd),
                                     ]),
                                 (new Para())

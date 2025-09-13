@@ -96,7 +96,7 @@ class FeedsActions extends Actions
             $feeds = ZoneclearFeedServer::instance()->getFeeds($params);
             while ($feeds->fetch()) {
                 $row                              = new FeedRow($feeds);
-                $this->entries[(string) $row->id] = $row->name;
+                $this->entries[((string) $row->id)] = $row->name; // @phpstan-ignore-line you are stupid
             }
             $this->rs = $feeds;
         } else {

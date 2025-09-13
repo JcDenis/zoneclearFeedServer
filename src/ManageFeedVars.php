@@ -16,8 +16,8 @@ use Dotclear\Helper\Html\Html;
  */
 class ManageFeedVars
 {
-    /** @var    ManageFeedVars  $container  Self instance  */
-    private static $container;
+    /** @var    ManageFeedVars  $instance  Self instance  */
+    private static ManageFeedVars $instance;
 
     public readonly int $id;
     public readonly string $name;
@@ -185,11 +185,11 @@ class ManageFeedVars
      */
     public static function instance(): ManageFeedVars
     {
-        if (!(self::$container instanceof self)) {
-            self::$container = new self();
+        if (!isset(self::$instance)) {
+            self::$instance = new self();
         }
 
-        return self::$container;
+        return self::$instance;
     }
 
     /**

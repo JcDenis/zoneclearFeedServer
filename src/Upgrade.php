@@ -21,7 +21,7 @@ class Upgrade
     public static function preUpgrade(): void
     {
         $current = App::version()->getVersion(My::id());
-        if (!is_string($current) || empty($current)) {
+        if (empty($current)) {
             return;
         }
 

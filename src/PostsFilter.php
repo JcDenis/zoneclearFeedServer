@@ -46,7 +46,7 @@ class PostsFilter extends Filters
     /**
      * Posts users select
      *
-     * @return null|Filter
+     * @return string|Filter
      */
     public function getPostUserFilter()
     {
@@ -55,12 +55,12 @@ class PostsFilter extends Filters
         try {
             $users = App::blog()->getPostsUsers();
             if ($users->isEmpty()) {
-                return null;
+                return '';
             }
         } catch (Exception $e) {
             App::error()->add($e->getMessage());
 
-            return null;
+            return '';
         }
 
         $combo = Combos::getUsersCombo($users);
@@ -79,7 +79,7 @@ class PostsFilter extends Filters
     /**
      * Posts categories select
      *
-     * @return null|Filter
+     * @return string|Filter
      */
     public function getPostCategoriesFilter()
     {
@@ -88,12 +88,12 @@ class PostsFilter extends Filters
         try {
             $categories = App::blog()->getCategories();
             if ($categories->isEmpty()) {
-                return null;
+                return '';
             }
         } catch (Exception $e) {
             App::error()->add($e->getMessage());
 
-            return null;
+            return '';
         }
 
         $combo = [
@@ -133,7 +133,7 @@ class PostsFilter extends Filters
     /**
      * Posts by month select
      *
-     * @return null|Filter
+     * @return string|Filter
      */
     public function getPostMonthFilter()
     {
@@ -142,12 +142,12 @@ class PostsFilter extends Filters
         try {
             $dates = App::blog()->getDates(['type' => 'month']);
             if ($dates->isEmpty()) {
-                return null;
+                return '';
             }
         } catch (Exception $e) {
             App::error()->add($e->getMessage());
 
-            return null;
+            return '';
         }
 
         return (new Filter('month'))

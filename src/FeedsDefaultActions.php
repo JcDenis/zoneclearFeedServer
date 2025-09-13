@@ -361,7 +361,7 @@ class FeedsDefaultActions
                                 (new Label(__('Frequency:'), Label::OUTSIDE_LABEL_BEFORE))
                                     ->for('upd_upd_int'),
                                 (new Select('upd_upd_int'))
-                                    ->items(Combo::updateInterval()),
+                                    ->items(array_map(fn ($v): string => (string) $v, Combo::updateInterval())),
                                 (new Submit('do-action'))
                                     ->value(__('Save')),
                                 (new Hidden(['action'], 'changeint')),

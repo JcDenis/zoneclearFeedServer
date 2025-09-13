@@ -14,7 +14,7 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 class Settings
 {
     /** @var    Settings    Self instance */
-    private static $instance;
+    private static Settings $instance;
 
     public readonly bool $active;
 
@@ -61,7 +61,7 @@ class Settings
 
     public static function instance(): Settings
     {
-        if (!(self::$instance instanceof Settings)) {
+        if (!isset(self::$instance)) {
             self::$instance = new Settings();
         }
 

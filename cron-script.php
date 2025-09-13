@@ -44,7 +44,7 @@ if (isset($opts['c']) && is_string($opts['c'])) {
 if (isset($opts['b'])) {
     $blog_id = $opts['b'];
 } elseif (isset($_SERVER['DC_BLOG_ID'])) {
-    $blog_id = $opts['DC_BLOG_ID'];
+    $blog_id = $_SERVER['DC_BLOG_ID'];
 }
 
 if (!$dc_root || !is_dir($dc_root)) {

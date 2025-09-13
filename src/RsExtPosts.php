@@ -65,7 +65,7 @@ class RsExtPosts extends Post
             return '';
         }
 
-        $cb = call_user_func_array($func, $args);
+        $cb = call_user_func_array($func, $args); // @phpstan-ignore-line
 
         return is_string($cb) ? $cb : '';
     }

@@ -113,9 +113,7 @@ class FeedsList extends Listing
         }
 
         $url = My::manageUrl(['part' => 'feed', 'feed_id' => $row->id]);
-        if (!is_string($url)) {
-            $url = '';
-        }
+
         $tz = App::auth()->getInfo('user_tz');
         if (!is_string($tz)) {
             $tz = 'UTC';
