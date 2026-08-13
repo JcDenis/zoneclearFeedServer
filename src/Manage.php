@@ -118,7 +118,7 @@ class Manage
         // feeds list
         try {
             $feeds         = $z->getFeeds($params);
-            $feeds_counter = $z->getFeeds($params, true)->f(0);
+            $feeds_counter = $z->getFeeds($params, true)->cardinal();
             $feeds_list    = new FeedsList($feeds, $feeds_counter);
         } catch (Exception $e) {
             App::error()->add($e->getMessage());
@@ -178,10 +178,10 @@ class Manage
                                         (new Label(__('Selected feeds action:'), Label::OUTSIDE_LABEL_BEFORE))
                                             ->for('action'),
                                         (new Select('action'))
-                                            ->items($feeds_actions_page->getCombo() ?? []),
+                                            ->items($feeds_actions_page->getCombo()),
                                         (new Submit('feeds-action'))
                                             ->value(__('ok')),
-                                        ... My::hiddenFields($feeds_filter->values(true)),
+                                        ... My::hiddenFields(array_filter($feeds_filter->values(true), is_string(...))),
 
                                     ]),
                             ]),

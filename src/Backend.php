@@ -6,6 +6,7 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use Dotclear\App;
 use Dotclear\Helper\Process\TraitProcess;
+use Dotclear\Plugin\Uninstaller\CleanersStack;
 
 /**
  * @brief       zoneclearFeedServer backend class.
@@ -38,7 +39,7 @@ class Backend
             // widgets registration
             'initWidgets' => Widgets::init(...),
             // add Uninstaller cleaner for special direct action
-            'UninstallerCleanersConstruct' => function ($uninstaller_stack) {
+            'UninstallerCleanersConstruct' => function (CleanersStack $uninstaller_stack) {
                 UninstallCleaner::init($uninstaller_stack);
             },
         ]);

@@ -318,7 +318,7 @@ class Template
         "\$allfeeds = \$zc->getFeeds(); \n" .
         "if (!\$allfeeds->isEmpty()) { \n" .
         ' while ($allfeeds->fetch()) { ' .
-        "  \$fcount += (integer) \$zc->getPostsByFeed(array('feed_id'=>\$allfeeds->feed_id),true)->f(0); " .
+        "  \$fcount += (int) \$zc->getPostsByFeed(array('feed_id'=>\$allfeeds->feed_id),true)->f(0); " .
         " } \n" .
         "} \n" .
         "if (\$fcount == 0) {\n" .

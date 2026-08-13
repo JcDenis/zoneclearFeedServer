@@ -124,7 +124,7 @@ class ManageFeed
                 [
                     'p'       => My::id(),
                     'part'    => 'feed',
-                    'feed_id' => $v->id,
+                    'feed_id' => (string) $v->id,
                     '_ANCHOR' => 'entries',
                 ]
             );
@@ -163,8 +163,8 @@ class ManageFeed
             # posts
             try {
                 $posts     = $z->getPostsByFeed($params);
-                $counter   = $z->getPostsByFeed($params, true);
-                $post_list = new PostsList($posts, $counter->f(0));
+                $counter   = $z->getPostsByFeed($params, true)->cardinal();
+                $post_list = new PostsList($posts, $counter);
             } catch (Exception $e) {
                 App::error()->add($e->getMessage());
             }
@@ -393,6 +393,7 @@ class ManageFeed
             $args = $post_filter->values();
             unset($args['page']);
             $args['page'] = '%s';
+            $args = array_filter($args, is_string(...));
 
             # show posts
             $post_list->display(
@@ -411,14 +412,14 @@ class ManageFeed
                                 (new Para())
                                     ->class('col right')
                                     ->items([
-                                        (new Hidden('redir', My::manageUrl($post_filter->values()))),
+                                        (new Hidden('redir', My::manageUrl(array_filter($post_filter->values(), is_string(...))))),
                                         (new Label(__('Selected entries action:'), Label::OUTSIDE_LABEL_BEFORE))
                                             ->for('action'),
                                         (new Select('action'))
-                                            ->items($posts_actions_page->getCombo() ?? []),
+                                            ->items($posts_actions_page->getCombo()),
                                         (new Submit('feed-action'))
                                             ->value(__('ok')),
-                                        ... My::hiddenFields($post_filter->values()),
+                                        ... My::hiddenFields(array_filter($post_filter->values(), is_string(...))),
 
                                     ]),
                             ]),

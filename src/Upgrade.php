@@ -83,7 +83,7 @@ class Upgrade
         while ($record->fetch()) {
             foreach ($setting_values as $key => $default) {
                 try {
-                    $value = @unserialize($record->__get($key));
+                    $value = @unserialize($record->strField($key));
                 } catch(Exception) {
                     $value = $default;
                 }
@@ -94,8 +94,8 @@ class Upgrade
                 $sql = new UpdateStatement();
                 $sql
                     ->where('setting_id = ' . $sql->quote($key))
-                    ->and('setting_ns = ' . $sql->quote($record->f('setting_ns')))
-                    ->and('blog_id ' . (null === $record->f('blog_id') ? 'IS NULL ' : ('= ' . $sql->quote($record->f('blog_id')))))
+                    ->and('setting_ns = ' . $sql->quote($record->strField('setting_ns')))
+                    ->and('blog_id ' . (null === $record->f('blog_id') ? 'IS NULL ' : ('= ' . $sql->quote($record->strField('blog_id')))))
                     ->update($cur);
             }
         }

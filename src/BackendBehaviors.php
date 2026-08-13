@@ -44,7 +44,7 @@ class BackendBehaviors
                     return;
                 }
 
-                $fav['title'] .= '<br />' . sprintf(__('%s feed disabled', '%s feeds disabled', (int) $count), (int) $count);
+                $fav['title'] = (is_string($fav['title']) ? $fav['title'] : '') . '<br />' . sprintf(__('%s feed disabled', '%s feeds disabled', (int) $count), (int) $count);
                 $fav['large-icon'] = My::fileURL('icon-update.svg');
                 $fav['url']        = My::manageUrl(['part' => 'feeds', 'sortby' => 'feed_status', 'order' => 'asc']);
             },
@@ -78,6 +78,14 @@ class BackendBehaviors
             ],
         ];
         // posts feed
+
+        if (!isset($cols['posts']) || !is_array($cols['posts'])) {
+            $cols['posts'] = [];
+        }
+        if (!isset($cols['posts'][1]) || !is_array($cols['posts'][1])) {
+            $cols['posts'][1] = [];
+        }
+
         $cols['posts'][1]['feed'] = [true, __('Feed server')];
     }
 
@@ -167,7 +175,7 @@ class BackendBehaviors
             'meta_type' => My::META_PREFIX . 'url',
             'limit'     => 1,
         ]);
-        $url = $url->isEmpty() ? '' : $url->f('meta_id');
+        $url = $url->isEmpty() ? '' : $url->strField('meta_id');
         if (!$url) {
             return;
         }
@@ -177,21 +185,21 @@ class BackendBehaviors
             'meta_type' => My::META_PREFIX . 'author',
             'limit'     => 1,
         ]);
-        $author = $author->isEmpty() ? '' : $author->f('meta_id');
+        $author = $author->isEmpty() ? '' : $author->strField('meta_id');
 
         $site = App::meta()->getMetadata([
             'post_id'   => $post->f('post_id'),
             'meta_type' => My::META_PREFIX . 'site',
             'limit'     => 1,
         ]);
-        $site = $site->isEmpty() ? '' : $site->f('meta_id');
+        $site = $site->isEmpty() ? '' : $site->strField('meta_id');
 
         $sitename = App::meta()->getMetadata([
             'post_id'   => $post->f('post_id'),
             'meta_type' => My::META_PREFIX . 'sitename',
             'limit'     => 1,
         ]);
-        $sitename = $sitename->isEmpty() ? '' : $sitename->f('meta_id');
+        $sitename = $sitename->isEmpty() ? '' : $sitename->strField('meta_id');
 
         $edit = (new Text('', ''));
         if (App::auth()->check(App::auth()->makePermissions([
@@ -199,15 +207,22 @@ class BackendBehaviors
         ]), App::blog()->id())
         ) {
             $fid = App::meta()->getMetadata([
-                'post_id'   => $post->f('post_id'),
+                'post_id'   => $post->strField('post_id'),
                 'meta_type' => My::META_PREFIX . 'id',
                 'limit'     => 1,
             ]);
             if (!$fid->isEmpty()) {
                 $edit = (new Link())
-                    ->href(My::manageUrl(['part' => 'feed', 'feed_id' => $fid->f('meta_id')]))
+                    ->href(My::manageUrl(['part' => 'feed', 'feed_id' => $fid->strField('meta_id')]))
                     ->text(__('Edit this feed'));
             }
+        }
+
+        if (!isset($sidebar_items['options-box']) || !is_array($sidebar_items['options-box'])) {
+            $sidebar_items['options-box'] = [];
+        }
+        if (!isset($sidebar_items['options-box']['items']) || !is_array($sidebar_items['options-box']['items'])) {
+            $sidebar_items['options-box']['items'] = [];
         }
 
         $sidebar_items['options-box']['items'][My::id()] = (new Div('zcfs'))

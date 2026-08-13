@@ -27,7 +27,7 @@ class FeedsActions extends Actions
 
     /**
      * @param   string                  $uri
-     * @param   array<string,mixed>     $redirect_args
+     * @param   array<string,string>    $redirect_args
      */
     public function __construct(string $uri, array $redirect_args = [])
     {

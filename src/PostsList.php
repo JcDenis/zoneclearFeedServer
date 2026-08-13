@@ -10,6 +10,7 @@ use Dotclear\Core\Backend\Listing\Listing;
 use Dotclear\Core\Backend\Listing\Pager;
 use Dotclear\Helper\Date;
 use Dotclear\Helper\Html\Form\Checkbox;
+use Dotclear\Helper\Html\Form\Component;
 use Dotclear\Helper\Html\Form\Div;
 use Dotclear\Helper\Html\Form\Link;
 use Dotclear\Helper\Html\Form\Para;
@@ -47,6 +48,9 @@ class PostsList extends Listing
         $pager           = new Pager($page, $count, $nbpp, 10);
         $pager->base_url = $base_url;
 
+        /**
+         * @var ArrayObject<string, Component>
+         */
         $cols = new ArrayObject([
             'title' => (new Text('th', __('Title')))
                 ->class('first')
@@ -64,8 +68,9 @@ class PostsList extends Listing
         $this->userColumns(My::id() . 'posts', $cols);
 
         $lines = [];
+        $entries = isset($_POST['entries']) && is_array($_POST['entries']) ? $_POST['entries'] : [];
         while ($this->rs->fetch()) {
-            $lines[] = $this->line(isset($_POST['entries']) && in_array($this->rs->post_id, $_POST['entries']));
+            $lines[] = $this->line(in_array($this->rs->strField('post_id'), $entries));
         }
 
         echo
@@ -97,16 +102,16 @@ class PostsList extends Listing
     private function line(bool $checked): Para
     {
         $cat_title = (new Text('', __('None')));
-        if ($this->rs->cat_title
+        if ($this->rs->strField('cat_title') != ''
             && App::auth()->check(App::auth()->makePermissions([App::auth()::PERMISSION_CATEGORIES]), App::blog()->id())
         ) {
             $cat_title = (new Link())
-                ->href('category.php?id=' . $this->rs->cat_id)
+                ->href('category.php?id=' . $this->rs->strField('cat_id'))
                 ->title(Html::escapeHTML(__('Edit category')))
-                ->text(Html::escapeHTML($this->rs->cat_title));
+                ->text(Html::escapeHTML($this->rs->strField('cat_title')));
         }
 
-        switch ($this->rs->post_status) {
+        switch ($this->rs->intField('post_status')) {
             case 1:
                 $img_title = __('Published');
                 $img_src   = 'check-on.png';
@@ -133,25 +138,28 @@ class PostsList extends Listing
                 break;
         }
 
+        /**
+         * @var ArrayObject<string, Component>
+         */
         $cols = new ArrayObject([
             'check' => (new Para(null, 'td'))
                 ->class('nowrap minimal')
                 ->items([
                     (new Checkbox(['entries[]'], $checked))
-                        ->value($this->rs->post_id)
+                        ->value($this->rs->strField('post_id'))
                         ->disabled(!$this->rs->isEditable()),
                 ]),
             'title' => (new Para(null, 'td'))
                 ->class('maximal')
                 ->items([
                     (new Link())
-                        ->href(App::postTypes()->getPostAdminURL($this->rs->post_type, $this->rs->post_id))
+                        ->href(App::postTypes()->getPostAdminURL($this->rs->strField('post_type'), $this->rs->strField('post_id')))
                         ->title(Html::escapeHTML($this->rs->getURL()))
-                        ->text(Html::escapeHTML(trim(Html::clean($this->rs->post_title)))),
+                        ->text(Html::escapeHTML(trim(Html::clean($this->rs->strField('post_title'))))),
                 ]),
-            'date' => (new Text('td', Date::dt2str(__('%Y-%m-%d %H:%M'), $this->rs->post_dt)))
+            'date' => (new Text('td', Date::dt2str(__('%Y-%m-%d %H:%M'), $this->rs->strField('post_dt'))))
                 ->class('nowrap count'),
-            'author' => (new Text('td', Html::escapeHTML($this->rs->user_id)))
+            'author' => (new Text('td', Html::escapeHTML($this->rs->strField('user_id'))))
                 ->class('nowrap'),
             'category' => (new Para(null, 'td'))
                 ->class('nowrap')
@@ -167,8 +175,8 @@ class PostsList extends Listing
 
         $this->userColumns(My::id() . 'posts', $cols);
 
-        return (new Para('p' . $this->rs->post_id, 'tr'))
-            ->class('line' . ($this->rs->post_status != 1 ? ' offline ' : '') . $sts_class)
+        return (new Para('p' . $this->rs->strField('post_id'), 'tr'))
+            ->class('line' . ($this->rs->intField('post_status') != 1 ? ' offline ' : '') . $sts_class)
             ->items(iterator_to_array($cols));
     }
 }

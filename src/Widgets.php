@@ -134,13 +134,13 @@ class Widgets
 
         if ($w->get('offline')
             || !$s->active
-            || !$w->checkHomeOnly(App::url()->type)
+            || !$w->checkHomeOnly(App::url()->getType())
         ) {
             return '';
         }
 
         $p          = [];
-        $p['order'] = ($w->get('sortby') && in_array($w->get('sortby'), ['feed_upd_last', 'lowername', 'feed_creadt'])) ?
+        $p['order'] = (is_string($w->get('sortby')) && in_array($w->get('sortby'), ['feed_upd_last', 'lowername', 'feed_creadt'])) ?
             $w->get('sortby') . ' ' : 'feed_upd_last ';
         $p['order'] .= $w->get('sort') == 'desc' ? 'DESC' : 'ASC';
         $p['limit']       = is_numeric($w->get('limit')) ? abs((int) $w->get('limit')) : 10;
@@ -174,7 +174,7 @@ class Widgets
 
         return $w->renderDiv(
             (bool) $w->get('content_only'),
-            'zoneclear-sources ' . $w->get('class'),
+            'zoneclear-sources' . (is_string($w->get('class')) ? ' ' . $w->get('class') : ''),
             '',
             ($w->get('title') ? $w->renderTitle(Html::escapeHTML(is_string($w->get('title')) ? $w->get('title') : '')) : '') .
             sprintf('<ul>%s</ul>', implode('', $lines)) . $pub
@@ -193,7 +193,7 @@ class Widgets
 
         if ($w->get('offline')
             || !$s->active
-            || !$w->checkHomeOnly(App::url()->type)
+            || !$w->checkHomeOnly(App::url()->getType())
         ) {
             return '';
         }
@@ -253,7 +253,7 @@ class Widgets
         # Display
         return $w->renderDiv(
             (bool) $w->get('content_only'),
-            'zoneclear-number ' . $w->get('class'),
+            'zoneclear-number' . (is_string($w->get('class')) ? ' ' . $w->get('class') : ''),
             '',
             ($w->get('title') ? $w->renderTitle(Html::escapeHTML(is_string($w->get('title')) ? $w->get('title') : '')) : '') .
             sprintf('<ul>%s</ul>', $content)

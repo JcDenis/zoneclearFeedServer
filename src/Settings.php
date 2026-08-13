@@ -54,8 +54,8 @@ class Settings
         $this->update_limit     = $update_limit < 1 ? 10 : $update_limit;
         $this->keep_empty_feed  = !empty($s->get('keep_empty_feed'));
         $this->tag_case         = is_numeric($s->get('tag_case')) ? (int) $s->get('tag_case') : 0;
-        $this->post_full_tpl    = is_array($s->get('post_full_tpl')) ? $s->get('post_full_tpl') : [];
-        $this->post_title_redir = is_array($s->get('post_title_redir')) ? $s->get('post_title_redir') : [];
+        $this->post_full_tpl    = array_values(array_filter(is_array($s->get('post_full_tpl')) ? $s->get('post_full_tpl') : [], is_string(...)));
+        $this->post_title_redir = array_values(array_filter(is_array($s->get('post_title_redir')) ? $s->get('post_title_redir') : [], is_string(...)));
         $this->user             = is_string($s->get('user')) ? $s->get('user') : '';
     }
 
@@ -106,6 +106,6 @@ class Settings
      */
     public function dump(): array
     {
-        return get_object_vars($this);
+        return array_filter(get_object_vars($this), is_string(...), ARRAY_FILTER_USE_KEY);
     }
 }

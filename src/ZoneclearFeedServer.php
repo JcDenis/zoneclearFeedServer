@@ -325,7 +325,7 @@ class ZoneclearFeedServer
         } else {
             $content_req = '';
             if (!empty($params['columns']) && is_array($params['columns'])) {
-                $content_req .= implode(', ', $params['columns']) . ', ';
+                $content_req .= implode(', ', array_filter($params['columns'], is_string(...))) . ', ';
             }
 
             $strReq = 'SELECT Z.feed_id, Z.feed_creadt, Z.feed_upddt, Z.feed_type, ' .
@@ -355,11 +355,10 @@ class ZoneclearFeedServer
         }
 
         if (!empty($params['feed_id'])) {
-            if (is_array($params['feed_id'])) {
-                array_walk($params['feed_id'], function (&$v, $k) { if ($v !== null) { $v = (int) $v; }});
-            } elseif (is_numeric($params['feed_id'])) {
-                $params['feed_id'] = [(int) $params['feed_id']];
+            if (!is_array($params['feed_id'])) {
+                $params['feed_id'] = [$params['feed_id']];
             }
+            array_walk($params['feed_id'], function (&$v, $k) { if (is_numeric($v)) { $v = (int) $v; }});
             $strReq .= 'AND Z.feed_id ' . App::db()->con()->in($params['feed_id']);
         }
 
@@ -369,7 +368,7 @@ class ZoneclearFeedServer
         if (isset($params['feed_url']) && is_string($params['feed_url'])) {
             $strReq .= "AND Z.feed_url = '" . App::db()->con()->escapeStr((string) $params['feed_url']) . "' ";
         }
-        if (isset($params['feed_status'])) {
+        if (isset($params['feed_status']) && is_numeric($params['feed_status'])) {
             $strReq .= 'AND Z.feed_status = ' . ((int) $params['feed_status']) . ' ';
         }
 
@@ -382,6 +381,7 @@ class ZoneclearFeedServer
             $strReq .= $params['sql'] . ' ';
         }
 
+
         if (!$count_only) {
             if (!empty($params['order']) && is_string($params['order'])) {
                 $strReq .= 'ORDER BY ' . App::db()->con()->escapeStr((string) $params['order']) . ' ';
@@ -390,13 +390,22 @@ class ZoneclearFeedServer
             }
         }
 
-        if (!$count_only && isset($params['limit'])) {
-            if (is_numeric($params['limit'])) {
-                $params['limit'] = (int) $params['limit'];
+        if (!$count_only && !empty($params['limit'])) {
+            $values = is_array($params['limit']) ? array_values($params['limit']) : [$params['limit']];
+            // Make $values an array of integer values
+            $values = array_map(fn (mixed $v): int => is_numeric($v) ? (int) $v : 0, $values);
+
+            /**
+             * @var array{0: int, 1?: int}  $limit
+             */
+            $limit = [
+                $values[0],
+            ];
+            if (isset($values[1])) {
+                $limit[1] = $values[1];
             }
-            if (is_int($params['limit']) || is_array($params['limit'])) {
-                $strReq .= App::db()->con()->limit($params['limit']);
-            }
+
+            $strReq .= App::db()->con()->limit($limit);
         }
 
         return new MetaRecord(App::db()->con()->select($strReq));
@@ -415,7 +424,7 @@ class ZoneclearFeedServer
             ->from(App::db()->con()->prefix() . My::TABLE_NAME)
             ->select();
 
-        return (int) $rs?->f(0) + 1;
+        return is_null($rs) ? 0 : $rs->intField(0);
     }
 
     /**
@@ -550,19 +559,19 @@ class ZoneclearFeedServer
                     App::db()->con()->begin();
 
                     foreach ($feed->items as $item) {
-                        $item_TS = $item->TS ? $item->TS : $time;
+                        $item_TS = is_numeric($item->TS) && $item->TS > 0 ? $item->TS : $time;
 
                         // I found that mercurial atom feed did not repect standard
                         $item_link = @$item->link;
-                        if (!$item_link) {
+                        if (!is_string($item_link) || empty($item_link)) {
                             $item_link = @$item->guid;
                         }
                         # Unknow feed item link
-                        if (!$item_link) {
+                        if (!is_string($item_link) || empty($item_link)) {
                             continue;
                         }
 
-                        $item_link              = App::db()->con()->escapeStr((string) $item_link);
+                        $item_link              = App::db()->con()->escapeStr($item_link);
                         $is_new_published_entry = false;
 
                         # Not updated since last visit
@@ -602,11 +611,11 @@ class ZoneclearFeedServer
 
                         # Prepare entry Cursor
                         $cur_post->clean();
-                        $cur_post->setField('post_dt', date('Y-m-d H:i:s', $item_TS));
+                        $cur_post->setField('post_dt', date('Y-m-d H:i:s', (int) $item_TS));
                         if ($row->cat_id) {
                             $cur_post->setField('cat_id', $row->cat_id);
                         }
-                        $post_content = $item->content ? $item->content : $item->description;
+                        $post_content = is_string($item->content) && !empty($item->content) ? $item->content : (is_string($item->description) && !empty($item->description) ? $item->description : '');
                         $cur_post->setField('post_format', 'xhtml');
                         $cur_post->setField('post_content', Html::absoluteURLs($post_content, $feed->link));
                         $cur_post->setField('post_title', $item->title ? $item->title : Text::cutString(Html::clean(is_string($cur_post->getField('post_content')) ? $cur_post->getField('post_content') : ''), 60));
@@ -691,11 +700,13 @@ class ZoneclearFeedServer
 
                             # Add new tags
                             $tags = App::meta()->splitMetaValues($row->tags);
-                            if ($row->get_tags) {
+                            if ($row->get_tags && is_array($item->subject )) {
                                 # Some feed subjects contains more than one tag
                                 foreach ($item->subject as $subjects) {
-                                    $tmp  = App::meta()->splitMetaValues($subjects);
-                                    $tags = array_merge($tags, $tmp);
+                                    if (is_string($subjects)) {
+                                        $tmp  = App::meta()->splitMetaValues($subjects);
+                                        $tags = array_merge($tags, $tmp);
+                                    }
                                 }
                                 $tags = array_unique($tags);
                             }
@@ -883,12 +894,12 @@ class ZoneclearFeedServer
         if (!is_null($rs) && !$rs->isEmpty()) {
             while ($rs->fetch()) {
                 $user_cn = App::users()->getUserCN(
-                    $rs->f('user_id'),
-                    $rs->f('user_name'),
-                    $rs->f('user_firstname'),
-                    $rs->f('user_displayname')
+                    $rs->strField('user_id'),
+                    $rs->strField('user_name'),
+                    $rs->strField('user_firstname'),
+                    $rs->strField('user_displayname')
                 );
-                $admins[$user_cn . ' (super admin)'] = $rs->f('user_id');
+                $admins[$user_cn . ' (super admin)'] = $rs->strField('user_id');
             }
         }
 
@@ -918,12 +929,12 @@ class ZoneclearFeedServer
         if (!is_null($rs) && !$rs->isEmpty()) {
             while ($rs->fetch()) {
                 $user_cn = App::users()->getUserCN(
-                    $rs->f('user_id'),
-                    $rs->f('user_name'),
-                    $rs->f('user_firstname'),
-                    $rs->f('user_displayname')
+                    $rs->strField('user_id'),
+                    $rs->strField('user_name'),
+                    $rs->strField('user_firstname'),
+                    $rs->strField('user_displayname')
                 );
-                $admins[$user_cn . ' (admin)'] = $rs->f('user_id');
+                $admins[$user_cn . ' (admin)'] = $rs->strField('user_id');
             }
         }
 

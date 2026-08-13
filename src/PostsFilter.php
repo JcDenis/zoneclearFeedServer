@@ -101,12 +101,10 @@ class PostsFilter extends Filters
             __('(No cat)') => 'NULL',
         ];
         while ($categories->fetch()) {
-            if (is_numeric($categories->f('level')) && is_string($categories->f('cat_title'))) {
-                $combo[
-                    str_repeat('&nbsp;', ((int) $categories->f('level') - 1) * 4) .
-                    Html::escapeHTML($categories->f('cat_title')) . ' (' . $categories->f('nb_post') . ')'
-                ] = $categories->f('cat_id');
-            }
+            $combo[
+                str_repeat('&nbsp;', ((int) $categories->intField('level') - 1) * 4) .
+                Html::escapeHTML($categories->strField('cat_title')) . ' (' . $categories->strField('nb_post') . ')'
+            ] = $categories->strField('cat_id');
         }
 
         return (new Filter('cat_id'))
@@ -151,8 +149,8 @@ class PostsFilter extends Filters
         }
 
         return (new Filter('month'))
-            ->param('post_month', function ($f) { return substr($f[0], 4, 2); })
-            ->param('post_year', function ($f) { return substr($f[0], 0, 4); })
+            ->param('post_month', function (string $f) { return substr($f[0], 4, 2); })
+            ->param('post_year', function (string $f) { return substr($f[0], 0, 4); })
             ->title(__('Month:'))
             ->options(array_merge(
                 ['-' => ''],

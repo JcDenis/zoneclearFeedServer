@@ -9,7 +9,7 @@ use Dotclear\App;
 
 $opts = getopt('d:c:b:u:h');
 
-function zchelp(string|int $status = 0): void
+function zchelp(string|int $status = 0): never
 {
     echo
     "Options: \n" .
@@ -38,7 +38,7 @@ if (isset($opts['d'])) {
 if (isset($opts['c']) && is_string($opts['c'])) {
     $dc_conf = realpath($opts['c']);
 } elseif (isset($_SERVER['DC_RC_PATH'])) {
-    $dc_conf = realpath($_SERVER['DC_RC_PATH']);
+    $dc_conf = realpath(is_string($_SERVER['DC_RC_PATH']) ? $_SERVER['DC_RC_PATH'] : '');
 }
 
 if (isset($opts['b'])) {
@@ -47,7 +47,7 @@ if (isset($opts['b'])) {
     $blog_id = $_SERVER['DC_BLOG_ID'];
 }
 
-if (!$dc_root || !is_dir($dc_root)) {
+if (!is_string($dc_root) || empty($dc_root) || !is_dir($dc_root)) {
     fwrite(STDERR, "DotClear root path is not defined\n\n");
     zchelp(1);
 }
@@ -71,7 +71,7 @@ unset($blog_id);
 require $dc_root . '/inc/prepend.php';
 unset($dc_root);
 
-App::blog()->loadFromBlog(is_string(DC_BLOG_ID) ? DC_BLOG_ID : '');
+App::blog()->loadFromBlog(DC_BLOG_ID);
 if (!App::blog()->isDefined() || '' == App::blog()->id()) {
     fwrite(STDERR, "Blog is not defined\n");
     exit(1);

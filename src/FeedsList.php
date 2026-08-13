@@ -11,6 +11,7 @@ use Dotclear\Core\Backend\Listing\Listing;
 use Dotclear\Core\Backend\Listing\Pager;
 use Dotclear\Helper\Date;
 use Dotclear\Helper\Html\Form\Checkbox;
+use Dotclear\Helper\Html\Form\Component;
 use Dotclear\Helper\Html\Form\Div;
 use Dotclear\Helper\Html\Form\Link;
 use Dotclear\Helper\Html\Form\Para;
@@ -47,6 +48,9 @@ class FeedsList extends Listing
         $count = (int) $this->rs_count;
         $pager = new Pager($page, $count, $nbpp, 10);
 
+        /**
+         * @var ArrayObject<string, Component>
+         */
         $cols = new ArrayObject([
             'title' => (new Text('th', __('Name')))
                 ->class('first')
@@ -65,9 +69,10 @@ class FeedsList extends Listing
 
         $this->userColumns(My::id() . 'feeds', $cols);
 
+        $posts = isset($_POST['feeds']) && is_array($_POST['feeds']) ? $_POST['feeds'] : [];
         $lines = [];
         while ($this->rs->fetch()) {
-            $lines[] = $this->line(isset($_POST['feeds']) && in_array($this->rs->post_id, $_POST['feeds']));
+            $lines[] = $this->line(in_array($this->rs->strField('post_id'), $posts));
         }
 
         echo
@@ -119,6 +124,9 @@ class FeedsList extends Listing
             $tz = 'UTC';
         }
 
+        /**
+         * @var ArrayObject<string, Component>
+         */
         $cols = new ArrayObject([
             'check' => (new Para(null, 'td'))
                 ->class('nowrap minimal')

@@ -114,7 +114,7 @@ class RsExtPosts extends Post
     {
         $url  = $rs->__call('zcFeed', ['url']);
         $site = $rs->__call('zcFeed', ['site']);
-        $full = in_array(App::url()->type, ZoneclearFeedServer::instance()->settings->post_title_redir);
+        $full = App::url()->isType(ZoneclearFeedServer::instance()->settings->post_title_redir);
 
         return is_string($site) && is_string($url) && $full ?
             ZoneclearFeedServer::instance()::absoluteURL($site, $url) :
@@ -136,7 +136,7 @@ class RsExtPosts extends Post
         $content  = self::zcFeedBrother('getContent', [&$rs, $absolute_urls]);
 
         if (is_string($url) && is_string($sitename) && $rs->f('post_type') == 'post') {
-            if (in_array(App::url()->type, ZoneclearFeedServer::instance()->settings->post_full_tpl)) {
+            if (App::url()->isType(ZoneclearFeedServer::instance()->settings->post_full_tpl)) {
                 return $content . sprintf(
                     '<p class="zoneclear-original"><em>%s</em></p>',
                     sprintf(__('Original post on <a href="%s">%s</a>'), $url, $sitename)

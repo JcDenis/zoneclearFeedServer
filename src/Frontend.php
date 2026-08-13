@@ -66,7 +66,7 @@ class Frontend
         // feeds update methods
         if (1 == $s->bhv_pub_upd) {
             App::behavior()->addBehavior('publicBeforeDocumentV2', function (): void {
-                if (in_array(App::url()->type, ['default', 'feed'])) {
+                if (App::url()->isType(['default', 'feed'])) {
                     try {
                         ZoneclearFeedServer::instance()->checkFeedsUpdate();
                     } catch (Exception $e) {
@@ -82,7 +82,7 @@ class Frontend
             });
         } elseif (3 == $s->bhv_pub_upd) {
             App::behavior()->addBehavior('publicHeadContent', function (): void {
-                if (!App::blog()->isDefined() || App::url()->type != 'default') {
+                if (!App::blog()->isDefined() || !App::url()->isType('default')) {
                     return;
                 }
 

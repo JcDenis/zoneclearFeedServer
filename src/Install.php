@@ -47,7 +47,7 @@ class Install
                 ->field('feed_upd_last', 'integer', 0, false, 0)
                 ->field('feed_status', 'smallint', 0, false, 0)
                 ->field('feed_name', 'varchar', 255, false)
-                ->field('feed_desc', 'text', null, true) //!pgsql reserved 'desc'
+                ->field('feed_desc', 'text', 0, true) //!pgsql reserved 'desc'
                 ->field('feed_url', 'varchar', 255, false)
                 ->field('feed_feed', 'varchar', 255, false)
                 ->field('feed_tags', 'varchar', 255, true)
