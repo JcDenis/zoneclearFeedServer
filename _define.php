@@ -15,13 +15,17 @@
  */
 declare(strict_types=1);
 
+if (!isset($this) || !is_object($this) || !method_exists($this, 'registerModule') || !isset($this->id) || !is_string($this->id)) {
+    return;
+}
+
 $this->registerModule(
     'Feeds server',
     'Mix your blog with a feeds planet',
     'Jean-Christian Denis, BG, Pierre Van Glabeke',
-    '2025.09.13',
+    '2026.08.13',
     [
-        'requires'    => [['core', '2.36']],
+        'requires'    => [['core', '2.39']],
         'permissions' => 'My',
         'type'        => 'plugin',
         'support'     => 'https://github.com/JcDenis/' . $this->id . '/issues',
