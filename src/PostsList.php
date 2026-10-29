@@ -70,7 +70,7 @@ class PostsList extends Listing
         $lines = [];
         $entries = isset($_POST['entries']) && is_array($_POST['entries']) ? $_POST['entries'] : [];
         while ($this->rs->fetch()) {
-            $lines[] = $this->line(in_array($this->rs->strField('post_id'), $entries));
+            $lines[] = $this->line(in_array((string) $this->rs->intField('post_id'), $entries, true));
         }
 
         echo
@@ -106,7 +106,7 @@ class PostsList extends Listing
             && App::auth()->check(App::auth()->makePermissions([App::auth()::PERMISSION_CATEGORIES]), App::blog()->id())
         ) {
             $cat_title = (new Link())
-                ->href('category.php?id=' . $this->rs->strField('cat_id'))
+                ->href(App::backend()->url()->get('admin.category', ['id' => $this->rs->intField('cat_id')], '&amp;', true))
                 ->title(Html::escapeHTML(__('Edit category')))
                 ->text(Html::escapeHTML($this->rs->strField('cat_title')));
         }
@@ -146,14 +146,14 @@ class PostsList extends Listing
                 ->class('nowrap minimal')
                 ->items([
                     (new Checkbox(['entries[]'], $checked))
-                        ->value($this->rs->strField('post_id'))
+                        ->value($this->rs->intField('post_id'))
                         ->disabled(!$this->rs->isEditable()),
                 ]),
             'title' => (new Para(null, 'td'))
                 ->class('maximal')
                 ->items([
                     (new Link())
-                        ->href(App::postTypes()->getPostAdminURL($this->rs->strField('post_type'), $this->rs->strField('post_id')))
+                        ->href(App::postTypes()->getPostAdminURL($this->rs->strField('post_type'), $this->rs->intField('post_id')))
                         ->title(Html::escapeHTML($this->rs->getURL()))
                         ->text(Html::escapeHTML(trim(Html::clean($this->rs->strField('post_title'))))),
                 ]),
@@ -175,7 +175,7 @@ class PostsList extends Listing
 
         $this->userColumns(My::id() . 'posts', $cols);
 
-        return (new Para('p' . $this->rs->strField('post_id'), 'tr'))
+        return (new Para('p' . $this->rs->intField('post_id'), 'tr'))
             ->class('line' . ($this->rs->intField('post_status') != 1 ? ' offline ' : '') . $sts_class)
             ->items(iterator_to_array($cols));
     }

@@ -72,7 +72,7 @@ class FeedsList extends Listing
         $posts = isset($_POST['feeds']) && is_array($_POST['feeds']) ? $_POST['feeds'] : [];
         $lines = [];
         while ($this->rs->fetch()) {
-            $lines[] = $this->line(in_array($this->rs->strField('post_id'), $posts));
+            $lines[] = $this->line(in_array((string) $this->rs->intField('feed_id'), $posts, true));
         }
 
         echo
@@ -107,10 +107,7 @@ class FeedsList extends Listing
         $img_title = $row->status ? __('enabled') : __('disabled');
         $img_src   = $row->status ? 'check-on.png' : 'check-off.png';
 
-        $entries_count = ZoneclearFeedServer::instance()->getPostsByFeed(['feed_id' => $row->id], true)->f(0);
-        if (!is_numeric($entries_count)) {
-            $entries_count = 0;
-        }
+        $entries_count = ZoneclearFeedServer::instance()->getPostsByFeed(['feed_id' => $row->id], true)->intField(0);
 
         $shunk_feed = $row->feed;
         if (strlen($shunk_feed) > 83) {
