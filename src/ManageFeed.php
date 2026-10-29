@@ -163,7 +163,7 @@ class ManageFeed
             # posts
             try {
                 $posts     = $z->getPostsByFeed($params);
-                $counter   = $z->getPostsByFeed($params, true)->cardinal();
+                $counter   = $z->getPostsByFeed($params, true)->intField(0);
                 $post_list = new PostsList($posts, $counter);
             } catch (Exception $e) {
                 App::error()->add($e->getMessage());

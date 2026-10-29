@@ -118,7 +118,7 @@ class Manage
         // feeds list
         try {
             $feeds         = $z->getFeeds($params);
-            $feeds_counter = $z->getFeeds($params, true)->cardinal();
+            $feeds_counter = $z->getFeeds($params, true)->intField(0);
             $feeds_list    = new FeedsList($feeds, $feeds_counter);
         } catch (Exception $e) {
             App::error()->add($e->getMessage());
