@@ -424,7 +424,7 @@ class ZoneclearFeedServer
             ->from(App::db()->con()->prefix() . My::TABLE_NAME)
             ->select();
 
-        return is_null($rs) ? 0 : $rs->intField(0);
+        return (is_null($rs) ? 0 : $rs->intField(0)) + 1;
     }
 
     /**
