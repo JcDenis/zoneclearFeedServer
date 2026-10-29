@@ -29,8 +29,8 @@ class Template
             $lastn = abs((int) $a['lastn']) + 0;
             $p .= "\$zcfs_params['limit'] = " . $lastn . ";\n";
         }
-        if (isset($a['cat_id']) && is_string($a['cat_id'])) {
-            $p .= "@\$zcfs_params['sql'] .= 'AND Z.cat_id = " . addslashes($a['cat_id']) . " ';\n";
+        if (isset($a['cat_id']) && is_numeric($a['cat_id'])) {
+            $p .= "@\$zcfs_params['sql'] .= 'AND Z.cat_id = " . (int) $a['cat_id'] . " ';\n";
         }
         if (isset($a['no_category'])) {
             $p .= "@\$zcfs_params['sql'] .= 'AND Z.cat_id IS NULL ';\n";
