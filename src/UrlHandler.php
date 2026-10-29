@@ -83,13 +83,11 @@ class UrlHandler
             if (!is_string($theme)) {
                 App::url()::p404();
             }
-            $id = App::blog()->settings()->get('system')->get('theme');
-            $tplset = is_string($id) ? App::themes()->getDefine($id)->get('tplset') : '';
-            $paths = implode(DIRECTORY_SEPARATOR, array_filter([My::path(), 'default-templates', $tplset], is_string(...)));
-            if (empty($tplset) || !is_dir($paths)) {
+            $tplset = App::themes()->getDefine($theme)->get('tplset');
+            if (!is_string($tplset) || $tplset === '' || !is_dir(implode(DIRECTORY_SEPARATOR, [My::path(), 'default-templates', $tplset]))) {
                 $tplset = App::config()->defaultTplset();
             }
-            App::frontend()->template()->appendPath($paths);
+            App::frontend()->template()->appendPath(implode(DIRECTORY_SEPARATOR, [My::path(), 'default-templates', $tplset]));
             App::url()::serveDocument('zcfeeds.html');
         }
         # Unknow
