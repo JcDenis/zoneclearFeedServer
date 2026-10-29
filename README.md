@@ -1,8 +1,8 @@
 # README
 
-[![Release](https://img.shields.io/badge/release-2023.11.04-a2cbe9.svg)](https://github.com/JcDenis/zoneclearFeedServer/releases)
-![Date](https://img.shields.io/badge/date-2023.11.04-c44d58.svg)
-[![Dotclear](https://img.shields.io/badge/dotclear-v2.36-137bbb.svg)](https://fr.dotclear.org/download)
+[![Release](https://img.shields.io/badge/release-2026.10.29-a2cbe9.svg)](https://github.com/JcDenis/zoneclearFeedServer/releases)
+![Date](https://img.shields.io/badge/date-2026.10.29-c44d58.svg)
+[![Dotclear](https://img.shields.io/badge/dotclear-v2.39-137bbb.svg)](https://fr.dotclear.org/download)
 [![Repository](https://img.shields.io/badge/repository-official-9ac123.svg)](https://dotclear.org/plugin/detail/zoneclearFeedServer)
 [![License](https://img.shields.io/badge/license-GPL--2.0-ececec.svg)](https://github.com/JcDenis/zoneclearFeedServer/blob/master/LICENSE)
 

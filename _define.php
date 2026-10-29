@@ -23,7 +23,7 @@ $this->registerModule(
     'Feeds server',
     'Mix your blog with a feeds planet',
     'Jean-Christian Denis, BG, Pierre Van Glabeke',
-    '2026.08.13',
+    '2026.10.29',
     [
         'requires'    => [['core', '2.39']],
         'permissions' => 'My',

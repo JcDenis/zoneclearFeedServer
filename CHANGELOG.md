@@ -1,3 +1,13 @@
+zoneclearFeedServer 2026.10.29
+===========================================================
+* Require Dotclear 2.39 (tested with 2.39.3)
+* Fix feed ID on creation (only one feed could be added)
+* Fix feeds and entries counters and pagers
+* Fix entries filters (month filter error, categories values)
+* Fix feeds and entries lists
+* Fix public feeds page template path
+* Code review
+
 zoneclearFeedServer 2026.08.13
 ===========================================================
 * Bump Dotclear from 2.36 to 2.39
