@@ -1,0 +1,35 @@
+name: Delete merged branches
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Delete branches merged into master
+        shell: bash
+        run: |
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          master=$(git rev-parse origin/master)
+          for ref in $(git for-each-ref --format='%(refname:short)' --merged origin/master refs/remotes/origin); do
+            branch=${ref#origin/}
+            case "$branch" in master|main|HEAD|origin) continue ;; esac
+            # Skip branches just created from master (nothing merged yet)
+            if [[ "$(git rev-parse "$ref")" == "$master" ]]; then
+              echo "Keep branch $branch (same as master)"
+              continue
+            fi
+            echo "Delete branch $branch"
+            git push origin --delete "$branch" || true
+          done
