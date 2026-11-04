@@ -1,5 +1,5 @@
 name: Release package
-on: 
+on:
   push:
   workflow_dispatch:
 
@@ -9,7 +9,7 @@ env:
 
 # required to set secrets in
 # https://github.com/xxx/xxx/settings/secrets/actions
-# TELEGRAM_ID, TELEGRAM_TOKEN
+# BOT_GPG_KEY, BOT_GPG_PASS, TELEGRAM_ID, TELEGRAM_TOKEN
 
 jobs:
   check_release:
@@ -21,15 +21,17 @@ jobs:
       exists: ${{ steps.repository.outputs.release-exists }}
     steps:
       - name: Checkout repository master branch
-        uses: actions/checkout@master
+        uses: actions/checkout@v7
 
       # Parser from https://github.com/franck-paul
       - name: Run PHP code
         id: dotclear
         shell: php {0}
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           <?php
-          $version = substr('${{ github.event.head_commit.message }}', 8);
+          $version = trim(substr((string) getenv('COMMIT_MESSAGE'), 8));
           $dcmin = '${{ env.DC_MIN }}';
           $df = file_get_contents('./_define.php');
           if (preg_match('/registerModule\((.*?),(.*?)[\'\"],(.*?)[\'\"],(.*?)[\'\"](.*?)[\'\"](.*?)(,.*)\)/s',$df,$matches)) {
@@ -41,27 +43,40 @@ jobs:
 
       - name: Check repository releases
         id: repository
-        uses: insightsengineering/release-existence-action@v1.0.0
-        with:
-          release-tag: 'v${{ steps.dotclear.outputs.version }}'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ "${{ steps.dotclear.outputs.version }}" == "" ]]; then
+            echo "No version found in commit message."
+            echo "release-exists=true" >> $GITHUB_OUTPUT
+          elif gh release view "v${{ steps.dotclear.outputs.version }}" --repo "${{ github.repository }}" > /dev/null 2>&1; then
+            echo "Release found."
+            echo "release-exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Release not found."
+            echo "release-exists=false" >> $GITHUB_OUTPUT
+          fi
 
   do_release:
     needs: check_release
     if: needs.check_release.outputs.exists == 'false'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository master branch
-        uses: actions/checkout@master
+        uses: actions/checkout@v7
 
       - name: Get repository name
         id: repository
-        uses: MariachiBear/get-repo-name-action@v1.1.0
-        with:
-          with-owner: 'false'
+        shell: bash
+        run: |
+          echo "repository-name=${{ github.event.repository.name }}" >> $GITHUB_OUTPUT
 
       - name: Import GPG key
         id: import-gpg
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@v7
         with:
           gpg_private_key: ${{ secrets.BOT_GPG_KEY }}
           passphrase: ${{ secrets.BOT_GPG_PASS }}
@@ -72,7 +87,6 @@ jobs:
       - name: Get download URL
         id: download
         run: |
-          fulltag=${{ github.ref_name }}
           echo download-url="https://github.com/${{ github.repository }}/releases/download/v${{ needs.check_release.outputs.version }}/${{ env.DC_TYPE }}-${{ steps.repository.outputs.repository-name }}.zip" >> $GITHUB_OUTPUT
 
       # Parser from https://github.com/franck-paul
@@ -138,10 +152,10 @@ jobs:
           path: '${{ steps.repository.outputs.repository-name }}'
           filename: '${{ env.DC_TYPE }}-${{ steps.repository.outputs.repository-name }}.zip'
           exclusions: '*.git* /*node_modules/* .editorconfig'
-    
+
       - name: Create release with archive
         id: writerelease
-        uses: ncipollo/release-action@v1.14.0
+        uses: ncipollo/release-action@v1
         with:
           artifacts: '../${{ env.DC_TYPE }}-${{ steps.repository.outputs.repository-name }}.zip'
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -151,15 +165,15 @@ jobs:
           generateReleaseNotes: true
           name: ${{ steps.repository.outputs.repository-name }} ${{ needs.check_release.outputs.version }}
           tag: 'v${{ needs.check_release.outputs.version }}'
-    
+
       - name: Send Telegram Message Ok
-        uses: appleboy/telegram-action@v1.0.0
+        uses: appleboy/telegram-action@v1.1.1
         with:
           to: ${{ secrets.TELEGRAM_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
           message: |
             __Github workflow run__
-            - Trigger: ${{ github.event_name }} 
-            - Release: ${{ steps.repository.outputs.repository-name }} ${{ needs.check_release.outputs.version }} 
-            - Download URL: ${{ steps.download.outputs.download-url }} 
+            - Trigger: ${{ github.event_name }}
+            - Release: ${{ steps.repository.outputs.repository-name }} ${{ needs.check_release.outputs.version }}
+            - Download URL: ${{ steps.download.outputs.download-url }}
