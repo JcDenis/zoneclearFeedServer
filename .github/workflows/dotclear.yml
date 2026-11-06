@@ -1,0 +1,47 @@
+# Dotclear module workflow
+# Checks, releases and branches cleanup are done by the reusable workflow
+# https://github.com/JcDenis/gh2da/blob/master/.github/workflows/dotclear-module.yml
+#
+# Release: Actions > Dotclear module > Run workflow > check "Prepare and publish a release"
+# (or push a commit "Release x.y" on master as before)
+#
+# Required secrets: BOT_GPG_KEY, BOT_GPG_PASS, TELEGRAM_ID, TELEGRAM_TOKEN
+
+name: Dotclear module
+
+on:
+  push:
+  pull_request:
+  schedule:
+    # Weekly checks against Dotclear master
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Prepare and publish a release'
+        type: boolean
+        default: false
+      version:
+        description: 'Release version (empty for automatic: today for date versions, else 1.2.3 -> 1.3)'
+        type: string
+        default: ''
+      skip_checks:
+        description: 'Skip code checks'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  module:
+    uses: JcDenis/gh2da/.github/workflows/dotclear-module.yml@master
+    with:
+      release: ${{ inputs.release == true }}
+      version: ${{ inputs.version || '' }}
+      skip_checks: ${{ inputs.skip_checks == true }}
+    secrets:
+      BOT_GPG_KEY: ${{ secrets.BOT_GPG_KEY }}
+      BOT_GPG_PASS: ${{ secrets.BOT_GPG_PASS }}
+      TELEGRAM_ID: ${{ secrets.TELEGRAM_ID }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
