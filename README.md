@@ -43,5 +43,6 @@ Once it's done you can manage your feeds from menu
 * Jean-Christian Denis (author)
 * BG
 * Pierre Van Glabeke
+* Claude (AI assistant by Anthropic)
 
 You are welcome to contribute to this code.
