@@ -627,7 +627,7 @@ class ZoneclearFeedServer
                                 # Post
                                 $cur_post->setField('user_id', App::auth()->userID());
                                 $cur_post->setField('post_format', 'xhtml');
-                                $cur_post->setField('post_status', $s->post_status_new ? App::blog()::POST_PUBLISHED : App::blog()::POST_UNPUBLISHED);
+                                $cur_post->setField('post_status', $s->post_status_new ? App::status()->post()::PUBLISHED : App::status()->post()::UNPUBLISHED);
                                 $cur_post->setField('post_open_comment', 0);
                                 $cur_post->setField('post_open_tb', 0);
 

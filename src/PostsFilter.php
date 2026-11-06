@@ -124,7 +124,7 @@ class PostsFilter extends Filters
             ->title(__('Status:'))
             ->options(array_merge(
                 ['-' => ''],
-                Combos::getPostStatusesCombo()
+                App::status()->post()->combo()
             ));
     }
 
