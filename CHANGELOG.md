@@ -1,3 +1,8 @@
+zoneclearFeedServer 2026.11.06
+===========================================================
+* Fix CHANGELOG
+* Fix deprecated post statuses
+
 zoneclearFeedServer 2026.10.29
 ===========================================================
 * Require Dotclear 2.39 (tested with 2.39.3)
