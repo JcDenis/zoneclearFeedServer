@@ -82,26 +82,20 @@ class Frontend
             });
         } elseif (3 == $s->bhv_pub_upd) {
             App::behavior()->addBehavior('publicHeadContent', function (): void {
-                if (!App::blog()->isDefined() || !App::url()->isType('default')) {
+                if (!App::blog()->isDefined() || !App::url()->isType(['default', 'default-page', 'static'])) {
                     return;
                 }
 
-                $blog_url = Html::escapeJS(
-                    App::blog()->url() .
-                    App::url()->getBase('zoneclearFeedsPage') .
-                    '/zcfsupd'
-                );
-                $blog_id = Html::escapeJS(App::blog()->id());
-
+                // Background request, without waiting for response
                 echo
-                "\n<!-- JS for zoneclearFeedServer --> \n" .
-                App::plugins()->jsLoad(App::blog()->url() . App::url()->getBase('zoneclearFeedsPage') . '/zcfsupd.js') .
-                "<script type=\"text/javascript\"> \n//<![CDATA[\n" .
-                ' $(function(){if(!document.getElementById){return;} ' .
-                " $('body').zoneclearFeedServer({blog_url:'" .
-                    $blog_url . "',blog_id:'" . $blog_id . "'}); " .
-                " })\n" .
-                "//]]>\n</script>\n";
+                "\n<!-- JS for zoneclearFeedServer -->\n" .
+                '<script>' .
+                "window.addEventListener('load',()=>{" .
+                'fetch(' . json_encode(App::blog()->url() . App::url()->getBase('zoneclearFeedsPage') . '/zcfsupd', JSON_HEX_TAG | JSON_HEX_AMP | JSON_THROW_ON_ERROR) . ',' .
+                "{method:'POST',keepalive:true,body:new URLSearchParams({blogId:" . json_encode(App::blog()->id(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_THROW_ON_ERROR) . '})})' .
+                '.catch(()=>{});' .
+                '});' .
+                "</script>\n";
             });
         }
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use Dotclear\App;
-use Dotclear\Helper\Html\Html;
 use Exception;
 
 /**
@@ -38,7 +37,10 @@ class UrlHandler
         # Update feeds (from ajax or other post resquest)
         if ($args == '/zcfsupd' && 3 == $s->bhv_pub_upd) {
             $msg = '';
-            if (!empty($_POST['blogId']) && Html::escapeJS(App::blog()->id()) == $_POST['blogId']) {
+            if (!empty($_POST['blogId']) && App::blog()->id() === $_POST['blogId']) {
+                // Feeds can be slow to parse, do not stop if visitor leaves the page
+                ignore_user_abort(true);
+
                 try {
                     if ($z->checkFeedsUpdate()) {
                         $msg = sprintf(
@@ -66,16 +68,6 @@ class UrlHandler
             '</rsp></response>';
 
             exit(1);
-
-            # Server js
-        } elseif ($args == '/zcfsupd.js' && 3 == $s->bhv_pub_upd) {
-            App::frontend()->template()->appendPath(My::path() . '/default-templates');
-            App::url()::serveDocument(
-                'zcfsupd.js',
-                'text/javascript',
-                false,
-                false
-            );
 
             # Server feeds description page
         } elseif (in_array($args, ['', '/']) && $s->pub_active) {
