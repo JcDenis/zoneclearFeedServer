@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
 use Dotclear\App;
-use Exception;
+use Throwable;
 
 /**
  * @brief       zoneclearFeedServer frontend URL handler.
@@ -49,7 +49,7 @@ class UrlHandler
                             'Feeds updated successfully'
                         );
                     }
-                } catch (Exception $e) {
+                } catch (Throwable) {
                 }
             }
             if (empty($msg)) {

@@ -19,6 +19,7 @@ use Dotclear\Helper\Network\Feed\Parser;
 use Dotclear\Helper\Network\Feed\Reader;
 use Dotclear\Helper\Text;
 use Exception;
+use Throwable;
 
 /**
  * @brief       zoneclearFeedServer main class.
@@ -614,10 +615,12 @@ class ZoneclearFeedServer
                             $cur_post->setField('cat_id', $row->cat_id);
                         }
                         $post_content = is_string($item->content) && !empty($item->content) ? $item->content : (is_string($item->description) && !empty($item->description) ? $item->description : '');
+                        $post_content = self::toUTF8(Html::absoluteURLs($post_content, $feed->link));
+                        $post_title   = is_string($item->title) && !empty($item->title) ? self::toUTF8($item->title) : Text::cutString(Html::clean($post_content), 60);
                         $cur_post->setField('post_format', 'xhtml');
-                        $cur_post->setField('post_content', Html::absoluteURLs($post_content, $feed->link));
-                        $cur_post->setField('post_title', $item->title ? $item->title : Text::cutString(Html::clean(is_string($cur_post->getField('post_content')) ? $cur_post->getField('post_content') : ''), 60));
-                        $creator = $item->creator ? $item->creator : $row->owner;
+                        $cur_post->setField('post_content', $post_content);
+                        $cur_post->setField('post_title', $post_title);
+                        $creator = self::toUTF8(is_string($item->creator) && !empty($item->creator) ? $item->creator : $row->owner);
 
                         try {
                             # Create entry
@@ -717,14 +720,15 @@ class ZoneclearFeedServer
                             $formated_tags = [];
                             foreach ($tags as $tag) {
                                 # Change tags case
+                                $tag = self::toUTF8($tag);
                                 switch ((int) $s->tag_case) {
-                                    case 3: $tag = strtoupper($tag);
+                                    case 3: $tag = mb_strtoupper($tag);
 
                                         break;
-                                    case 2: $tag = strtolower($tag);
+                                    case 2: $tag = mb_strtolower($tag);
 
                                         break;
-                                    case 1: $tag = ucfirst(strtolower($tag));
+                                    case 1: $tag = mb_strtoupper(mb_substr($tag, 0, 1)) . mb_strtolower(mb_substr($tag, 1));
 
                                         break;
                                     default: /* do nothing */                 break;
@@ -745,7 +749,7 @@ class ZoneclearFeedServer
                                     );
                                 }
                             }
-                        } catch (Exception $e) {
+                        } catch (Throwable $e) {
                             $this->unlockUpdate();
 
                             throw $e;
@@ -760,6 +764,22 @@ class ZoneclearFeedServer
         $this->unlockUpdate();
 
         return true;
+    }
+
+    /**
+     * Get a valid UTF-8 string from a feed value.
+     *
+     * Database (ie PostgreSQL) refuses invalid UTF-8 sequences.
+     *
+     * @param   mixed   $str    The value
+     *
+     * @return  string  The valid UTF-8 string
+     */
+    private static function toUTF8(mixed $str): string
+    {
+        $str = is_string($str) ? $str : '';
+
+        return mb_check_encoding($str, 'UTF-8') ? $str : (string) mb_scrub($str, 'UTF-8');
     }
 
     /**

@@ -8,7 +8,7 @@ use Dotclear\App;
 use Dotclear\Helper\Process\TraitProcess;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\Html\Html;
-use Exception;
+use Throwable;
 
 /**
  * @brief       zoneclearFeedServer frontend class.
@@ -69,7 +69,7 @@ class Frontend
                 if (App::url()->isType(['default', 'feed'])) {
                     try {
                         ZoneclearFeedServer::instance()->checkFeedsUpdate();
-                    } catch (Exception $e) {
+                    } catch (Throwable) {
                     }
                 };
             });
@@ -77,7 +77,7 @@ class Frontend
             App::behavior()->addBehavior('publicAfterDocumentV2', function (): void {
                 try {
                     ZoneclearFeedServer::instance()->checkFeedsUpdate();
-                } catch (Exception $e) {
+                } catch (Throwable) {
                 }
             });
         } elseif (3 == $s->bhv_pub_upd) {
