@@ -61,7 +61,7 @@ class Widgets
             ->setting(
                 'limit',
                 __('Limit:'),
-                10,
+                '10',
                 'text'
             )
             ->setting(
@@ -207,7 +207,7 @@ class Widgets
                 Html::escapeHTML(is_string($w->get('feed_title')) ? $w->get('feed_title') : '')
             ) : '');
 
-            $count = $z->getFeeds([], true)->f(0);
+            $count = $z->getFeeds(['feed_status' => 1], true)->f(0);
             $count = is_numeric($count) ? (int) $count : 0;
 
             $text = $count ? sprintf(__('one source', '%d sources', $count), $count) : __('no sources');
@@ -226,7 +226,7 @@ class Widgets
         # Entry
         if ($w->get('entry_show')) {
             $count = 0;
-            $feeds = $z->getFeeds();
+            $feeds = $z->getFeeds(['feed_status' => 1]);
 
             if (!$feeds->isEmpty()) {
                 while ($feeds->fetch()) {

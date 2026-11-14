@@ -525,7 +525,9 @@ msgstr "Billets :"
 
 #: src/Widgets.php:219
 msgid "one source"
-msgstr "une source"
+msgid_plural "%d sources"
+msgstr[0] "une source"
+msgstr[1] "%d sources"
 
 #: src/Widgets.php:219
 msgid "no sources"
@@ -533,7 +535,9 @@ msgstr "aucune source"
 
 #: src/Widgets.php:250
 msgid "one entry"
-msgstr "une publication"
+msgid_plural "%d entries"
+msgstr[0] "une publication"
+msgstr[1] "%d publications"
 
 #: src/Widgets.php:250
 msgid "no entries"

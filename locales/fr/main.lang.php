@@ -149,9 +149,15 @@ L10n::$locales['Feeds:']                                     = 'Flux :';
 L10n::$locales['Show entries count']                         = 'Afficher le nombre de billets';
 L10n::$locales['Title for entries count:']                   = 'Titre pour le nombre de billets :';
 L10n::$locales['Entries:']                                   = 'Billets :';
-L10n::$locales['one source']                                 = 'une source';
+L10n::$locales['one source'] = [
+    'une source',
+    '%d sources',
+];
 L10n::$locales['no sources']                                 = 'aucune source';
-L10n::$locales['one entry']                                  = 'une publication';
+L10n::$locales['one entry'] = [
+    'une publication',
+    '%d publications',
+];
 L10n::$locales['no entries']                                 = 'aucune publication';
 L10n::$locales['Entries pages']                              = 'Pages des billets';
 L10n::$locales['Tags pages']                                 = 'Pages des mots-clés';

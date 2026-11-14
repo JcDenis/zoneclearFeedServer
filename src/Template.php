@@ -296,10 +296,8 @@ class Template
         "<?php \$fcount = App::frontend()->context()->feeds->count(); \n" .
         "if (\$fcount == 0) {\n" .
         "  printf(__('" . $none . "'),\$fcount);\n" .
-        "} elseif (\$fcount == 1) {\n" .
-        "  printf(__('" . $one . "'),\$fcount);\n" .
         "} else {\n" .
-        "  printf(__('" . $more . "'),\$fcount);\n" .
+        "  printf(__('" . $one . "', '" . $more . "', \$fcount),\$fcount);\n" .
         '} unset($fcount); ?>';
     }
 
@@ -315,7 +313,7 @@ class Template
         return
         "<?php \$fcount = 0; \n" .
         '$zc = ' . ZoneclearFeedServer::class . '::instance();' . "\n" .
-        "\$allfeeds = \$zc->getFeeds(); \n" .
+        "\$allfeeds = \$zc->getFeeds(['feed_status' => 1]); \n" .
         "if (!\$allfeeds->isEmpty()) { \n" .
         ' while ($allfeeds->fetch()) { ' .
         "  \$fcount += (int) \$zc->getPostsByFeed(array('feed_id'=>\$allfeeds->feed_id),true)->f(0); " .
@@ -323,10 +321,8 @@ class Template
         "} \n" .
         "if (\$fcount == 0) {\n" .
         "  printf(__('" . $none . "'),\$fcount);\n" .
-        "} elseif (\$fcount == 1) {\n" .
-        "  printf(__('" . $one . "'),\$fcount);\n" .
         "} else {\n" .
-        "  printf(__('" . $more . "'),\$fcount);\n" .
+        "  printf(__('" . $one . "', '" . $more . "', \$fcount),\$fcount);\n" .
         '} unset($allfeeds,$fcount); ?>';
     }
 
@@ -340,14 +336,12 @@ class Template
         $more = isset($a['more']) && is_string($a['more']) ? addslashes($a['more']) : '%d entries';
 
         return
-        '<?php $zcfs = ' . ZoneclearFeedServer::class . "::instance(); \n" .
+        '<?php $zc = ' . ZoneclearFeedServer::class . "::instance(); \n" .
         "\$fcount = \$zc->getPostsByFeed(array('feed_id'=>App::frontend()->context()->feeds->feed_id),true)->f(0); \n" .
         "if (\$fcount == 0) {\n" .
         "  printf(__('" . $none . "'),\$fcount);\n" .
-        "} elseif (\$fcount == 1) {\n" .
-        "  printf(__('" . $one . "'),\$fcount);\n" .
         "} else {\n" .
-        "  printf(__('" . $more . "'),\$fcount);\n" .
+        "  printf(__('" . $one . "', '" . $more . "', \$fcount),\$fcount);\n" .
         '} unset($fcount); ?>';
     }
 
