@@ -507,6 +507,8 @@ class ZoneclearFeedServer
 
         # No feed
         if ($f->isEmpty()) {
+            $this->unlockUpdate();
+
             return false;
         }
 
@@ -527,7 +529,13 @@ class ZoneclearFeedServer
             ) {
                 if (!$enabled) {
                     # Set feeds user
-                    $this->enableUser(true);
+                    try {
+                        $this->enableUser(true);
+                    } catch (Exception $e) {
+                        $this->unlockUpdate();
+
+                        throw $e;
+                    }
                     $enabled = true;
                 }
                 $i++;
@@ -555,8 +563,6 @@ class ZoneclearFeedServer
                 } else {
                     # Set update time of this feed
                     $this->enableFeed($row->id, (bool) $row->status, $time);
-
-                    App::db()->con()->begin();
 
                     foreach ($feed->items as $item) {
                         $item_TS = is_numeric($item->TS) && $item->TS > 0 ? $item->TS : $time;
@@ -742,14 +748,12 @@ class ZoneclearFeedServer
                                 }
                             }
                         } catch (Exception $e) {
-                            App::db()->con()->rollback();
                             $this->enableUser(false);
                             $this->unlockUpdate();
 
                             throw $e;
                         }
                     }
-                    App::db()->con()->commit();
                 }
 
                 # --BEHAVIOR-- zoneclearFeedServerAfterCheckFeedUpdate -- FeedRow
