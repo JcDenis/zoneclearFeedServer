@@ -13,6 +13,7 @@ use Dotclear\Helper\Date;
 use Dotclear\Helper\Html\Form\Checkbox;
 use Dotclear\Helper\Html\Form\Component;
 use Dotclear\Helper\Html\Form\Div;
+use Dotclear\Helper\Html\Form\Img;
 use Dotclear\Helper\Html\Form\Link;
 use Dotclear\Helper\Html\Form\Para;
 use Dotclear\Helper\Html\Form\Text;
@@ -105,7 +106,7 @@ class FeedsList extends Listing
     {
         $row       = new FeedRow($this->rs);
         $img_title = $row->status ? __('enabled') : __('disabled');
-        $img_src   = $row->status ? 'check-on.png' : 'check-off.png';
+        $img_src   = $row->status ? 'check-on.svg' : 'check-off.svg';
 
         $entries_count = ZoneclearFeedServer::instance()->getPostsByFeed(['feed_id' => $row->id], true)->intField(0);
 
@@ -168,9 +169,10 @@ class FeedsList extends Listing
             'status' => (new Para(null, 'td'))
                 ->class('nowrap minimal status')
                 ->items([
-                    (new Text('img', ''))
-                        ->title($img_title)
-                        ->extra('src="images/' . $img_src . '"'),
+                    (new Img('images/' . $img_src))
+                        ->class('mark')
+                        ->alt($img_title)
+                        ->title($img_title),
                 ]),
         ]);
 

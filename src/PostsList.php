@@ -111,32 +111,12 @@ class PostsList extends Listing
                 ->text(Html::escapeHTML($this->rs->strField('cat_title')));
         }
 
-        switch ($this->rs->intField('post_status')) {
-            case 1:
-                $img_title = __('Published');
-                $img_src   = 'check-on.png';
-                $sts_class = ' sts-online';
-
-                break;
-            case -1:
-                $img_title = __('Scheduled');
-                $img_src   = 'scheduled.png';
-                $sts_class = ' sts-scheduled';
-
-                break;
-            case -2:
-                $img_title = __('Pending');
-                $img_src   = 'check-wrn.png';
-                $sts_class = ' sts-pending';
-
-                break;
-            default:
-                $img_title = __('Unpublished');
-                $img_src   = 'check-off.png';
-                $sts_class = ' sts-offline';
-
-                break;
-        }
+        $sts_class = match ($this->rs->intField('post_status')) {
+            App::status()->post()::PUBLISHED => ' sts-online',
+            App::status()->post()::SCHEDULED => ' sts-scheduled',
+            App::status()->post()::PENDING   => ' sts-pending',
+            default                          => ' sts-offline',
+        };
 
         /**
          * @var ArrayObject<string, Component>
@@ -167,9 +147,7 @@ class PostsList extends Listing
             'status' => (new Para(null, 'td'))
                 ->class('nowrap status')
                 ->items([
-                    (new Text('img', ''))
-                        ->title($img_title)
-                        ->extra('src="images/' . $img_src . '"'),
+                    App::status()->post()->image($this->rs->intField('post_status')),
                 ]),
         ]);
 
