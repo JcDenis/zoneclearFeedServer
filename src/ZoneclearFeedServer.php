@@ -19,6 +19,7 @@ use Dotclear\Helper\Network\Feed\Parser;
 use Dotclear\Helper\Network\Feed\Reader;
 use Dotclear\Helper\Text;
 use Exception;
+use Throwable;
 
 /**
  * @brief       zoneclearFeedServer main class.
@@ -70,13 +71,6 @@ class ZoneclearFeedServer
      * @var     null|string     $lock
      */
     private static $lock = null;
-
-    /**
-     * Affiliate user ID.
-     *
-     * @var     null|string     $user
-     */
-    private $user = null;
 
     /**
      * Constructor load settings.
@@ -497,7 +491,8 @@ class ZoneclearFeedServer
         }
 
         $tz = App::blog()->settings()->get('system')->get('blog_timezone');
-        Date::setTZ(is_string($tz) ? $tz : 'UTC');
+        $tz = is_string($tz) ? $tz : 'UTC';
+        Date::setTZ($tz);
         $time = time();
 
         # All feeds or only one (from admin)
@@ -528,13 +523,11 @@ class ZoneclearFeedServer
              || $i < $s->update_limit && $row->status == 1 && ($time > $row->upd_last + $row->upd_int)
             ) {
                 if (!$enabled) {
-                    # Set feeds user
-                    try {
-                        $this->enableUser(true);
-                    } catch (Exception $e) {
+                    # Check feeds user
+                    if (App::users()->getUser($s->user)->isEmpty()) {
                         $this->unlockUpdate();
 
-                        throw $e;
+                        throw new Exception('Unable to set user');
                     }
                     $enabled = true;
                 }
@@ -622,16 +615,18 @@ class ZoneclearFeedServer
                             $cur_post->setField('cat_id', $row->cat_id);
                         }
                         $post_content = is_string($item->content) && !empty($item->content) ? $item->content : (is_string($item->description) && !empty($item->description) ? $item->description : '');
+                        $post_content = self::toUTF8(Html::absoluteURLs($post_content, $feed->link));
+                        $post_title   = is_string($item->title) && !empty($item->title) ? self::toUTF8($item->title) : Text::cutString(Html::clean($post_content), 60);
                         $cur_post->setField('post_format', 'xhtml');
-                        $cur_post->setField('post_content', Html::absoluteURLs($post_content, $feed->link));
-                        $cur_post->setField('post_title', $item->title ? $item->title : Text::cutString(Html::clean(is_string($cur_post->getField('post_content')) ? $cur_post->getField('post_content') : ''), 60));
-                        $creator = $item->creator ? $item->creator : $row->owner;
+                        $cur_post->setField('post_content', $post_content);
+                        $cur_post->setField('post_title', $post_title);
+                        $creator = self::toUTF8(is_string($item->creator) && !empty($item->creator) ? $item->creator : $row->owner);
 
                         try {
                             # Create entry
                             if ($old_post->isEmpty()) {
                                 # Post
-                                $cur_post->setField('user_id', App::auth()->userID());
+                                $cur_post->setField('user_id', $s->user);
                                 $cur_post->setField('post_format', 'xhtml');
                                 $cur_post->setField('post_status', $s->post_status_new ? App::status()->post()::PUBLISHED : App::status()->post()::UNPUBLISHED);
                                 $cur_post->setField('post_open_comment', 0);
@@ -641,6 +636,12 @@ class ZoneclearFeedServer
                                     App::blog()->addPost(...),
                                     $cur_post
                                 );
+                                $post_id = is_numeric($post_id) ? (int) $post_id : 0;
+
+                                # Entry date is in blog timezone, whoever is the current user (may be nobody on frontend)
+                                $cur_tz = App::blog()->openPostCursor();
+                                $cur_tz->setField('post_tz', $tz);
+                                $cur_tz->update('WHERE post_id = ' . $post_id);
 
                                 # Auto tweet new post
                                 if (!empty($cur_post->getField('post_status'))) {
@@ -719,14 +720,15 @@ class ZoneclearFeedServer
                             $formated_tags = [];
                             foreach ($tags as $tag) {
                                 # Change tags case
+                                $tag = self::toUTF8($tag);
                                 switch ((int) $s->tag_case) {
-                                    case 3: $tag = strtoupper($tag);
+                                    case 3: $tag = mb_strtoupper($tag);
 
                                         break;
-                                    case 2: $tag = strtolower($tag);
+                                    case 2: $tag = mb_strtolower($tag);
 
                                         break;
-                                    case 1: $tag = ucfirst(strtolower($tag));
+                                    case 1: $tag = mb_strtoupper(mb_substr($tag, 0, 1)) . mb_strtolower(mb_substr($tag, 1));
 
                                         break;
                                     default: /* do nothing */                 break;
@@ -747,8 +749,7 @@ class ZoneclearFeedServer
                                     );
                                 }
                             }
-                        } catch (Exception $e) {
-                            $this->enableUser(false);
+                        } catch (Throwable $e) {
                             $this->unlockUpdate();
 
                             throw $e;
@@ -760,37 +761,25 @@ class ZoneclearFeedServer
                 App::behavior()->callBehavior('zoneclearFeedServerAfterCheckFeedUpdate', $row);
             }
         }
-        if ($enabled) {
-            $this->enableUser(false);
-        }
         $this->unlockUpdate();
 
         return true;
     }
 
     /**
-     * Set permission to update post table.
+     * Get a valid UTF-8 string from a feed value.
      *
-     * @param  boolean $enable Enable or disable perm
+     * Database (ie PostgreSQL) refuses invalid UTF-8 sequences.
+     *
+     * @param   mixed   $str    The value
+     *
+     * @return  string  The valid UTF-8 string
      */
-    public function enableUser(bool $enable = false): void
+    private static function toUTF8(mixed $str): string
     {
-        # Enable
-        if ($enable) {
-            // backup current user
-            if (!App::auth()->userID()) {
-                throw new Exception('Unable to backup user');
-            }
-            $this->user = App::auth()->userID();
-            // set zcfs posts user
-            if (!App::auth()->checkUser($this->settings->user)) {
-                throw new Exception('Unable to set user');
-            }
-            # Disable
-        } else {
-            // restore current user
-            App::auth()->checkUser($this->user ?? '');
-        }
+        $str = is_string($str) ? $str : '';
+
+        return mb_check_encoding($str, 'UTF-8') ? $str : (string) mb_scrub($str, 'UTF-8');
     }
 
     /**
