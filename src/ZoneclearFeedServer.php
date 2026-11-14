@@ -72,13 +72,6 @@ class ZoneclearFeedServer
     private static $lock = null;
 
     /**
-     * Affiliate user ID.
-     *
-     * @var     null|string     $user
-     */
-    private $user = null;
-
-    /**
      * Constructor load settings.
      */
     protected function __construct()
@@ -497,7 +490,8 @@ class ZoneclearFeedServer
         }
 
         $tz = App::blog()->settings()->get('system')->get('blog_timezone');
-        Date::setTZ(is_string($tz) ? $tz : 'UTC');
+        $tz = is_string($tz) ? $tz : 'UTC';
+        Date::setTZ($tz);
         $time = time();
 
         # All feeds or only one (from admin)
@@ -528,13 +522,11 @@ class ZoneclearFeedServer
              || $i < $s->update_limit && $row->status == 1 && ($time > $row->upd_last + $row->upd_int)
             ) {
                 if (!$enabled) {
-                    # Set feeds user
-                    try {
-                        $this->enableUser(true);
-                    } catch (Exception $e) {
+                    # Check feeds user
+                    if (App::users()->getUser($s->user)->isEmpty()) {
                         $this->unlockUpdate();
 
-                        throw $e;
+                        throw new Exception('Unable to set user');
                     }
                     $enabled = true;
                 }
@@ -631,7 +623,7 @@ class ZoneclearFeedServer
                             # Create entry
                             if ($old_post->isEmpty()) {
                                 # Post
-                                $cur_post->setField('user_id', App::auth()->userID());
+                                $cur_post->setField('user_id', $s->user);
                                 $cur_post->setField('post_format', 'xhtml');
                                 $cur_post->setField('post_status', $s->post_status_new ? App::status()->post()::PUBLISHED : App::status()->post()::UNPUBLISHED);
                                 $cur_post->setField('post_open_comment', 0);
@@ -641,6 +633,12 @@ class ZoneclearFeedServer
                                     App::blog()->addPost(...),
                                     $cur_post
                                 );
+                                $post_id = is_numeric($post_id) ? (int) $post_id : 0;
+
+                                # Entry date is in blog timezone, whoever is the current user (may be nobody on frontend)
+                                $cur_tz = App::blog()->openPostCursor();
+                                $cur_tz->setField('post_tz', $tz);
+                                $cur_tz->update('WHERE post_id = ' . $post_id);
 
                                 # Auto tweet new post
                                 if (!empty($cur_post->getField('post_status'))) {
@@ -748,7 +746,6 @@ class ZoneclearFeedServer
                                 }
                             }
                         } catch (Exception $e) {
-                            $this->enableUser(false);
                             $this->unlockUpdate();
 
                             throw $e;
@@ -760,37 +757,9 @@ class ZoneclearFeedServer
                 App::behavior()->callBehavior('zoneclearFeedServerAfterCheckFeedUpdate', $row);
             }
         }
-        if ($enabled) {
-            $this->enableUser(false);
-        }
         $this->unlockUpdate();
 
         return true;
-    }
-
-    /**
-     * Set permission to update post table.
-     *
-     * @param  boolean $enable Enable or disable perm
-     */
-    public function enableUser(bool $enable = false): void
-    {
-        # Enable
-        if ($enable) {
-            // backup current user
-            if (!App::auth()->userID()) {
-                throw new Exception('Unable to backup user');
-            }
-            $this->user = App::auth()->userID();
-            // set zcfs posts user
-            if (!App::auth()->checkUser($this->settings->user)) {
-                throw new Exception('Unable to set user');
-            }
-            # Disable
-        } else {
-            // restore current user
-            App::auth()->checkUser($this->user ?? '');
-        }
     }
 
     /**
