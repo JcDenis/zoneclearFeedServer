@@ -1,3 +1,17 @@
+zoneclearFeedServer 2026.11.15
+===========================================================
+* Add Claude to contributors
+* Fix feeds update on SQLite (nested transaction)
+* Fix entries filters of a feed and feed without category
+* Fix status icons
+* Fix sources and entries counts and their translation
+* Remove broken cron script
+* Fix feeds update from public side (no more user switch)
+* Update feeds through Ajax without jQuery
+* Fix feeds update with invalid UTF-8 content
+* Add a user guide in French, with screenshots
+* Add admin help in English and French, one block per page
+
 zoneclearFeedServer 2026.11.06
 ===========================================================
 * Fix CHANGELOG
