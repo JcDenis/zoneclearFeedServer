@@ -248,6 +248,6 @@ class Config
             ])
             ->render();
 
-        Page::helpBlock('zoneclearFeedServer');
+        Page::helpBlock(My::id() . '-config');
     }
 }
