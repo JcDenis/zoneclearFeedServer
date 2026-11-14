@@ -76,7 +76,7 @@ class ManageFeed
             if (!$z::validateURL($v->feed)) {
                 App::error()->add(__('You must provide valid feed URL.'));
             }
-            if (App::blog()->getCategory($v->cat_id)->isEmpty()) {
+            if ($v->cat_id && App::blog()->getCategory($v->cat_id)->isEmpty()) {
                 App::error()->add(__('You must provide valid category.'));
             }
 
@@ -383,10 +383,8 @@ class ManageFeed
             # show posts filters
             $post_filter->display(
                 ['admin.plugin.' . My::id(),'#entries'],
-                My::manageUrl([
-                    'part'    => 'feed',
-                    'feed_id' => $v->id,
-                ])
+                (new Hidden('part', 'feed'))->render() .
+                (new Hidden('feed_id', (string) $v->id))->render()
             );
 
             # fix pager url
