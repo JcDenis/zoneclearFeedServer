@@ -1,6 +1,5 @@
 zoneclearFeedServer 2026.11.15
 ===========================================================
-* Add Claude to contributors
 * Fix feeds update on SQLite (nested transaction)
 * Fix entries filters of a feed and feed without category
 * Fix status icons
