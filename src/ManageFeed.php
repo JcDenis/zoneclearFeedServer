@@ -428,6 +428,8 @@ class ManageFeed
             echo '</div>';
         }
 
+        Page::helpBlock(My::id() . '-feed');
+
         Page::closeModule();
     }
 }

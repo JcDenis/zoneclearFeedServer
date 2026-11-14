@@ -190,6 +190,8 @@ class Manage
             );
         }
 
+        Page::helpBlock(My::id() . '-feeds');
+
         Page::closeModule();
     }
 }

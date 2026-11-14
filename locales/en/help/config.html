@@ -1,15 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <html>
   <head>
-    <title>Configure ZoneclearFeedServer</title>
+    <title>Configure Feeds server</title>
   </head>
   <body>
-    <h3>Informations</h3>
-    <ul>
-      <li>A writable cache folder is required to use this plugin.</li>
-      <li>If you set a large number of feeds to update at one time, this may cause a timeout error. We recommand to keep it to one.</li>
-      <li>If you use cron script, you can disable public update.</li>
-      <li>In order to do update through Ajax, your theme must have behavior publicHeadContent.</li>
-    </ul>
+    <dl>
+      <dt>Plugin and entries</dt>
+      <dd>Enable the plugin, then choose the status of new entries, their owner and how imported tags are transformed.</dd>
+      <dt>Public update</dt>
+      <dd>Feeds can be updated when a visitor loads a page (before or after display, or through Ajax). With Ajax, your theme must have the behavior publicHeadContent. Keep the number of feeds updated at one time to 1, a large number may cause a timeout.</dd>
+      <dt>Public side</dt>
+      <dd>Enable the public page of sources, choose where entry titles link to the original entry and where the full content is shown.</dd>
+      <dt>Requirement</dt>
+      <dd>A writable cache folder is required.</dd>
+    </dl>
   </body>
 </html>
