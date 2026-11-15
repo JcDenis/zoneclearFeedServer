@@ -17,10 +17,14 @@ use Dotclear\Schema\Extension\PostPublic;
  *
  * Posts record extension to integrate feed info.
  *
+ * This class must not extend Post: record extensions take all public static
+ * methods, inherited ones would replace those of other plugins (ex: FrontendSession
+ * commentsActive()). Other methods are called through zcFeedBrother().
+ *
  * @author      Jean-Christian Denis
  * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-class RsExtPosts extends Post
+class RsExtPosts
 {
     /** @var    array<string,mixed>     $brother_extensions     Stack posts record extensions */
     public static array $brother_extensions = [];
