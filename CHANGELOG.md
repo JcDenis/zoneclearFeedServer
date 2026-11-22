@@ -1,3 +1,8 @@
+zoneclearFeedServer 2026.11.23
+===========================================================
+* [new] Feeds for an AI assistant connected with ClaudetteMcp (list_feeds, set_feed)
+* [new] Family of the ClaudetteMcp tools, for the keys limited to some families
+
 zoneclearFeedServer 2026.11.22
 ===========================================================
 * [compat] Use adminFiltersListsV3 behavior
