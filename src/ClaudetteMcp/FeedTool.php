@@ -36,6 +36,14 @@ abstract class FeedTool extends McpTool
     ];
 
     /**
+     * Family of tools for the keys of ClaudetteMcp (string, not constant: older ClaudetteMcp versions have none).
+     */
+    public function family(): string
+    {
+        return 'extras';
+    }
+
+    /**
      * Like in backend: the plugin must be configured on the blog (active, with a user for its entries),
      * its page is for blog administrators.
      */
