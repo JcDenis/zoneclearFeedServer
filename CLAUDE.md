@@ -17,6 +17,8 @@ Required Dotclear and PHP versions: see `_define.php`.
 
 ## Structure
 
+* `src/ClaudetteMcp/`: tools for the plugin ClaudetteMcp (`list_feeds`, `set_feed`, never required), registered in `src/Frontend.php`
+  with the behavior `ClaudetteMcpAddTool`, before anything that depends on the page type.
 * `src/ActivityReportAction.php`: add feeds actions to the plugin activity report.
 * `src/Backend.php`: admin side: menu entry, favorites, behaviors registration.
 * `src/BackendBehaviors.php`: admin behaviors.
@@ -49,7 +51,7 @@ Required Dotclear and PHP versions: see `_define.php`.
 * Database table `zc_feed`.
 * URL handlers: `zoneclearFeedsPage`.
 * Widgets: `zcfssource`, `zcfsnumber`.
-* Behaviors used: `publicBeforeDocumentV2`, `publicAfterDocumentV2`, `publicHeadContent`, `adminBeforePostDelete`, `initWidgets`, `UninstallerCleanersConstruct`, `adminDashboardFavoritesV2`, `adminColumnsListsV2`, `adminFiltersListsV3`, `adminPostListHeaderV2`, `adminPostListValueV2`, `adminPostHeaders`, `adminPostFormItems`, `coreBlogGetPosts`, `publicBreadcrumb`.
+* Behaviors used: `ClaudetteMcpAddTool`, `publicBeforeDocumentV2`, `publicAfterDocumentV2`, `publicHeadContent`, `adminBeforePostDelete`, `initWidgets`, `UninstallerCleanersConstruct`, `adminDashboardFavoritesV2`, `adminColumnsListsV2`, `adminFiltersListsV3`, `adminPostListHeaderV2`, `adminPostListValueV2`, `adminPostHeaders`, `adminPostFormItems`, `coreBlogGetPosts`, `publicBreadcrumb`.
 
 ## Pitfalls
 

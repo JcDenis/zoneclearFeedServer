@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\zoneclearFeedServer;
 
+use ArrayObject;
 use Dotclear\App;
 use Dotclear\Helper\Process\TraitProcess;
 use Dotclear\Database\MetaRecord;
@@ -31,6 +32,12 @@ class Frontend
         if (!self::status()) {
             return false;
         }
+
+        // Tools for AI assistants connected to the blog with the plugin ClaudetteMcp (never required)
+        App::behavior()->addBehavior('ClaudetteMcpAddTool', function (ArrayObject $tools): void {
+            $tools->append(new ClaudetteMcp\ListFeeds());
+            $tools->append(new ClaudetteMcp\SetFeed());
+        });
 
         $s = ZoneclearFeedServer::instance()->settings;
 

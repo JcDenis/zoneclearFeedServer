@@ -11,6 +11,7 @@ Ce guide explique comment mélanger votre blog Dotclear avec un « planet » : l
 5. [Les billets importés](#les-billets-importés)
 6. [Afficher les sources sur le site](#afficher-les-sources-sur-le-site)
 7. [Favori et préférences](#favori-et-préférences)
+8. [Avec un assistant IA](#avec-un-assistant-ia)
 
 ## Configurer l'extension
 
@@ -141,3 +142,14 @@ Dans **Préférences › Mon tableau de bord**, ajoutez **Serveur de flux** à v
 Dans **Préférences › Mes options**, vous choisissez les colonnes affichées dans les listes « Serveur de flux : Flux » et « Serveur de flux : Billets », ainsi que le tri et le nombre d'éléments par page.
 
 ![Colonnes des listes](img/preferences-colonnes.png)
+
+## Avec un assistant IA
+
+Avec le plugin [ClaudetteMcp](https://github.com/JcDenis/ClaudetteMcp), un assistant IA connecté au blog peut gérer les flux,
+si l'extension est configurée et si vous êtes administrateur du blog :
+
+* `list_feeds` : lister les flux avec leur état (activé, dernière mise à jour, flux en retard) ;
+* `set_feed` : ajouter un flux, le modifier, l'activer ou le désactiver.
+
+Un flux ajouté par l'assistant est désactivé : activez-le, ou demandez-le à l'assistant, une fois vérifié.
+L'assistant ne supprime jamais de flux. _ClaudetteMcp_ n'est pas nécessaire au fonctionnement de _zoneclearFeedServer_.
