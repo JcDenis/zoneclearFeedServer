@@ -25,7 +25,7 @@ $this->registerModule(
     'Jean-Christian Denis, BG, Pierre Van Glabeke',
     '2026.11.23',
     [
-        'requires'    => [['core', '2.39']],
+        'requires'    => [['core', '2.39'], ['ClaudetteMcp?', '0.5']],
         'permissions' => 'My',
         'type'        => 'plugin',
         'support'     => 'https://github.com/JcDenis/' . $this->id . '/issues',

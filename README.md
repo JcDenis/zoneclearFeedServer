@@ -34,7 +34,7 @@ Once it's done you can manage your feeds from menu
 
 With the plugin [ClaudetteMcp](https://github.com/JcDenis/ClaudetteMcp), an AI assistant connected to the blog
 can list the feeds with their state (`list_feeds`) and add, update, enable or disable a feed (`set_feed`),
-with the permissions of a blog administrator, never deleting one. ClaudetteMcp is not required by _zoneclearFeedServer_.
+with the permissions of a blog administrator, never deleting one. ClaudetteMcp is optional for _zoneclearFeedServer_ (version 0.5 or later).
 
 ## LINKS
 

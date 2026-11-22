@@ -17,7 +17,7 @@ Required Dotclear and PHP versions: see `_define.php`.
 
 ## Structure
 
-* `src/ClaudetteMcp/`: tools for the plugin ClaudetteMcp (`list_feeds`, `set_feed`, never required), registered in `src/Frontend.php`
+* `src/ClaudetteMcp/`: tools for the plugin ClaudetteMcp (`list_feeds`, `set_feed`, optional dependency `ClaudetteMcp?` in `requires`), registered in `src/Frontend.php`
   with the behavior `ClaudetteMcpAddTool`, before anything that depends on the page type.
 * `src/ActivityReportAction.php`: add feeds actions to the plugin activity report.
 * `src/Backend.php`: admin side: menu entry, favorites, behaviors registration.
