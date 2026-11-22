@@ -61,7 +61,7 @@ class Backend
         App::behavior()->addBehaviors([
             'adminDashboardFavoritesV2' => BackendBehaviors::adminDashboardFavoritesV2(...),
             'adminColumnsListsV2'       => BackendBehaviors::adminColumnsListsV2(...),
-            'adminFiltersListsV2'       => BackendBehaviors::adminFiltersListsV2(...),
+            'adminFiltersListsV3'       => BackendBehaviors::adminFiltersListsV3(...),
             'adminPostListHeaderV2'     => BackendBehaviors::adminPostListHeaderV2(...),
             'adminPostListValueV2'      => BackendBehaviors::adminPostListValueV2(...),
             'adminPostHeaders'          => BackendBehaviors::adminPostHeaders(...),

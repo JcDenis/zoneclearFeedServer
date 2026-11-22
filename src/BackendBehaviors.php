@@ -7,6 +7,7 @@ namespace Dotclear\Plugin\zoneclearFeedServer;
 use ArrayObject;
 use Dotclear\App;
 use Dotclear\Core\Backend\Favorites;
+use Dotclear\Core\Backend\UserPrefFilter;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\Html\Form\Div;
 use Dotclear\Helper\Html\Form\Link;
@@ -92,26 +93,30 @@ class BackendBehaviors
     /**
      * Lists filter.
      *
-     * @param   ArrayObject<string, mixed>  $sorts
+     * @param   ArrayObject<array-key, UserPrefFilter>  $filters
      */
-    public static function adminFiltersListsV2(ArrayObject $sorts): void
+    public static function adminFiltersListsV3(ArrayObject $filters): void
     {
         // feeds
-        $sorts[My::id() . 'feeds'] = [
+        $filters->append(new UserPrefFilter(
+            My::id() . 'feeds',
             __('Feeds server: Feeds'),
             Combo::feedsSortby(),
             'lowername',
             'asc',
-            [__('feeds per page'), 30],
-        ];
+            __('feeds per page'),
+            30
+        ));
         // feed posts
-        $sorts[My::id() . 'posts'] = [
+        $filters->append(new UserPrefFilter(
+            My::id() . 'posts',
             __('Feeds server: Entries'),
             Combo::postsSortby(),
             'post_dt',
             'desc',
-            [__('entries per page'), 30],
-        ];
+            __('entries per page'),
+            30
+        ));
     }
 
     /**
