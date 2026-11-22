@@ -1,3 +1,8 @@
+zoneclearFeedServer 2026.11.22
+===========================================================
+* [compat] Use adminFiltersListsV3 behavior
+* [compat] Use dotclear.toggleWithLegend() instead of deprecated jQuery plugin
+
 zoneclearFeedServer 2026.11.15
 ===========================================================
 * Fix feeds update on SQLite (nested transaction)
