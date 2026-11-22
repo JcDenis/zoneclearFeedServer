@@ -49,7 +49,7 @@ Required Dotclear and PHP versions: see `_define.php`.
 * Database table `zc_feed`.
 * URL handlers: `zoneclearFeedsPage`.
 * Widgets: `zcfssource`, `zcfsnumber`.
-* Behaviors used: `publicBeforeDocumentV2`, `publicAfterDocumentV2`, `publicHeadContent`, `adminBeforePostDelete`, `initWidgets`, `UninstallerCleanersConstruct`, `adminDashboardFavoritesV2`, `adminColumnsListsV2`, `adminFiltersListsV2`, `adminPostListHeaderV2`, `adminPostListValueV2`, `adminPostHeaders`, `adminPostFormItems`, `coreBlogGetPosts`, `publicBreadcrumb`.
+* Behaviors used: `publicBeforeDocumentV2`, `publicAfterDocumentV2`, `publicHeadContent`, `adminBeforePostDelete`, `initWidgets`, `UninstallerCleanersConstruct`, `adminDashboardFavoritesV2`, `adminColumnsListsV2`, `adminFiltersListsV3`, `adminPostListHeaderV2`, `adminPostListValueV2`, `adminPostHeaders`, `adminPostFormItems`, `coreBlogGetPosts`, `publicBreadcrumb`.
 
 ## Pitfalls
 
