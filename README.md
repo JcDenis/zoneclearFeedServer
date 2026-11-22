@@ -32,6 +32,10 @@ go to ''configure plugin'', fill in form.
 Once it's done you can manage your feeds from menu 
 ''Feeds server'' on sidebar or you can add dashboard icon.
 
+With the plugin [ClaudetteMcp](https://github.com/JcDenis/ClaudetteMcp), an AI assistant connected to the blog
+can list the feeds with their state (`list_feeds`) and add, update, enable or disable a feed (`set_feed`),
+with the permissions of a blog administrator, never deleting one. ClaudetteMcp is not required by _zoneclearFeedServer_.
+
 ## LINKS
 
 * [License](https://github.com/JcDenis/zoneclearFeedServer/blob/master/LICENSE)
